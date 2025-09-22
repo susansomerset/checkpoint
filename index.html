@@ -3,31 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkpoint</title>
+    <title>Checkpoint - Student Data Viewer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            min-height: 100vh;
         }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
         h1 {
-            font-size: 4rem;
+            text-align: center;
+            font-size: 3rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            animation: pulse 2s infinite;
+            margin-bottom: 30px;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .json-viewer {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 200px;
+        }
+        
+        .json-content {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .loading {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.8;
+        }
+        
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            color: #51cf66;
+            background: rgba(81, 207, 102, 0.1);
+            border: 1px solid rgba(81, 207, 102, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <h1>CHECKPOINT!</h1>
+    <div class="container">
+        <h1>CHECKPOINT!</h1>
+        <div class="controls">
+            <button id="fetchDataBtn" onclick="fetchStudentData()">Fetch Student Data</button>
+        </div>
+        <div class="json-viewer">
+            <div id="jsonContent" class="json-content">
+                Click "Fetch Student Data" to load data from the server...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchStudentData() {
+            const button = document.getElementById('fetchDataBtn');
+            const content = document.getElementById('jsonContent');
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.textContent = 'Loading...';
+            content.innerHTML = '<div class="loading">Fetching data from server...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/getStudentData');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display the JSON data in a formatted way
+                content.innerHTML = `<div class="success">✓ Data fetched successfully!</div><div class="json-content">${JSON.stringify(data, null, 2)}</div>`;
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                content.innerHTML = `<div class="error">✗ Error: ${error.message}</div><div class="json-content">Make sure the server is running on port 3001</div>`;
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = 'Fetch Student Data';
+            }
+        }
+    </script>
 </body>
 </html>
