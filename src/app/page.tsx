@@ -1,9 +1,15 @@
 'use client';
 
 function AuthButtons() {
+  const handleLogin = () => {
+    window.location.href = '/api/auth/login';
+  };
+
   return (
     <div className="flex gap-3">
-      <a href="/api/auth/login" className="underline">Log in</a>
+      <button onClick={handleLogin} className="underline" style={{ background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+        Log in
+      </button>
     </div>
   );
 }

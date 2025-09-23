@@ -58,9 +58,12 @@ export default function DashboardPage() {
     <main style={{ padding: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>Dashboard</h1>
-        <a href="/api/auth/logout" style={{ color: '#666', textDecoration: 'underline' }}>
+        <button 
+          onClick={() => window.location.href = '/api/auth/logout'} 
+          style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+        >
           Log out
-        </a>
+        </button>
       </div>
       <p>Retrieve the latest <code>studentData</code> JSON.</p>
       <button onClick={getStudentData} disabled={loading}>
