@@ -1,0 +1,14 @@
+{
+  "/api/auth/[auth0]/route": "app/api/auth/[auth0]/route.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/api/student-data/reset/route": "app/api/student-data/reset/route.js",
+  "/api/kv-smoke/route": "app/api/kv-smoke/route.js",
+  "/api/student-data/route": "app/api/student-data/route.js",
+  "/auth/profile/route": "app/auth/profile/route.js",
+  "/api/student-data/update/route": "app/api/student-data/update/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/page": "app/page.js",
+  "/settings/page": "app/settings/page.js"
+}
