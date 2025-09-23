@@ -41,6 +41,28 @@ export default function DashboardPage() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [data, setData] = React.useState<Record<string, unknown> | null>(null);
+  const [sessionValid, setSessionValid] = React.useState<boolean | null>(null);
+  const [validating, setValidating] = React.useState(true);
+
+  // Validate session on component mount
+  React.useEffect(() => {
+    async function validateSession() {
+      try {
+        const res = await fetch('/api/auth/validate', { 
+          cache: 'no-store',
+          credentials: 'include'
+        });
+        const result = await res.json();
+        setSessionValid(result.valid);
+      } catch {
+        setSessionValid(false);
+      } finally {
+        setValidating(false);
+      }
+    }
+    
+    validateSession();
+  }, []);
 
   async function getStudentData() {
     setLoading(true); setError(null);
@@ -56,11 +78,26 @@ export default function DashboardPage() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading || validating) {
     return (
       <main style={{ padding: 24 }}>
         <h1>Dashboard</h1>
         <p>Loading...</p>
+      </main>
+    );
+  }
+
+  if (sessionValid === false) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Dashboard</h1>
+        <p>Hello, stranger! Your session is no longer valid. Please log in again.</p>
+        <button 
+          onClick={() => window.location.href = '/api/auth/login'} 
+          style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          Log in
+        </button>
       </main>
     );
   }
