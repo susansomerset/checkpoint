@@ -10,7 +10,7 @@
     "prebuild": "node scripts/no-smoke-on-main.js || true"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^4.10.0",
+    "@auth0/nextjs-auth0": "^3.8.0",
     "@upstash/redis": "^1.25.0",
     "dotenv": "^16.4.5",
     "next": "15.5.3",

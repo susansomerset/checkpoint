@@ -83,15 +83,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
-// Validate ../../src/app/api/auth/me/route.ts
-{
-  type __IsExpected<Specific extends RouteHandlerConfig<"/api/auth/me">> = Specific
-  const handler = {} as typeof import("../../src/app/api/auth/me/route.js")
-  type __Check = __IsExpected<typeof handler>
-  // @ts-ignore
-  type __Unused = __Check
-}
-
 // Validate ../../src/app/api/kv-smoke/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/kv-smoke">> = Specific
@@ -123,15 +114,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/student-data/update">> = Specific
   const handler = {} as typeof import("../../src/app/api/student-data/update/route.js")
-  type __Check = __IsExpected<typeof handler>
-  // @ts-ignore
-  type __Unused = __Check
-}
-
-// Validate ../../src/app/auth/profile/route.ts
-{
-  type __IsExpected<Specific extends RouteHandlerConfig<"/auth/profile">> = Specific
-  const handler = {} as typeof import("../../src/app/auth/profile/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
