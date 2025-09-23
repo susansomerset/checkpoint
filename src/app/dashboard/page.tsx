@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
 
 function Toggle({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
@@ -59,9 +58,9 @@ export default function DashboardPage() {
     <main style={{ padding: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>Dashboard</h1>
-        <Link href="/api/auth/logout" style={{ color: '#666', textDecoration: 'underline' }}>
+        <a href="/api/auth/logout" style={{ color: '#666', textDecoration: 'underline' }}>
           Log out
-        </Link>
+        </a>
       </div>
       <p>Retrieve the latest <code>studentData</code> JSON.</p>
       <button onClick={getStudentData} disabled={loading}>

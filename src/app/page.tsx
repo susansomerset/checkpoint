@@ -1,11 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-
 function AuthButtons() {
   return (
     <div className="flex gap-3">
-      <Link href="/api/auth/login" className="underline">Log in</Link>
+      <a href="/api/auth/login" className="underline">Log in</a>
     </div>
   );
 }
