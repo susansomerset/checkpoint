@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 function Toggle({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
@@ -36,6 +37,7 @@ function JsonNode({ data, label }: { data: unknown; label: string }) {
 }
 
 export default function DashboardPage() {
+  const { user, error: authError, isLoading } = useUser();
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [data, setData] = React.useState<Record<string, unknown> | null>(null);
@@ -54,6 +56,45 @@ export default function DashboardPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Dashboard</h1>
+        <p>Loading...</p>
+      </main>
+    );
+  }
+
+  if (authError) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Dashboard</h1>
+        <p>Error: {authError.message}</p>
+        <button 
+          onClick={() => window.location.href = '/api/auth/logout'} 
+          style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          Log out
+        </button>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Dashboard</h1>
+        <p>Hello, stranger! You need to be logged in to access the dashboard.</p>
+        <button 
+          onClick={() => window.location.href = '/api/auth/login'} 
+          style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          Log in
+        </button>
+      </main>
+    );
+  }
+
   return (
     <main style={{ padding: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -65,7 +106,7 @@ export default function DashboardPage() {
           Log out
         </button>
       </div>
-      <p>Retrieve the latest <code>studentData</code> JSON.</p>
+      <p>Hello, {user.name || user.email || 'User'}! Retrieve the latest <code>studentData</code> JSON.</p>
       <button onClick={getStudentData} disabled={loading}>
         {loading ? 'Loading…' : 'Get Student Data'}
       </button>

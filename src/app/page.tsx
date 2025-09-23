@@ -31,7 +31,11 @@ export default function Home() {
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      // Small delay to show the greeting before redirect
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+      return () => clearTimeout(timer);
     }
   }, [user, router]);
 
@@ -40,6 +44,16 @@ export default function Home() {
       <main style={{ padding: 24 }}>
         <h1>Checkpoint</h1>
         <p>Loading...</p>
+      </main>
+    );
+  }
+
+  if (user) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Checkpoint</h1>
+        <p>Hello, {user.name || user.email || 'User'}! Redirecting to dashboard...</p>
+        <AuthButtons />
       </main>
     );
   }
@@ -57,7 +71,7 @@ export default function Home() {
   return (
     <main style={{ padding: 24 }}>
       <h1>Checkpoint</h1>
-      <p>Sign in to view your dashboard.</p>
+      <p>Hello, stranger! Sign in to view your dashboard.</p>
       <AuthButtons />
     </main>
   );
