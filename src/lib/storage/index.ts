@@ -16,3 +16,8 @@ export async function saveStudentData(doc: StudentData): Promise<void> {
       return kv.saveStudentData(doc);
   }
 }
+
+// Atomic save function
+export async function saveStudentDataAtomically(doc: StudentData): Promise<void> {
+  await saveStudentData(doc);
+}

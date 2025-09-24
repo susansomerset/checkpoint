@@ -13,3 +13,12 @@ export async function loadStudentData(): Promise<StudentData | null> {
 export async function saveStudentData(doc: StudentData): Promise<void> {
   mockStorage[KEY] = JSON.stringify(doc);
 }
+
+// Simple get/set for test data
+export async function get(key: string): Promise<string | null> {
+  return mockStorage[key] || null;
+}
+
+export async function set(key: string, value: string): Promise<void> {
+  mockStorage[key] = value;
+}

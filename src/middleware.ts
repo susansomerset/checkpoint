@@ -6,6 +6,6 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/settings/:path*',
-    '/api/student-data/:path*',
+    // ❌ Removed '/api/student-data/:path*' - protect APIs in-route instead
   ],
 };
