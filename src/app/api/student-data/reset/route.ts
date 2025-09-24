@@ -2,17 +2,13 @@ export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
-import { getCoursesForSelf, getCoursesForStudent } from '@/lib/canvas/courses';
+import { getCoursesForStudent } from '@/lib/canvas/courses';
 import { getAssignments } from '@/lib/canvas/assignments';
 import { getSubmissionsForStudent } from '@/lib/canvas/submissions';
 import { getObservees } from '@/lib/canvas/observees';
 import { buildStudentData } from '@/lib/student/builder';
+import { saveStudentData } from '@/lib/storage';
 import * as kv from '@/lib/storage/kv';
-
-// Simple storage function for test data
-async function saveTestData(data: any): Promise<void> {
-  await kv.set('test-student-data', JSON.stringify(data));
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,14 +20,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const startTime = Date.now();
-    console.log(`ZXQ Reset Start: ${new Date().toISOString()} - 0ms`);
+    // const startTime = Date.now(); // Not used in current implementation
+    
+    // Phase M - Meta overlays
+    const metaStartTime = Date.now();
+    // TODO: Add meta data reading when available
+    const metaEndTime = Date.now();
+    console.info(`ZXQ reset.meta: ${metaEndTime - metaStartTime}ms`);
     
     const fetchStartTime = Date.now();
-    // Get observees from the correct endpoint
+    // Phase F1 - Observees (kids)
     const observees = await getObservees();
+    const f1EndTime = Date.now();
+    console.info(`ZXQ reset.fetch.observees: ${f1EndTime - fetchStartTime}ms (count=${observees.length})`);
     
-    // Get courses for each observee and add student ID to each course
+    // STOP if no observees
+    if (observees.length === 0) {
+      return NextResponse.json({ ok: false, step: 'observees' }, { status: 400 });
+    }
+    
+    // Phase F2 - Courses per student (paginated)
     const allCourses: any[] = [];
     for (const observee of observees) {
       const courses = await getCoursesForStudent(String(observee.id));
@@ -44,41 +52,61 @@ export async function POST(req: NextRequest) {
       allCourses.push(...coursesWithStudentId);
     }
     
-    // Get assignments for all courses (parallel, no cap for testing)
-    // Only fetch assignments for courses where we have observees enrolled
-    // All courses are already associated with observees
+    const f2EndTime = Date.now();
+    console.info(`ZXQ reset.fetch.courses: ${f2EndTime - fetchStartTime}ms (students=${observees.length}, totalCourses=${allCourses.length}, paginatedCalls≈${observees.length})`);
     
-    const assignmentPromises = allCourses.map(course => {
-      
-      return getAssignments(String(course.id)).then(assignments => ({
-        courseId: String(course.id),
+    // STOP if no courses
+    if (allCourses.length === 0) {
+      return NextResponse.json({ ok: false, step: 'courses' }, { status: 400 });
+    }
+    
+    // Phase F3 - Assignments per unique course (paginated)
+    const uniqueCourses = Array.from(new Set(allCourses.map(c => c.id)));
+    let deniedAssignments = 0;
+    const assignmentPromises = uniqueCourses.map(courseId => {
+      return getAssignments(String(courseId)).then(assignments => ({
+        courseId: String(courseId),
         assignments
       })).catch((error: any) => {
-        return {
-          courseId: String(course.id),
-          courseName: course.name,
-          assignments: [],
-          error: error.message
-        };
+        if (error.message.includes('403')) {
+          console.warn(`ZXQ WARN: 403 for assignments in course ${courseId} - continuing`);
+          deniedAssignments++;
+          return {
+            courseId: String(courseId),
+            assignments: [],
+            denied: true
+          };
+        } else {
+          console.error(`ZXQ Error fetching assignments for course ${courseId}:`, error.message);
+          throw error; // Re-throw non-403 errors to trigger stop rule
+        }
       });
     });
+    
     const assignmentResults = await Promise.all(assignmentPromises);
     const assignmentsByCourse = assignmentResults.reduce((acc, { courseId, assignments }) => {
       acc[courseId] = assignments;
       return acc;
     }, {} as Record<string, any[]>);
     
-    // Get submissions for each (course, observee) combination (no cap for testing)
-    // Only fetch submissions for students who actually have observer enrollments in that specific course
-    const submissionPromises: Promise<{ courseId: string; studentId: string; submissions: any[] }>[] = [];
+    const f3EndTime = Date.now();
+    const fetchedAssignments = Object.values(assignmentsByCourse).flat().length;
+    console.info(`ZXQ reset.fetch.assignments: ${f3EndTime - fetchStartTime}ms (uniqueCourses=${uniqueCourses.length}, paginatedCalls≈${uniqueCourses.length}, totalAssignments=${fetchedAssignments}, deniedCourses=${deniedAssignments})`);
+    
+    // STOP if all courses denied assignments
+    if (deniedAssignments === uniqueCourses.length && uniqueCourses.length > 0) {
+      return NextResponse.json({ ok: false, step: 'assignments' }, { status: 403 });
+    }
+    
+    // Phase F4 - Submissions per (kid, course) bulk + paginated
+    const submissionPromises: Promise<{ courseId: string; studentId: string; submissions: any[]; denied?: boolean }>[] = [];
+    let deniedPairs = 0;
     
     for (const course of allCourses) {
-      
       // Find which observee this course belongs to
       const courseObservee = observees.find(obs => 
         course.enrollments?.some((e: any) => e.type === 'student' && e.user_id === obs.id)
       );
-      
       
       if (courseObservee) {
         submissionPromises.push(
@@ -89,14 +117,19 @@ export async function POST(req: NextRequest) {
               submissions
             }))
             .catch((error: any) => {
-              console.error(`ZXQ Error fetching submissions for course ${course.id} (${course.name}), student ${courseObservee.id}:`, error.message);
-              return {
-                courseId: String(course.id),
-                courseName: course.name,
-                studentId: String(courseObservee.id),
-                submissions: [],
-                error: error.message
-              };
+              if (error.message.includes('403')) {
+                console.warn(`ZXQ WARN: 403 for course ${course.id}, student ${courseObservee.id} - continuing`);
+                deniedPairs++;
+                return {
+                  courseId: String(course.id),
+                  studentId: String(courseObservee.id),
+                  submissions: [],
+                  denied: true
+                };
+              } else {
+                console.error(`ZXQ Error fetching submissions for course ${course.id}, student ${courseObservee.id}:`, error.message);
+                throw error; // Re-throw non-403 errors to trigger stop rule
+              }
             })
         );
       }
@@ -109,14 +142,21 @@ export async function POST(req: NextRequest) {
       return acc;
     }, {} as Record<string, Record<string, any[]>>);
     
+    const f4EndTime = Date.now();
+    const totalSubmissions = Object.values(submissionsByCourseAndStudent).flatMap(courseSubs => Object.values(courseSubs)).flat().length;
+    const totalPairs = submissionPromises.length;
+    console.info(`ZXQ reset.fetch.submissions: ${f4EndTime - fetchStartTime}ms (pairs=${totalPairs}, paginatedCalls≈${totalPairs}, totalSubmissions=${totalSubmissions}, deniedPairs=${deniedPairs})`);
+    
+    // STOP if all pairs denied
+    if (deniedPairs === totalPairs && totalPairs > 0) {
+      return NextResponse.json({ ok: false, step: 'submissions' }, { status: 403 });
+    }
+    
     const fetchEndTime = Date.now();
-    console.log(`ZXQ reset.fetch: ${fetchEndTime - fetchStartTime}ms`);
+    console.info(`ZXQ reset.fetch: ${fetchEndTime - fetchStartTime}ms`);
     
-    // 3. Build simple data structure for testing
+    // Phase B1 - Build L1: Students baseline
     const buildStartTime = Date.now();
-    console.log(`ZXQ Progress 8. <about to call student data builder>: ${new Date().toISOString()} - ${Date.now() - fetchStartTime}ms`);
-    
-    // Call the proper student data builder with assembled arrays
     const studentData = buildStudentData({
       courses: allCourses,
       assignmentsByCourse,
@@ -124,25 +164,47 @@ export async function POST(req: NextRequest) {
       observees
     });
     
-    const buildEndTime = Date.now();
-    console.log(`ZXQ Progress 9. <built data structure, about to save>: ${new Date().toISOString()} - ${Date.now() - fetchStartTime}ms`);
-    console.log(`ZXQ reset.build: ${buildEndTime - buildStartTime}ms`);
+    const b1EndTime = Date.now();
+    console.info(`ZXQ reset.build.L1.students: ${b1EndTime - buildStartTime}ms (students=${Object.keys(studentData.students).length})`);
     
-    // 4. Atomic save
+    // Phase B2 - Build L2: Courses attached + filtered (handled in builder)
+    const b2EndTime = Date.now();
+    const keptCourses = allCourses.length; // Builder handles filtering
+    const droppedCourses = 0; // TODO: Track dropped courses in builder
+    console.info(`ZXQ reset.build.L2.courses: ${b2EndTime - buildStartTime}ms (students=${Object.keys(studentData.students).length}, keptCourses=${keptCourses}, droppedCourses=${droppedCourses})`);
+    
+    // Phase B3 - Build L3: Assignments attached
+    const b3EndTime = Date.now();
+    const coursesWithAssignments = Object.keys(assignmentsByCourse).length;
+    const totalAssignments = Object.values(assignmentsByCourse).flat().length;
+    console.info(`ZXQ reset.build.L3.assignments: ${b3EndTime - buildStartTime}ms (coursesWithAssignments=${coursesWithAssignments}/${keptCourses}, totalAssignments=${totalAssignments})`);
+    
+    // Phase B4 - Build L4: Submissions attached
+    const b4EndTime = Date.now();
+    const attachedSubmissions = totalSubmissions;
+    const orphanSubmissions = 0; // TODO: Track orphan submissions
+    console.info(`ZXQ reset.build.L4.submissions: ${b4EndTime - buildStartTime}ms (attached=${attachedSubmissions}, orphans=${orphanSubmissions})`);
+    
+    // Phase S - Atomic save (only on success)
     const saveStartTime = Date.now();
-    console.log(`ZXQ Progress 10. <about to save to storage>: ${new Date().toISOString()} - ${Date.now() - fetchStartTime}ms`);
-    await saveTestData(studentData);
+    console.info(`ZXQ reset.save.start: ${Object.keys(studentData.students).length} students, ${Object.keys(studentData).length} top-level keys`);
+    
+    await saveStudentData(studentData);
+    
+    // Verify save
+    const verifyData = await kv.get('studentData:v1');
+    console.info(`ZXQ reset.save.verify: ${verifyData ? 'SUCCESS' : 'FAILED'} - ${verifyData ? verifyData.length : 0} bytes saved`);
+    
     const saveEndTime = Date.now();
-    console.log(`ZXQ reset.save: ${saveEndTime - saveStartTime}ms`);
+    console.info(`ZXQ reset.save: ${saveEndTime - saveStartTime}ms (students=${Object.keys(studentData.students).length}, courses=${keptCourses}, assignments=${totalAssignments}, submissions=${attachedSubmissions})`);
 
     return Response.json({ 
       ok: true, 
-      message: 'Student data reset successfully',
       counts: {
         students: Object.keys(studentData.students).length,
-        courses: allCourses.length,
-        assignments: Object.values(studentData.assignments).flat().length,
-        submissions: Object.values(submissionsByCourseAndStudent).flatMap(courseSubs => Object.values(courseSubs)).flat().length
+        courses: keptCourses,
+        assignments: totalAssignments,
+        submissions: attachedSubmissions
       }
     });
     
@@ -150,10 +212,7 @@ export async function POST(req: NextRequest) {
     console.error('Student data reset failed:', error);
     return Response.json({ 
       ok: false, 
-      error: 'Failed to reset student data', 
-      details: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
+      step: 'fetch'
     }, { status: 500 });
   }
 }

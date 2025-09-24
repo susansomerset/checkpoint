@@ -18,6 +18,56 @@ export interface Submission {
   score?: number;
   grade?: string;
   submitted_at?: string;
+  graded_at?: string;
+  late?: boolean;
+  excused?: boolean;
+  missing?: boolean;
+  points_deducted?: number;
+  points_possible?: number;
+  html_url?: string;
+  preview_url?: string;
+  body?: string;
+  attempt?: number;
+  url?: string;
+  submission_type?: string;
+  attachments?: any[];
+  discussion_entries?: any[];
+  media_comment?: any;
+  media_comment_id?: number;
+  media_comment_type?: string;
+  turnitin_data?: any;
+  vericite_data?: any;
+  turnitin_settings?: any;
+  grade_matches_current_submission?: boolean;
+  graded_anonymously?: boolean;
+  posted_at?: string;
+  read_status?: string;
+  redo_request?: boolean;
+  seconds_late?: number;
+  extra_attempts?: number;
+  anonymous_id?: string;
+  cached_due_date?: string;
+  excused_after_due?: boolean;
+  grading_period_id?: number;
+  grading_period_title?: string;
+  score_statistics?: any;
+  user?: {
+    id: number;
+    name: string;
+    created_at: string;
+    sortable_name: string;
+    short_name: string;
+    sis_user_id?: string;
+    integration_id?: string;
+    login_id?: string;
+    avatar_url?: string;
+    enrollments?: any[];
+    email?: string;
+    locale?: string;
+    last_login?: string;
+    time_zone?: string;
+    bio?: string;
+  };
 }
 
 /**

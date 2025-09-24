@@ -88,7 +88,7 @@ export class CanvasClient {
       this.activeRequests++;
       
       const response = await fetch(url, {
-        headers: {
+    headers: {
           'Authorization': `Bearer ${this.config.accessToken}`,
           'Accept': 'application/json',
           'Cache-Control': 'no-store'

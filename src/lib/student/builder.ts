@@ -15,30 +15,49 @@ export interface CourseWithStudent extends Course {
 }
 
 export interface StudentData {
-  students: Record<string, Student>;
-  assignments: Record<string, Assignment[]>;
-  lastUpdated: string;
+  students: Record<string, StudentNode>;
 }
 
-export interface Student {
-  id: string;
-  name: string;
-  courses: StudentCourse[];
+export interface StudentNode {
+  studentId: string;
+  meta: {
+    legalName?: string;
+    preferredName?: string;
+  };
+  courses: Record<string, CourseNode>;
 }
 
-export interface StudentCourse {
-  courseId: number;
-  courseName: string;
-  courseCode?: string;
-  startAt?: string;
-  endAt?: string;
-  workflowState: string;
-  enrollmentType: string;
-  enrollmentState: string;
-  enrollmentRole: string;
-  enrollmentCreatedAt: string;
-  enrollmentUpdatedAt: string;
-  courseMetadata: Course;
+export interface CourseNode {
+  courseId: string;
+  canvas: Record<string, any>;
+  meta: {
+    shortName?: string;
+    teacher?: string;
+    period?: number;
+  };
+  assignments: Record<string, AssignmentNode>;
+  orphanSubmissions: Record<string, SubmissionNode>;
+}
+
+export interface AssignmentNode {
+  assignmentId: string;
+  courseId: string;
+  canvas: Record<string, any>;
+  pointsPossible?: number;
+  link: string;
+  submissions: Record<string, SubmissionNode>;
+}
+
+export interface SubmissionNode {
+  submissionId: string;
+  assignmentId: string;
+  courseId: string;
+  studentId: string;
+  canvas: Record<string, any>;
+  status: 'missing' | 'submittedLate' | 'submittedOnTime' | 'graded' | 'noDueDate';
+  score?: number;
+  gradedAt?: string;
+  submittedAt?: string;
 }
 
 export interface BuilderInput {
@@ -51,8 +70,7 @@ export interface BuilderInput {
 export function buildStudentData(input: BuilderInput): StudentData {
   const { courses, assignmentsByCourse, submissionsByCourseAndStudent, observees } = input;
   
-  const students: Record<string, Student> = {};
-  const assignments: Record<string, Assignment[]> = { ...assignmentsByCourse };
+  const students: Record<string, StudentNode> = {};
   
   // Build student data from courses (now with studentId attached)
   for (const course of courses) {
@@ -65,36 +83,121 @@ export function buildStudentData(input: BuilderInput): StudentData {
     // Create student if not exists
     if (!students[studentId]) {
       students[studentId] = {
-        id: studentId,
-        name: studentName,
-        courses: []
+        studentId: studentId,
+        meta: {
+          legalName: studentName,
+          preferredName: studentName
+        },
+        courses: {}
       };
     }
     
-    // Add course to student
-    const studentCourse: StudentCourse = {
-      courseId: course.id,
-      courseName: course.name,
-      courseCode: course.course_code,
-      startAt: course.start_at,
-      endAt: course.end_at,
-      workflowState: course.workflow_state,
-      enrollmentType: 'StudentEnrollment', // We know this is a student course
-      enrollmentState: 'active', // Assume active since we got the course
-      enrollmentRole: 'student',
-      enrollmentCreatedAt: course.created_at || new Date().toISOString(),
-      enrollmentUpdatedAt: course.updated_at || new Date().toISOString(),
-      courseMetadata: course
+    // Create course node
+    const courseId = String(course.id);
+    const courseNode: CourseNode = {
+      courseId: courseId,
+      canvas: { ...course },
+      meta: {
+        shortName: course.course_code || course.name,
+        teacher: 'Unknown', // TODO: Extract from course data if available
+        period: extractPeriodFromCourseName(course.name, course.course_code)
+      },
+      assignments: {},
+      orphanSubmissions: {}
     };
     
-    students[studentId].courses.push(studentCourse);
+    // Add assignments for this course
+    const courseAssignments = assignmentsByCourse[courseId] || [];
+    for (const assignment of courseAssignments) {
+      const assignmentId = String(assignment.id);
+      const assignmentNode: AssignmentNode = {
+        assignmentId: assignmentId,
+        courseId: courseId,
+        canvas: { ...assignment },
+        pointsPossible: assignment.points_possible,
+        link: '', // TODO: Get html_url from Canvas API if needed
+        submissions: {}
+      };
+      
+      // Add submissions for this assignment
+      const courseSubmissions = submissionsByCourseAndStudent[courseId]?.[studentId] || [];
+      const assignmentSubmissions = courseSubmissions.filter(s => s.assignment_id === assignment.id);
+      
+      for (const submission of assignmentSubmissions) {
+        const submissionId = String(submission.id);
+        const submissionNode: SubmissionNode = {
+          submissionId: submissionId,
+          assignmentId: assignmentId,
+          courseId: courseId,
+          studentId: studentId,
+          canvas: { ...submission },
+          status: mapSubmissionStatus(submission),
+          score: submission.score,
+          gradedAt: submission.graded_at,
+          submittedAt: submission.submitted_at
+        };
+        
+        assignmentNode.submissions[submissionId] = submissionNode;
+      }
+      
+      courseNode.assignments[assignmentId] = assignmentNode;
+    }
+    
+    students[studentId].courses[courseId] = courseNode;
   }
   
   return {
-    students,
-    assignments,
-    lastUpdated: new Date().toISOString()
+    students
   };
+}
+
+function mapSubmissionStatus(submission: any): 'missing' | 'submittedLate' | 'submittedOnTime' | 'graded' | 'noDueDate' {
+  if (submission.workflow_state === 'graded') {
+    return 'graded';
+  }
+  if (submission.workflow_state === 'submitted') {
+    // TODO: Check if submitted late based on due date
+    return 'submittedOnTime';
+  }
+  if (submission.workflow_state === 'unsubmitted') {
+    return 'missing';
+  }
+  return 'noDueDate';
+}
+
+function extractPeriodFromCourseName(courseName: string, courseCode?: string): number | undefined {
+  // Try to extract period from course name patterns like:
+  // "P1-Math", "Period 2 Science", "P3-Physics", "1st Period English", etc.
+  const text = `${courseName} ${courseCode || ''}`.toLowerCase();
+  
+  // Pattern 1: P1, P2, P3, etc.
+  const pMatch = text.match(/p(\d+)/);
+  if (pMatch) {
+    return parseInt(pMatch[1], 10);
+  }
+  
+  // Pattern 2: Period 1, Period 2, etc.
+  const periodMatch = text.match(/period\s+(\d+)/);
+  if (periodMatch) {
+    return parseInt(periodMatch[1], 10);
+  }
+  
+  // Pattern 3: 1st Period, 2nd Period, etc.
+  const ordinalMatch = text.match(/(\d+)(?:st|nd|rd|th)\s+period/);
+  if (ordinalMatch) {
+    return parseInt(ordinalMatch[1], 10);
+  }
+  
+  // Pattern 4: Just a number at the start (e.g., "1 Math", "2 Science")
+  const numberMatch = text.match(/^(\d+)\s+/);
+  if (numberMatch) {
+    const num = parseInt(numberMatch[1], 10);
+    if (num >= 1 && num <= 8) { // Reasonable period range
+      return num;
+    }
+  }
+  
+  return undefined;
 }
 
 export function deriveCourseAggregates(course: Course, submissions: Submission[]): {

@@ -7,15 +7,17 @@ import * as kv from '@/lib/storage/kv';
 export async function GET(req: NextRequest) {
   await requireSession(req);
   
-  // Try to get test data first
-  try {
-    const testData = await kv.get('test-student-data');
-    if (testData) {
-      return Response.json(JSON.parse(testData));
-    }
-  } catch (error) {
-    console.log('No test data found, falling back to regular data');
-  }
+      // Try to get student data from storage
+      try {
+        const studentData = await kv.get('studentData:v1');
+        if (studentData) {
+          const parsed = JSON.parse(studentData);
+          console.info(`ZXQ get.storage: ${parsed.students ? Object.keys(parsed.students).length : 0} students, ${studentData.length} bytes`);
+          return Response.json(parsed);
+        }
+      } catch (error) {
+        console.log('No student data found, falling back to regular data');
+      }
   
   // Fall back to regular data
   const data = await loadStudentData();
