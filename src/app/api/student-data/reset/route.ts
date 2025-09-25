@@ -7,6 +7,7 @@ import { getAssignments } from '@/lib/canvas/assignments';
 import { getSubmissionsForStudent } from '@/lib/canvas/submissions';
 import { getObservees } from '@/lib/canvas/observees';
 import { buildStudentData } from '@/lib/student/builder';
+import { getMetadata } from '@/lib/storage/kv';
 import { saveStudentData } from '@/lib/storage';
 import * as kv from '@/lib/storage/kv';
 
@@ -157,11 +158,17 @@ export async function POST(req: NextRequest) {
     
     // Phase B1 - Build L1: Students baseline
     const buildStartTime = Date.now();
+    
+    // Load metadata for merging
+    const metadata = await getMetadata();
+    console.info(`ZXQ reset.metadata: ${metadata ? 'LOADED' : 'NOT_FOUND'} - ${metadata ? Object.keys(metadata).length : 0} top-level keys`);
+    
     const studentData = buildStudentData({
       courses: allCourses,
       assignmentsByCourse,
       submissionsByCourseAndStudent,
-      observees
+      observees,
+      metadata
     });
     
     const b1EndTime = Date.now();

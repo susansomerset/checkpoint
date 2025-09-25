@@ -3,7 +3,7 @@ import React from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 function Toggle({ label, children }: { label: string; children: React.ReactNode }) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   return (
     <div style={{ marginLeft: 12 }}>
       <button onClick={() => setOpen(!open)} aria-expanded={open}>
@@ -36,6 +36,7 @@ function JsonNode({ data, label }: { data: unknown; label: string }) {
   );
 }
 
+
 export default function DashboardPage() {
   const { user, error: authError, isLoading } = useUser();
   const [loading, setLoading] = React.useState(false);
@@ -46,6 +47,11 @@ export default function DashboardPage() {
   const [resetting, setResetting] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
   const [resetSuccess, setResetSuccess] = React.useState<string | null>(null);
+  const [metadata, setMetadata] = React.useState<Record<string, unknown> | null>(null);
+  const [loadingMetadata, setLoadingMetadata] = React.useState(false);
+  const [metadataJson, setMetadataJson] = React.useState<string>('');
+  const [savingMetadata, setSavingMetadata] = React.useState(false);
+  const [metadataSaveSuccess, setMetadataSaveSuccess] = React.useState<string | null>(null);
   
       
 
@@ -107,6 +113,41 @@ export default function DashboardPage() {
     }
   }
 
+  async function getMetadata() {
+    setLoadingMetadata(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/metadata', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setMetadata(json);
+    } catch (e: unknown) {
+      setError((e as Error).message || 'Request failed');
+    } finally {
+      setLoadingMetadata(false);
+    }
+  }
+
+  async function saveMetadata() {
+    setSavingMetadata(true);
+    setError(null);
+    setMetadataSaveSuccess(null);
+    try {
+      const parsedMetadata = JSON.parse(metadataJson);
+      const res = await fetch('/api/metadata', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsedMetadata)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setMetadataSaveSuccess('Metadata saved successfully!');
+    } catch (e: unknown) {
+      setError((e as Error).message || 'Save failed');
+    } finally {
+      setSavingMetadata(false);
+    }
+  }
+
 
   if (isLoading || validating) {
     return (
@@ -164,8 +205,8 @@ export default function DashboardPage() {
 
   return (
     <main style={{ padding: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h1 style={{ margin: 0 }}>Boron</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h1 style={{ margin: 0 }}>Carbon</h1>
         <button 
           onClick={() => window.location.href = '/api/auth/logout'} 
           style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
@@ -175,25 +216,65 @@ export default function DashboardPage() {
       </div>
       <p>Hello, {user.name || user.email || 'User'}! Retrieve the latest <code>studentData</code> JSON.</p>
       
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-        <button onClick={getStudentData} disabled={loading}>
-          {loading ? 'Loading…' : 'Get Student Data'}
-        </button>
-        <button 
-          onClick={resetStudentData} 
-          disabled={resetting}
-          style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px' }}
-        >
-          {resetting ? 'Resetting…' : 'Reset Student Data'}
-        </button>
-      </div>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+            <button onClick={getStudentData} disabled={loading}>
+              {loading ? 'Loading…' : 'Get Student Data'}
+            </button>
+            <button 
+              onClick={resetStudentData} 
+              disabled={resetting}
+              style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px' }}
+            >
+              {resetting ? 'Resetting…' : 'Reset Student Data'}
+            </button>
+            <button onClick={getMetadata} disabled={loadingMetadata}>
+              {loadingMetadata ? 'Loading…' : 'Get Metadata'}
+            </button>
+          </div>
       
       {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
       {resetError && <p style={{ color: 'crimson' }}>Reset Error: {resetError}</p>}
       {resetSuccess && <p style={{ color: 'green' }}>{resetSuccess}</p>}
+      <div style={{ marginTop: 16 }}>
+        <h3>Save Metadata</h3>
+            <textarea
+              value={metadataJson}
+              onChange={(e) => setMetadataJson(e.target.value)}
+              placeholder="Paste your metadata JSON here..."
+              style={{
+                width: '100%',
+                height: '200px',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                fontSize: '12px',
+                color: '#000'
+              }}
+            />
+        <button 
+          onClick={saveMetadata} 
+          disabled={savingMetadata || !metadataJson.trim()}
+          style={{ marginTop: '8px' }}
+        >
+          {savingMetadata ? 'Saving...' : 'Save Metadata'}
+        </button>
+        {metadataSaveSuccess && <p style={{ color: 'green' }}>{metadataSaveSuccess}</p>}
+      </div>
+      {metadata && (
+        <div style={{ marginTop: 16 }}>
+          <h3>Metadata</h3>
+          <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
+            <JsonNode data={metadata} label="metadata" />
+          </div>
+        </div>
+      )}
       {data && (
-        <div style={{ marginTop: 16, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
-          <JsonNode data={data} label="root" />
+        <div style={{ marginTop: 16 }}>
+          
+          <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
+            <JsonNode data={data} label="root" />
+          </div>
         </div>
       )}
 

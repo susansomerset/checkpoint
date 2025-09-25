@@ -24,6 +24,16 @@ export const SubmissionNodeSchema = z.object({
 });
 export type SubmissionNode = z.infer<typeof SubmissionNodeSchema>;
 
+export const AssignmentMetaSchema = z.object({
+  checkpointStatus: z.enum(['Locked', 'Closed', 'Due', 'Missing', 'Vector', 'Submitted', 'Graded', 'Cancelled']),
+  checkpointEarnedPoints: z.number(),
+  checkpointLostPoints: z.number(),
+  checkpointSubmittedPoints: z.number(),
+  checkpointMissingPoints: z.number(),
+  assignmentType: z.enum(['Pointed', 'Vector']),
+});
+export type AssignmentMeta = z.infer<typeof AssignmentMetaSchema>;
+
 export const AssignmentNodeSchema = z.object({
   assignmentId: z.string(),
   courseId: z.string(),
@@ -31,6 +41,7 @@ export const AssignmentNodeSchema = z.object({
   pointsPossible: z.number().optional(),
   link: z.string(), // html_url
   submissions: z.record(z.string(), SubmissionNodeSchema),
+  meta: AssignmentMetaSchema,
 });
 export type AssignmentNode = z.infer<typeof AssignmentNodeSchema>;
 

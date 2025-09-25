@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
       // Try to get student data from storage
       try {
         const studentData = await kv.get('studentData:v1');
+        console.info(`ZXQ get.storage.raw: ${studentData ? 'FOUND' : 'NOT_FOUND'} - ${studentData ? studentData.length : 0} bytes`);
         if (studentData) {
           const parsed = JSON.parse(studentData);
           console.info(`ZXQ get.storage: ${parsed.students ? Object.keys(parsed.students).length : 0} students, ${studentData.length} bytes`);
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest) {
       }
   
   // Fall back to regular data
+  console.info(`ZXQ get.fallback: Using loadStudentData()`);
   const data = await loadStudentData();
   return Response.json(data ?? { students: [] });
 }

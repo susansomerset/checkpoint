@@ -39,6 +39,15 @@ export interface CourseNode {
   orphanSubmissions: Record<string, SubmissionNode>;
 }
 
+export interface AssignmentMetadata {
+  checkpointStatus: 'Locked' | 'Closed' | 'Due' | 'Missing' | 'Vector' | 'Submitted' | 'Graded' | 'Cancelled';
+  checkpointEarnedPoints: number;
+  checkpointLostPoints: number;
+  checkpointSubmittedPoints: number;
+  checkpointMissingPoints: number;
+  assignmentType: 'Pointed' | 'Vector';
+}
+
 export interface AssignmentNode {
   assignmentId: string;
   courseId: string;
@@ -46,6 +55,7 @@ export interface AssignmentNode {
   pointsPossible?: number;
   link: string;
   submissions: Record<string, SubmissionNode>;
+  meta: AssignmentMetadata;
 }
 
 export interface SubmissionNode {
@@ -65,10 +75,111 @@ export interface BuilderInput {
   assignmentsByCourse: Record<string, Assignment[]>;
   submissionsByCourseAndStudent: Record<string, Record<string, Submission[]>>;
   observees: User[];
+  metadata?: {
+    students: Record<string, any>;
+    courses: Record<string, any>;
+  };
+}
+
+function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed' | 'Due' | 'Missing' | 'Vector' | 'Submitted' | 'Graded' | 'Cancelled' {
+  const now = new Date();
+  const sevenMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 7, now.getDate());
+  const academicYear = sevenMonthsAgo.getFullYear();
+  const academicYearStart = new Date(academicYear, 6, 1); // July 1st of academic year
+  
+  // Get assignment data
+  const assignment = assignmentNode.canvas;
+  const submissions = Object.values(assignmentNode.submissions);
+  const hasSubmission = submissions.length > 0;
+  const submission = hasSubmission ? submissions[0] : null;
+  
+  // Check if submission has been graded AND score is exactly 40% of possible points
+  if (submission && submission.canvas?.workflow_state === 'graded' && submission.canvas?.score !== null) {
+    const score = submission.canvas.score;
+    const possiblePoints = assignmentNode.pointsPossible || 0;
+    const expectedMissingScore = possiblePoints * 0.4;
+    
+    if (score === expectedMissingScore) {
+      return 'Missing';
+    } else if (score > 0 && score !== expectedMissingScore) {
+      return 'Graded';
+    }
+  }
+  
+  // If submission has been turned in, status is "Submitted" (pattern match for "submitted")
+   if (hasSubmission && submission?.canvas?.workflow_state && 
+    submission.canvas?.workflow_state === 'submitted') {
+     return 'Submitted';
+   }
+  
+  // Check if assignment is locked (unlock_date in future)
+  if (assignment.unlock_at) {
+    const unlockDate = new Date(assignment.unlock_at);
+    if (unlockDate > now) {
+      return 'Locked';
+    }
+  }
+  
+  // Check if assignment is closed (lock_date or due_date before July 1 of academic year)
+  if (assignment.lock_at) {
+    const lockDate = new Date(assignment.lock_at);
+    if (lockDate < academicYearStart) {
+      return 'Closed';
+    }
+  }
+  
+  if (assignment.due_at) {
+    const dueDate = new Date(assignment.due_at);
+    if (dueDate < academicYearStart) {
+      return 'Closed';
+    }
+  }
+  
+  // If no due date, status is "Due"
+  if (!assignment.due_at) {
+    return 'Due';
+  }
+  
+  // If due date is in the past, status is "Missing"
+  const dueDate = new Date(assignment.due_at);
+  if (dueDate < now) {
+    return 'Missing';
+  }
+  
+  // If no submission and due date is today or future, status is "Due"
+  return 'Due';
+}
+
+function calculateAssignmentPoints(assignmentNode: AssignmentNode): void {
+  const status = assignmentNode.meta.checkpointStatus;
+  const pointsPossible = assignmentNode.pointsPossible || 0;
+  
+  // Reset all point values to zero first
+  assignmentNode.meta.checkpointEarnedPoints = 0;
+  assignmentNode.meta.checkpointLostPoints = 0;
+  assignmentNode.meta.checkpointSubmittedPoints = 0;
+  assignmentNode.meta.checkpointMissingPoints = 0;
+  
+  if (status === 'Graded') {
+    // Get the submission score (may have up to 2 decimals)
+    const submissions = Object.values(assignmentNode.submissions);
+    const submission = submissions.length > 0 ? submissions[0] : null;
+    
+    if (submission && submission.canvas?.score !== null) {
+      assignmentNode.meta.checkpointEarnedPoints = submission.canvas.score;
+      assignmentNode.meta.checkpointLostPoints = Math.round((pointsPossible - submission.canvas.score) * 100) / 100;
+    }
+    // Stop processing - remaining values stay zero
+  } else if (status === 'Missing') {
+    assignmentNode.meta.checkpointMissingPoints = pointsPossible;
+  } else if (status === 'Submitted') {
+    assignmentNode.meta.checkpointSubmittedPoints = pointsPossible;
+  }
+  // For all other statuses (Locked, Closed, Due, Vector, Cancelled), all values remain zero
 }
 
 export function buildStudentData(input: BuilderInput): StudentData {
-  const { courses, assignmentsByCourse, submissionsByCourseAndStudent, observees } = input;
+  const { courses, assignmentsByCourse, submissionsByCourseAndStudent, observees, metadata } = input;
   
   const students: Record<string, StudentNode> = {};
   
@@ -78,6 +189,7 @@ export function buildStudentData(input: BuilderInput): StudentData {
     if (!course.studentId) continue;
     
     const studentId = String(course.studentId);
+    
     const studentName = course.studentName || `Student ${studentId}`;
     
     // Create student if not exists
@@ -86,7 +198,7 @@ export function buildStudentData(input: BuilderInput): StudentData {
         studentId: studentId,
         meta: {
           legalName: studentName,
-          preferredName: studentName
+          preferredName: metadata?.students?.[studentId]?.preferredName || studentName
         },
         courses: {}
       };
@@ -98,9 +210,9 @@ export function buildStudentData(input: BuilderInput): StudentData {
       courseId: courseId,
       canvas: { ...course },
       meta: {
-        shortName: course.course_code || course.name,
-        teacher: 'Unknown', // TODO: Extract from course data if available
-        period: extractPeriodFromCourseName(course.name, course.course_code)
+        shortName: metadata?.courses?.[courseId]?.shortName || course.course_code || course.name,
+        teacher: metadata?.courses?.[courseId]?.teacher || 'Unknown',
+        period: metadata?.courses?.[courseId]?.period || 'tbd'
       },
       assignments: {},
       orphanSubmissions: {}
@@ -116,7 +228,15 @@ export function buildStudentData(input: BuilderInput): StudentData {
         canvas: { ...assignment },
         pointsPossible: assignment.points_possible,
         link: '', // TODO: Get html_url from Canvas API if needed
-        submissions: {}
+        submissions: {},
+        meta: {
+          checkpointStatus: 'Due',
+          checkpointEarnedPoints: 0,
+          checkpointLostPoints: 0,
+          checkpointSubmittedPoints: 0,
+          checkpointMissingPoints: 0,
+          assignmentType: assignment.grading_type === 'points' ? 'Pointed' : 'Vector'
+        }
       };
       
       // Add submissions for this assignment
@@ -139,6 +259,12 @@ export function buildStudentData(input: BuilderInput): StudentData {
         
         assignmentNode.submissions[submissionId] = submissionNode;
       }
+      
+      // Set the checkpoint status based on the fully assembled assignment node
+      assignmentNode.meta.checkpointStatus = getAssignmentStatus(assignmentNode);
+      
+      // Calculate the points classifications based on the status
+      calculateAssignmentPoints(assignmentNode);
       
       courseNode.assignments[assignmentId] = assignmentNode;
     }
@@ -165,40 +291,6 @@ function mapSubmissionStatus(submission: any): 'missing' | 'submittedLate' | 'su
   return 'noDueDate';
 }
 
-function extractPeriodFromCourseName(courseName: string, courseCode?: string): number | undefined {
-  // Try to extract period from course name patterns like:
-  // "P1-Math", "Period 2 Science", "P3-Physics", "1st Period English", etc.
-  const text = `${courseName} ${courseCode || ''}`.toLowerCase();
-  
-  // Pattern 1: P1, P2, P3, etc.
-  const pMatch = text.match(/p(\d+)/);
-  if (pMatch) {
-    return parseInt(pMatch[1], 10);
-  }
-  
-  // Pattern 2: Period 1, Period 2, etc.
-  const periodMatch = text.match(/period\s+(\d+)/);
-  if (periodMatch) {
-    return parseInt(periodMatch[1], 10);
-  }
-  
-  // Pattern 3: 1st Period, 2nd Period, etc.
-  const ordinalMatch = text.match(/(\d+)(?:st|nd|rd|th)\s+period/);
-  if (ordinalMatch) {
-    return parseInt(ordinalMatch[1], 10);
-  }
-  
-  // Pattern 4: Just a number at the start (e.g., "1 Math", "2 Science")
-  const numberMatch = text.match(/^(\d+)\s+/);
-  if (numberMatch) {
-    const num = parseInt(numberMatch[1], 10);
-    if (num >= 1 && num <= 8) { // Reasonable period range
-      return num;
-    }
-  }
-  
-  return undefined;
-}
 
 export function deriveCourseAggregates(course: Course, submissions: Submission[]): {
   earned: number;

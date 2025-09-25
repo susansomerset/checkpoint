@@ -9,6 +9,7 @@ export interface Assignment {
   description?: string;
   assignment_group_id: number;
   published: boolean;
+  grading_type?: string;
 }
 
 export async function getAssignments(courseId: string): Promise<Assignment[]> {
