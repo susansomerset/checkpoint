@@ -14,5 +14,6 @@ export interface Assignment {
 
 export async function getAssignments(courseId: string): Promise<Assignment[]> {
   const client = createCanvasClient();
+  // eslint-disable-next-line camelcase
   return client.paginate<Assignment>(`/api/v1/courses/${courseId}/assignments`, { per_page: '100' });
 }

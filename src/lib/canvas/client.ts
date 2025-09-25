@@ -83,7 +83,7 @@ export class CanvasClient {
   /**
    * Fetch with retry logic, returning both data and headers for pagination
    */
-  private async fetchWithRetryAndHeaders(url: string, attempt: number = 1): Promise<{ data: any; headers: Headers }> {
+  private async fetchWithRetryAndHeaders(url: string, attempt: number = 1): Promise<{ data: unknown; headers: Headers }> {
     try {
       this.activeRequests++;
       
@@ -103,7 +103,7 @@ export class CanvasClient {
       // Handle retryable errors
       if (this.shouldRetry(response.status, attempt)) {
         const delay = this.calculateDelay(attempt);
-        console.log(`ZXQ Canvas API retry ${attempt}/${this.retryConfig.maxRetries} for ${response.status} - waiting ${delay}ms - URL: ${url}`);
+        console.info(`ZXQ Canvas API retry ${attempt}/${this.retryConfig.maxRetries} for ${response.status} - waiting ${delay}ms - URL: ${url}`);
         await this.sleep(delay);
         return this.fetchWithRetryAndHeaders(url, attempt + 1);
       }
@@ -194,7 +194,7 @@ export class CanvasClient {
       
       // Fetch page data with retry logic
       const response = await this.fetchWithRetryAndHeaders(nextUrl);
-      allData = allData.concat(response.data);
+      allData = allData.concat(response.data as T[]);
 
       // Parse Link header for next page URL
       const linkHeader = response.headers.get('Link');
@@ -223,7 +223,7 @@ export class CanvasClient {
       
       // Fetch page data with retry logic
       const response = await this.fetchWithRetryAndHeaders(nextUrl);
-      allData = allData.concat(response.data);
+      allData = allData.concat(response.data as T[]);
 
       // Parse Link header for next page URL
       const linkHeader = response.headers.get('Link');

@@ -1,7 +1,7 @@
 // Builder/transform layer - pure functions that join raw arrays into schema
 // No I/O, deterministic, unit-testable
 
-import { Course, Enrollment } from '../canvas/courses';
+import { Course } from '../canvas/courses';
 import { Assignment } from '../canvas/assignments';
 import { Submission } from '../canvas/submissions';
 import { User } from '../canvas/observees';
@@ -33,7 +33,7 @@ export interface CourseNode {
   meta: {
     shortName?: string;
     teacher?: string;
-    period?: number;
+    period?: string;
   };
   assignments: Record<string, AssignmentNode>;
   orphanSubmissions: Record<string, SubmissionNode>;
@@ -76,8 +76,8 @@ export interface BuilderInput {
   submissionsByCourseAndStudent: Record<string, Record<string, Submission[]>>;
   observees: User[];
   metadata?: {
-    students: Record<string, any>;
-    courses: Record<string, any>;
+    students: Record<string, unknown>;
+    courses: Record<string, unknown>;
   };
 }
 
@@ -179,7 +179,7 @@ function calculateAssignmentPoints(assignmentNode: AssignmentNode): void {
 }
 
 export function buildStudentData(input: BuilderInput): StudentData {
-  const { courses, assignmentsByCourse, submissionsByCourseAndStudent, observees, metadata } = input;
+  const { courses, assignmentsByCourse, submissionsByCourseAndStudent, metadata } = input;
   
   const students: Record<string, StudentNode> = {};
   
@@ -198,7 +198,7 @@ export function buildStudentData(input: BuilderInput): StudentData {
         studentId: studentId,
         meta: {
           legalName: studentName,
-          preferredName: metadata?.students?.[studentId]?.preferredName || studentName
+          preferredName: (metadata?.students?.[studentId] as { preferredName?: string })?.preferredName || studentName
         },
         courses: {}
       };
@@ -210,9 +210,9 @@ export function buildStudentData(input: BuilderInput): StudentData {
       courseId: courseId,
       canvas: { ...course },
       meta: {
-        shortName: metadata?.courses?.[courseId]?.shortName || course.course_code || course.name,
-        teacher: metadata?.courses?.[courseId]?.teacher || 'Unknown',
-        period: metadata?.courses?.[courseId]?.period || 'tbd'
+        shortName: (metadata?.courses?.[courseId] as { shortName?: string })?.shortName || course.course_code || course.name,
+        teacher: (metadata?.courses?.[courseId] as { teacher?: string })?.teacher || 'Unknown',
+        period: (metadata?.courses?.[courseId] as { period?: string })?.period || 'tbd'
       },
       assignments: {},
       orphanSubmissions: {}
@@ -277,7 +277,7 @@ export function buildStudentData(input: BuilderInput): StudentData {
   };
 }
 
-function mapSubmissionStatus(submission: any): 'missing' | 'submittedLate' | 'submittedOnTime' | 'graded' | 'noDueDate' {
+function mapSubmissionStatus(submission: Submission): 'missing' | 'submittedLate' | 'submittedOnTime' | 'graded' | 'noDueDate' {
   if (submission.workflow_state === 'graded') {
     return 'graded';
   }

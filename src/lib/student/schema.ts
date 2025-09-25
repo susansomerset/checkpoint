@@ -48,7 +48,7 @@ export type AssignmentNode = z.infer<typeof AssignmentNodeSchema>;
 export const CourseMetaSchema = z.object({
   shortName: z.string().optional(),
   teacher: z.string().optional(),
-  period: z.number().int().optional(),
+  period: z.string().optional(),
 });
 export type CourseMeta = z.infer<typeof CourseMetaSchema>;
 

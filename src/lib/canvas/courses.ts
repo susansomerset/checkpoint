@@ -15,6 +15,7 @@ export interface Course {
   course_code?: string;
   start_at?: string;
   end_at?: string;
+  created_at?: string;
   workflow_state: string;
   enrollments?: Enrollment[];
 }
@@ -41,6 +42,7 @@ export async function getCoursesForSelf(): Promise<Course[]> {
   console.info(`ZXQ getCoursesForSelf: Fetching all courses, will filter by created_at >= ${academicYearStart}`);
   
   // Fetch all courses first
+  // eslint-disable-next-line camelcase
   const allCourses = await client.paginate<Course>('/api/v1/courses', { per_page: '100' });
   
   // Filter courses created on or after academic year start
@@ -61,6 +63,7 @@ export async function getCoursesForStudent(studentId: string): Promise<Course[]>
   console.info(`ZXQ getCoursesForStudent(${studentId}): Fetching all courses, will filter by created_at >= ${academicYearStart}`);
   
   // Fetch all courses first
+  // eslint-disable-next-line camelcase
   const allCourses = await client.paginate<Course>(`/api/v1/users/${studentId}/courses`, { per_page: '100' });
   
   // Filter courses created on or after academic year start

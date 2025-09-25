@@ -69,11 +69,11 @@ export async function set(key: string, value: string): Promise<void> {
   }
 }
 
-export async function saveMetadata(metadata: any): Promise<void> {
+export async function saveMetadata(metadata: unknown): Promise<void> {
   await kv.set('metadata:v1', JSON.stringify(metadata));
 }
 
-export async function getMetadata(): Promise<any> {
+export async function getMetadata(): Promise<unknown> {
   const data = await get('metadata:v1');
   return data ? JSON.parse(data) : null;
 }

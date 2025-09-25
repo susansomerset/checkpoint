@@ -9,7 +9,7 @@ export function makeFreshStudentData(): StudentData {
   };
 }
 
-export function applyDeltas(current: StudentData, _deltas: unknown[]): StudentData {
+export function applyDeltas(current: StudentData): StudentData {
   // TODO: implement merge rules. Keep deterministic, id-based updates only.
   // For now, just return current data unchanged
   return current;

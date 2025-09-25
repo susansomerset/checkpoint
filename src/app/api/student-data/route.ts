@@ -16,8 +16,8 @@ export async function GET(req: NextRequest) {
           console.info(`ZXQ get.storage: ${parsed.students ? Object.keys(parsed.students).length : 0} students, ${studentData.length} bytes`);
           return Response.json(parsed);
         }
-      } catch (error) {
-        console.log('No student data found, falling back to regular data');
+      } catch {
+        console.info('No student data found, falling back to regular data');
       }
   
   // Fall back to regular data

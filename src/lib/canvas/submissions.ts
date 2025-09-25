@@ -30,14 +30,14 @@ export interface Submission {
   attempt?: number;
   url?: string;
   submission_type?: string;
-  attachments?: any[];
-  discussion_entries?: any[];
-  media_comment?: any;
+  attachments?: unknown[];
+  discussion_entries?: unknown[];
+  media_comment?: unknown;
   media_comment_id?: number;
   media_comment_type?: string;
-  turnitin_data?: any;
-  vericite_data?: any;
-  turnitin_settings?: any;
+  turnitin_data?: unknown;
+  vericite_data?: unknown;
+  turnitin_settings?: unknown;
   grade_matches_current_submission?: boolean;
   graded_anonymously?: boolean;
   posted_at?: string;
@@ -50,7 +50,7 @@ export interface Submission {
   excused_after_due?: boolean;
   grading_period_id?: number;
   grading_period_title?: string;
-  score_statistics?: any;
+  score_statistics?: unknown;
   user?: {
     id: number;
     name: string;
@@ -61,7 +61,7 @@ export interface Submission {
     integration_id?: string;
     login_id?: string;
     avatar_url?: string;
-    enrollments?: any[];
+    enrollments?: unknown[];
     email?: string;
     locale?: string;
     last_login?: string;

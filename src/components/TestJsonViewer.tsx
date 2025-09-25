@@ -3,7 +3,7 @@
 import React from 'react';
 
 interface TestJsonViewerProps {
-  data: any;
+  data: unknown;
   title?: string;
 }
 

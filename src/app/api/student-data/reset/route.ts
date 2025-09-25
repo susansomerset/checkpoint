@@ -6,7 +6,8 @@ import { getCoursesForStudent } from '@/lib/canvas/courses';
 import { getAssignments } from '@/lib/canvas/assignments';
 import { getSubmissionsForStudent } from '@/lib/canvas/submissions';
 import { getObservees } from '@/lib/canvas/observees';
-import { buildStudentData } from '@/lib/student/builder';
+import { Submission } from '@/lib/canvas/submissions';
+import { buildStudentData, CourseWithStudent } from '@/lib/student/builder';
 import { getMetadata } from '@/lib/storage/kv';
 import { saveStudentData } from '@/lib/storage';
 import * as kv from '@/lib/storage/kv';
@@ -41,13 +42,13 @@ export async function POST(req: NextRequest) {
     }
     
     // Phase F2 - Courses per student (paginated)
-    const allCourses: any[] = [];
+    const allCourses: CourseWithStudent[] = [];
     for (const observee of observees) {
       const courses = await getCoursesForStudent(String(observee.id));
       // Add student ID to each course to make builder's job easier
       const coursesWithStudentId = courses.map(course => ({
         ...course,
-        studentId: observee.id,
+        studentId: String(observee.id),
         studentName: observee.name
       }));
       allCourses.push(...coursesWithStudentId);
@@ -68,8 +69,8 @@ export async function POST(req: NextRequest) {
       return getAssignments(String(courseId)).then(assignments => ({
         courseId: String(courseId),
         assignments
-      })).catch((error: any) => {
-        if (error.message.includes('403')) {
+      })).catch((error: unknown) => {
+        if ((error as Error).message.includes('403')) {
           console.warn(`ZXQ WARN: 403 for assignments in course ${courseId} - continuing`);
           deniedAssignments++;
           return {
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
             denied: true
           };
         } else {
-          console.error(`ZXQ Error fetching assignments for course ${courseId}:`, error.message);
+          console.error(`ZXQ Error fetching assignments for course ${courseId}:`, (error as Error).message);
           throw error; // Re-throw non-403 errors to trigger stop rule
         }
       });
@@ -100,13 +101,13 @@ export async function POST(req: NextRequest) {
     }
     
     // Phase F4 - Submissions per (kid, course) bulk + paginated
-    const submissionPromises: Promise<{ courseId: string; studentId: string; submissions: any[]; denied?: boolean }>[] = [];
+    const submissionPromises: Promise<{ courseId: string; studentId: string; submissions: Submission[]; denied?: boolean }>[] = [];
     let deniedPairs = 0;
     
     for (const course of allCourses) {
       // Find which observee this course belongs to
       const courseObservee = observees.find(obs => 
-        course.enrollments?.some((e: any) => e.type === 'student' && e.user_id === obs.id)
+        course.enrollments?.some((e: unknown) => (e as { type: string; user_id: number }).type === 'student' && (e as { type: string; user_id: number }).user_id === obs.id)
       );
       
       if (courseObservee) {
@@ -117,8 +118,8 @@ export async function POST(req: NextRequest) {
               studentId: String(courseObservee.id),
               submissions
             }))
-            .catch((error: any) => {
-              if (error.message.includes('403')) {
+            .catch((error: unknown) => {
+              if ((error as Error).message.includes('403')) {
                 console.warn(`ZXQ WARN: 403 for course ${course.id}, student ${courseObservee.id} - continuing`);
                 deniedPairs++;
                 return {
@@ -128,7 +129,7 @@ export async function POST(req: NextRequest) {
                   denied: true
                 };
               } else {
-                console.error(`ZXQ Error fetching submissions for course ${course.id}, student ${courseObservee.id}:`, error.message);
+                console.error(`ZXQ Error fetching submissions for course ${course.id}, student ${courseObservee.id}:`, (error as Error).message);
                 throw error; // Re-throw non-403 errors to trigger stop rule
               }
             })
@@ -168,7 +169,7 @@ export async function POST(req: NextRequest) {
       assignmentsByCourse,
       submissionsByCourseAndStudent,
       observees,
-      metadata
+      metadata: metadata as { students: Record<string, unknown>; courses: Record<string, unknown> } | undefined
     });
     
     const b1EndTime = Date.now();
