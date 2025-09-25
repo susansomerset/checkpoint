@@ -51,7 +51,7 @@ export class CanvasClient {
    * @returns Promise resolving to JSON response
    * @throws Error with detailed context on failure
    */
-  async canvasFetch(path: string, query?: Record<string, string | string[]>): Promise<any> {
+  async canvasFetch(path: string, query?: Record<string, string | string[]>): Promise<unknown> {
     // Wait for available slot if at concurrency limit
     await this.waitForAvailableSlot();
     
@@ -75,7 +75,7 @@ export class CanvasClient {
   /**
    * Fetch with retry logic for rate limiting and server errors
    */
-  private async fetchWithRetry(url: string, attempt: number = 1): Promise<any> {
+  private async fetchWithRetry(url: string, attempt: number = 1): Promise<unknown> {
     const response = await this.fetchWithRetryAndHeaders(url, attempt);
     return response.data;
   }

@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getCoursesForStudent } from '@/lib/canvas/courses';
-import { getAssignments } from '@/lib/canvas/assignments';
+import { getAssignments, Assignment } from '@/lib/canvas/assignments';
 import { getSubmissionsForStudent } from '@/lib/canvas/submissions';
 import { getObservees } from '@/lib/canvas/observees';
 import { Submission } from '@/lib/canvas/submissions';
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     const assignmentsByCourse = assignmentResults.reduce((acc, { courseId, assignments }) => {
       acc[courseId] = assignments;
       return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, Assignment[]>);
     
     const f3EndTime = Date.now();
     const fetchedAssignments = Object.values(assignmentsByCourse).flat().length;
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
       if (!acc[courseId]) acc[courseId] = {};
       acc[courseId][studentId] = submissions;
       return acc;
-    }, {} as Record<string, Record<string, any[]>>);
+    }, {} as Record<string, Record<string, Submission[]>>);
     
     const f4EndTime = Date.now();
     const totalSubmissions = Object.values(submissionsByCourseAndStudent).flatMap(courseSubs => Object.values(courseSubs)).flat().length;

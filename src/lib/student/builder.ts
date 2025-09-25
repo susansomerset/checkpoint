@@ -29,7 +29,7 @@ export interface StudentNode {
 
 export interface CourseNode {
   courseId: string;
-  canvas: Record<string, any>;
+  canvas: Record<string, unknown>;
   meta: {
     shortName?: string;
     teacher?: string;
@@ -51,7 +51,7 @@ export interface AssignmentMetadata {
 export interface AssignmentNode {
   assignmentId: string;
   courseId: string;
-  canvas: Record<string, any>;
+  canvas: Record<string, unknown>;
   pointsPossible?: number;
   link: string;
   submissions: Record<string, SubmissionNode>;
@@ -63,7 +63,7 @@ export interface SubmissionNode {
   assignmentId: string;
   courseId: string;
   studentId: string;
-  canvas: Record<string, any>;
+  canvas: Record<string, unknown>;
   status: 'missing' | 'submittedLate' | 'submittedOnTime' | 'graded' | 'noDueDate';
   score?: number;
   gradedAt?: string;
@@ -88,28 +88,33 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
   const academicYearStart = new Date(academicYear, 6, 1); // July 1st of academic year
   
   // Get assignment data
-  const assignment = assignmentNode.canvas;
+  const assignment = assignmentNode.canvas as any; // Canvas assignment object
   const submissions = Object.values(assignmentNode.submissions);
   const hasSubmission = submissions.length > 0;
   const submission = hasSubmission ? submissions[0] : null;
   
   // Check if submission has been graded AND score is exactly 40% of possible points
-  if (submission && submission.canvas?.workflow_state === 'graded' && submission.canvas?.score !== null) {
-    const score = submission.canvas.score;
+  if (submission && submission.canvas && typeof submission.canvas === 'object' && 'workflow_state' in submission.canvas && 'score' in submission.canvas) {
+    const submissionCanvas = submission.canvas as any;
+    if (submissionCanvas.workflow_state === 'graded' && submissionCanvas.score !== null) {
+      const score = submissionCanvas.score;
     const possiblePoints = assignmentNode.pointsPossible || 0;
     const expectedMissingScore = possiblePoints * 0.4;
     
-    if (score === expectedMissingScore) {
-      return 'Missing';
-    } else if (score > 0 && score !== expectedMissingScore) {
-      return 'Graded';
+      if (score === expectedMissingScore) {
+        return 'Missing';
+      } else if (score > 0 && score !== expectedMissingScore) {
+        return 'Graded';
+      }
     }
   }
   
   // If submission has been turned in, status is "Submitted" (pattern match for "submitted")
-   if (hasSubmission && submission?.canvas?.workflow_state && 
-    submission.canvas?.workflow_state === 'submitted') {
-     return 'Submitted';
+   if (hasSubmission && submission?.canvas && typeof submission.canvas === 'object' && 'workflow_state' in submission.canvas) {
+     const submissionCanvas = submission.canvas as any;
+     if (submissionCanvas.workflow_state === 'submitted') {
+       return 'Submitted';
+     }
    }
   
   // Check if assignment is locked (unlock_date in future)
@@ -165,9 +170,12 @@ function calculateAssignmentPoints(assignmentNode: AssignmentNode): void {
     const submissions = Object.values(assignmentNode.submissions);
     const submission = submissions.length > 0 ? submissions[0] : null;
     
-    if (submission && submission.canvas?.score !== null) {
-      assignmentNode.meta.checkpointEarnedPoints = submission.canvas.score;
-      assignmentNode.meta.checkpointLostPoints = Math.round((pointsPossible - submission.canvas.score) * 100) / 100;
+    if (submission && submission.canvas && typeof submission.canvas === 'object' && 'score' in submission.canvas) {
+      const submissionCanvas = submission.canvas as any;
+      if (submissionCanvas.score !== null) {
+        assignmentNode.meta.checkpointEarnedPoints = submissionCanvas.score;
+        assignmentNode.meta.checkpointLostPoints = Math.round((pointsPossible - submissionCanvas.score) * 100) / 100;
+      }
     }
     // Stop processing - remaining values stay zero
   } else if (status === 'Missing') {
@@ -315,3 +323,4 @@ export function deriveCourseAggregates(course: Course, submissions: Submission[]
     turnedInPct
   };
 }
+
