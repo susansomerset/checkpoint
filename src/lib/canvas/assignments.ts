@@ -6,6 +6,8 @@ export interface Assignment {
   name: string;
   points_possible: number;
   due_at?: string;
+  unlock_at?: string;
+  lock_at?: string;
   description?: string;
   assignment_group_id: number;
   published: boolean;
