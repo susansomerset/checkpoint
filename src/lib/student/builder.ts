@@ -88,14 +88,14 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
   const academicYearStart = new Date(academicYear, 6, 1); // July 1st of academic year
   
   // Get assignment data
-  const assignment = assignmentNode.canvas as any; // Canvas assignment object
+  const assignment = assignmentNode.canvas as Assignment;
   const submissions = Object.values(assignmentNode.submissions);
   const hasSubmission = submissions.length > 0;
   const submission = hasSubmission ? submissions[0] : null;
   
   // Check if submission has been graded AND score is exactly 40% of possible points
   if (submission && submission.canvas && typeof submission.canvas === 'object' && 'workflow_state' in submission.canvas && 'score' in submission.canvas) {
-    const submissionCanvas = submission.canvas as any;
+    const submissionCanvas = submission.canvas as Submission;
     if (submissionCanvas.workflow_state === 'graded' && submissionCanvas.score !== null) {
       const score = submissionCanvas.score;
     const possiblePoints = assignmentNode.pointsPossible || 0;
@@ -111,7 +111,7 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
   
   // If submission has been turned in, status is "Submitted" (pattern match for "submitted")
    if (hasSubmission && submission?.canvas && typeof submission.canvas === 'object' && 'workflow_state' in submission.canvas) {
-     const submissionCanvas = submission.canvas as any;
+     const submissionCanvas = submission.canvas as Submission;
      if (submissionCanvas.workflow_state === 'submitted') {
        return 'Submitted';
      }
@@ -171,7 +171,7 @@ function calculateAssignmentPoints(assignmentNode: AssignmentNode): void {
     const submission = submissions.length > 0 ? submissions[0] : null;
     
     if (submission && submission.canvas && typeof submission.canvas === 'object' && 'score' in submission.canvas) {
-      const submissionCanvas = submission.canvas as any;
+      const submissionCanvas = submission.canvas as Submission;
       if (submissionCanvas.score !== null) {
         assignmentNode.meta.checkpointEarnedPoints = submissionCanvas.score;
         assignmentNode.meta.checkpointLostPoints = Math.round((pointsPossible - submissionCanvas.score) * 100) / 100;
