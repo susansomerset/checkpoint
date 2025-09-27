@@ -160,12 +160,18 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Loading skeleton while fetching
    - Error boundary with retry
    - Empty state when no assignments
+   - **Retry with backoff** and visible "Retry" button in error state
    - Toast notifications for errors
 
 4. **Implement Basic Navigation**
    - Student selection persistence
    - URL state management
    - Basic routing structure
+
+5. **Add Link Helper Tests**
+   - **Centralized Canvas URL builder** (`lib/derive/canvasLinks.ts`)
+   - **Link Helper Tests**: Prevent death-by-typo in Canvas URLs
+   - **URL Validation**: Ensure all generated links are valid
 
 ### Testing
 - **E2E Tests**: Complete data flow from API to UI
@@ -242,6 +248,35 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] All tests pass
 - [ ] No console errors or warnings
 
+## Go/No-Go Cutline (Phase 2 Success Criteria)
+
+*"The proof is in the pudding."*
+
+### Required Before Moving Beyond Phase 2:
+
+**Data & Performance**:
+- [ ] **Real data renders** without console warnings
+- [ ] **Web Vitals within gates**: INP ≤ 200ms, CLS ≤ 0.1, LCP ≤ 2.5s
+- [ ] **Bundle size verified**: Route-level code splitting working
+- [ ] **ApexCharts**: Dynamic import confirmed, no hydration errors
+
+**Observability & Security**:
+- [ ] **Sentry receiving**: At least one synthetic error with PII scrubbed
+- [ ] **RLS verified**: Every data call goes through protected endpoints
+- [ ] **PII protection**: No names/IDs in logs or telemetry
+
+**Accessibility**:
+- [ ] **VoiceOver pass**: Names read sensibly, controls reachable
+- [ ] **Keyboard navigation**: Complete workflow without mouse
+- [ ] **Screen reader**: Chart data accessible via table toggle
+
+**Error Handling**:
+- [ ] **Error boundaries**: Catch and report failures gracefully
+- [ ] **Retry logic**: Backoff and retry buttons work
+- [ ] **Progressive rendering**: Partial data doesn't break UI
+
+**If ANY criteria fail**: Stop and address before proceeding to Phase 3.
+
 ---
 
 ## Phase 3: Progress Header
@@ -260,7 +295,9 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Four-layer radial chart (Earned/Submitted/Missing/Lost)
    - Center percentage/checkmark display
    - Hover tooltip with detailed breakdown
-   - Screen reader summary (`aria-live` region)
+   - **"View as table" toggle** for screen readers and data copy
+   - **ARIA Summary**: Totals and per-segment counts in `aria-live` region
+   - **Focus Order**: Lands on summary, not chart segments
    - Keyboard navigation support
 
 2. **Implement Chart Data Logic**
@@ -281,6 +318,12 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Bundle size monitoring
    - Fallback SVG radial chart (if needed)
 
+5. **Progressive Hydration & Error Handling**
+   - **Progressive Rendering**: Show courses as they arrive, totals tolerate partials
+   - **Stale-While-Revalidate**: Show `lastLoadedAt` + "Refresh" affordance
+   - **Error Boundaries**: Per-route and per-widget (chart/table) boundaries
+   - **Sentry Integration**: All error boundaries report to Sentry
+
 ### Testing
 - **Unit Tests**: Chart data calculations, backend status integration
 - **Component Tests**: Chart rendering, hover states, error boundaries
@@ -300,7 +343,9 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Keyboard navigation works
 - [ ] Error boundary catches failures gracefully
 - [ ] Bundle size within budget (or fallback ready)
-- [ ] Performance gate: Lighthouse TTI >90
+- [ ] **Modern Web Vitals**: INP ≤ 200ms, CLS ≤ 0.1, LCP ≤ 2.5s (4× CPU/Slow 4G)
+- [ ] **Bundle Analysis**: `@next/bundle-analyzer` + `size-limit` per entry
+- [ ] **ApexCharts**: Route-level code splitting verified
 - [ ] Accessibility gate: axe passes, keyboard demo
 
 ---
@@ -579,6 +624,11 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - **Solution**: Simplified MSW tests, focus on real API integration
    - **Status**: Basic MSW handlers working, complex tests temporarily disabled
 
+6. **Alternative Testing Stack** (If MSW Issues Persist)
+   - **Vitest**: ESM-native unit testing (replace Jest if needed)
+   - **Playwright Route Mocks**: `page.route(...)` for E2E failure paths
+   - **Golden Fixture**: Single JSON from prod-like data, regenerate intentionally
+
 ### Manual Testing
 1. **User Acceptance Testing**
    - Complete user workflows
@@ -605,6 +655,32 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - **Fixtures**: Realistic test data with edge cases
 - **Mocks**: API responses and error conditions
 - **Snapshots**: Component output verification
+
+## Contract & Versioning Hygiene
+
+*"Contracts are the foundation of trust."*
+
+### API Versioning & Deprecation Policy
+- **Current Version**: `apiVersion: 1`
+- **Deprecation Policy**: Support N and N-1 versions for 30 days
+- **Breaking Changes**: Bump `apiVersion` and add `x-deprecated` notes in schema
+- **Migration Window**: 30-day overlap for client updates
+
+### Metadata Contract Definition
+**Student Metadata** (editable via Settings):
+- `legalName`: string, max 100 chars
+- `preferredName`: string, max 50 chars, required for UI display
+
+**Course Metadata** (editable via Settings):
+- `shortName`: string, max 20 chars, required for UI display
+- `teacher`: string, max 50 chars
+- `period`: number, 1-8 (drives ordering)
+
+**Validation Rules**:
+- All metadata fields have max length constraints
+- Required fields cannot be empty
+- Period must be valid integer 1-8
+- Changes persist immediately to `metaData` endpoint
 
 ## Phase 1 Learnings Applied to Future Phases
 
@@ -634,6 +710,37 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - **Status**: Ready for all future phases
 - **Impact**: Bundle size checks available from Phase 2 onwards
 
+### Observability Improvements
+
+**Sentry Configuration**:
+- **Release Tagging**: Enable release tags + source map upload
+- **Sampling**: 10% trace sampling for performance monitoring
+- **PII Scrubbing**: Student names/IDs scrubbed in `beforeSend` hook
+- **Custom Breadcrumbs**: Fetch start/end with counts, retries, rate-limit backoffs
+
+**Metrics Collection**:
+- **Web Vitals**: Log INP/CLS per route to console in dev
+- **Production Tags**: Send INP/CLS to Sentry as tags in prod
+- **Performance Tracking**: Route-level performance monitoring
+
+### Security & Privacy (Student Data Protection)
+
+**Content Security Policy**:
+- **No Inline Scripts**: All scripts must be from trusted sources
+- **Restricted Resources**: Limit img/script/connect to necessary domains only
+- **Canvas Integration**: Allow Canvas domains for assignment links
+
+**PII Protection**:
+- **No Logging**: Student names/IDs never logged in console or telemetry
+- **Hashed IDs**: Use stable hashed IDs for tracking instead of real IDs
+- **Error Masking**: Mask tokens/URLs in error payloads
+- **RLS Verification**: Confirm Row-Level Security on every data call
+
+**Data Handling**:
+- **Client-Side**: No PII stored in localStorage or sessionStorage
+- **API Calls**: All student data calls go through RLS-protected endpoints
+- **Error Reporting**: PII scrubbed before sending to Sentry
+
 ## Test Implementation Details
 
 *"The proof is in the pudding."*
@@ -655,7 +762,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 #### 2. Utility Function Test Suite
 ```bash
-# tests/lib/status/statusResolver.test.ts
+# tests/lib/derive/statusDisplay.test.ts
 # tests/lib/derive/courseAggregates.test.ts
 # tests/lib/derive/weekWindow.test.ts
 # Run: npm test
@@ -909,7 +1016,7 @@ Each phase builds on the previous one, with testing gates between phases to ensu
 
 ### High Risk Items
 - **Bundle Size**: Monitor ApexCharts impact; have SVG fallback ready
-- **Status Logic**: Keep isolated in module; comprehensive tests
+- **Backend Status Contract**: Stability + migration policy; frontend trusts `checkpointStatus`
 - **Timezone/DST**: Extensive edge case testing; configurable TZ
 - **Data Drift**: Canvas API fields changing or being null; graceful degradation required
 
@@ -932,9 +1039,9 @@ Each phase builds on the previous one, with testing gates between phases to ensu
 - Proves contracts, pagination, auth, and link building
 
 ### Status Logic Package
-- **Well-isolated internal module** in `lib/status/`
-- Export pure `resolveStatus(assignment, submission, now, course)` and `groupByStatus(...)`
-- Treat as "platform primitive" consumed by all views
+- **Backend status contract** - frontend trusts `checkpointStatus` completely
+- Frontend uses `assignment.meta.checkpointStatus` directly
+- Vector filtering via `assignment.meta.assignmentType` field
 
 ### Bundle Budget
 - **Initial route JS (gzip)**: ≤ 250–300 KB
