@@ -224,8 +224,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 #### Error Boundary
 - [ ] Create `components/ErrorBoundary.tsx`
-- [ ] Add Sentry integration (gated by env)
-- [ ] Implement PII scrubbing in beforeSend
+- [ ] Add Sentry client integration (gated by env)
+- [ ] Implement PII scrubbing in client beforeSend
 - [ ] Add friendly error message with retry button
 
 #### Basic Assignment List
@@ -759,11 +759,15 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 ### Observability Improvements
 
 **Sentry Configuration**:
-- **Release Tagging**: Enable release tags + source map upload
-- **Sampling**: 10% trace sampling for performance monitoring
-- **PII Scrubbing**: Student names/IDs scrubbed in `beforeSend` hook
-- **Synthetic Error Path**: Test error reporting with PII scrubbed
-- **Custom Breadcrumbs**: Request start/finish with counts, retries/backoffs, "render with partial data"
+- **Client-Side (Frontend Only)**:
+  - Release tags + client source map upload
+  - 10% trace sampling for performance monitoring
+  - PII scrubbing in client `beforeSend` hook
+  - Synthetic error trigger for testing
+- **Server-Side (Backend Required)**:
+  - Sentry SDK on server + release tagging
+  - Server source-map upload
+  - Server breadcrumbs (request IDs, upstream calls, rate-limit events)
 
 **Metrics Collection**:
 - **Web Vitals**: Log INP/CLS per route to console in dev
@@ -774,22 +778,37 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 ### Security & Privacy (Student Data Protection)
 
 **Content Security Policy**:
+- **Frontend Implementation**: CSP meta tag or header configuration
+- **Backend Required**: CSP headers at edge/proxy/CDN layer
 - **Default CSP**: `default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://*.instructure.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'`
 - **No Inline Scripts**: All scripts must be from trusted sources
 - **Restrict connect-src**: Only to your API + Canvas domains
-- **Canvas Integration**: Allow Canvas domains for assignment links
 
 **PII Protection**:
-- **No Logging**: Student names/IDs never logged in console or telemetry
-- **Hashed IDs**: Use stable hashed IDs for tracking instead of real IDs
-- **Error Masking**: Mask tokens/URLs in error payloads
-- **RLS Verification**: Every data call goes through protected endpoints
-- **Enforce No PII**: All logs/telemetry must use hashed IDs only
+- **Client-Side (Frontend Only)**:
+  - No logging of names/IDs in browser console
+  - Hash IDs in client if needed (but prefer backend approach)
+- **Server-Side (Backend Required)**:
+  - Scrub PII in server logs
+  - Mask tokens/URLs in error payloads
+  - Issue pseudonymous hashed IDs (studentHash/courseHash) in API
+  - RLS enforcement on all /api/* endpoints
 
 **Data Handling**:
 - **Client-Side**: No PII stored in localStorage or sessionStorage
 - **API Calls**: All student data calls go through RLS-protected endpoints
 - **Error Reporting**: PII scrubbed before sending to Sentry
+
+### Minimal Backend Task List (Recommended)
+
+**For Full End-to-End Robustness**:
+- [ ] **Sentry server integration**: SDK, release tags, server source maps
+- [ ] **CSP headers at edge/proxy**: Allow Canvas, block inline scripts
+- [ ] **RLS hardening**: All student-data endpoints + tests
+- [ ] **PII scrubbing policy**: Server logs and Sentry beforeSend
+- [ ] **Pseudonymous IDs**: Expose studentHash/courseHash in API instead of raw identifiers
+
+**Note**: Frontend-only implementation still provides significant benefits. Backend items turn this into a robust, auditable system end-to-end.
 
 ## Test Implementation Details
 
