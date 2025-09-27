@@ -12,10 +12,18 @@ const customJestConfig = {
   testPathIgnorePatterns: [
     '<rootDir>/.next/', 
     '<rootDir>/node_modules/',
-    '<rootDir>/tests/mocks/' // Temporarily skip MSW tests due to ES module issues
   ],
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(node-fetch|until-async|@mswjs|msw|@mswjs/interceptors|@mswjs/node)/)',
+  ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
