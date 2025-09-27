@@ -37,7 +37,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 ### Tasks
 1. **Setup Dependencies**
    - Install required packages: `apexcharts`, `react-apexcharts`, `@headlessui/react`
-   - Install testing: `@testing-library/jest-dom`, `msw`, `@storybook/react` (if using Chromatic)
+   - Install testing: `@testing-library/jest-dom`, `msw`, `playwright`
    - Install observability: `@sentry/nextjs`
    - Configure TypeScript paths for `@/components`, `@/lib`
    - Setup Jest + React Testing Library + Playwright
@@ -48,20 +48,17 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - `mocks.ts` - MSW handlers mirroring `/api/student-data` responses
    - Version contracts: breaking changes bump `apiVersion`
 
-3. **Create Status Logic Module** (`lib/status/`)
-   - `statusResolver.ts` - Pure status determination logic
-   - `statusBuckets.ts` - Status grouping and ordering
-   - `vectorFilter.ts` - Vector assignment filtering predicate
-   - Comprehensive unit tests with fixtures
-   - Isolated from UI concerns
+3. **Create Core Utilities** (`lib/derive/`)
+   - `canvasLinks.ts` - Canvas URL generation helper
+   - `dateUtils.ts` - Timezone-aware date calculations
+   - Pure functions with comprehensive tests
 
-4. **Create Core Utilities** (`lib/derive/`)
+4. **Create Additional Utilities** (`lib/derive/`)
    - `courseAggregates.ts` - Course-level calculations
    - `turnedInPct.ts` - Turned-in percentage calculations
    - `weekWindow.ts` - Timezone-aware date/weekday logic (configurable TZ)
    - `labels.ts` - Column-specific label formatting
    - `pointsSizing.ts` - Font size rules by point value
-   - `canvasLinks.ts` - Centralized Canvas link generation
 
 5. **Setup Observability**
    - Sentry integration for error reporting
@@ -163,17 +160,17 @@ Reset to the stable Phase 1 baseline and re-apply only the essential fixes disco
    - ✅ **Auth0 Route Correctness**: Use SDK's `app/api/auth/[auth0]/route.ts` (node runtime), no custom `/api/auth/me`
    - ✅ **UserProvider Client Wrapper**: Move `UserProvider` to client component at app root
    - ✅ **Environment Configuration**: `AUTH0_DEBUG=1` (dev only), correct domain/issuer/clientId
-   - ✅ **Auth Behavior Verification**: `/api/auth/me` returns 204 (logged out) / 200 (logged in)
+   - ✅ **Auth Behavior Verification**: `/api/auth/me` returns **204** when logged out, **200 + JSON** when logged in (SDK default)
    - ✅ **Canvas Link Helper**: Re-implement with tests
    - ✅ **Size-limit Script**: Bundle budget checks in CI
    - ✅ **Sentry Integration**: DSN-gated init with PII scrubbing
 
 4. **Add Guard Tests (Prevent Regressions)**
-   - **E2E Smoke Test**: 
+   - **E2E Smoke Test**: `tests/e2e/auth.me.spec.ts`
      - Visit `/api/auth/me` logged out → expects 204
      - Complete login flow → `/api/auth/me` returns 200 with `sub`
-   - **Unit Tests**: Canvas link helper tests
-   - **Bundle Budget**: Size-limit CI check
+   - **Unit Tests**: `tests/components/canvasLinks.test.ts`
+   - **Bundle Budget**: `scripts/size-limit-check` CI check
 
 5. **Verification Steps**
    ```bash
@@ -181,6 +178,8 @@ Reset to the stable Phase 1 baseline and re-apply only the essential fixes disco
    npm run dev
    # Verify /api/auth/me -> 204 logged out; 200 with JSON after login
    ```
+   - **Env Hygiene**: Verify `.env.local` has *only* the four required Auth0 vars + `AUTH0_DEBUG=1` in dev; no `NEXT_PUBLIC_*` auth vars
+   - **Middleware Prohibition**: No `middleware.ts` that touches `/api/auth/*` or sets `edge` runtime
 
 ### Success Criteria
 - [ ] Clean rollback to `phase-1-stable` completed
@@ -201,6 +200,12 @@ Reset to the stable Phase 1 baseline and re-apply only the essential fixes disco
 - **"chore: reapply minimal auth + observability baseline"** - Essential fixes
 - **"test: auth smoke + canvas link helper"** - Guard tests
 - **"chore: phase-2-reset complete"** - Final verification
+
+### Tagging Phase 2 Reset
+```bash
+git tag -a phase-2-reset-stable -m "Phase 2 Reset: Clean baseline with essential fixes"
+git push origin phase-2-reset-stable
+```
 
 ---
 
@@ -223,6 +228,8 @@ Build a minimal, working assignment list that proves the entire data flow from a
 ### Tasks
 
 1. **Create Assignment List Component** (`components/AssignmentList.tsx`)
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/components/AssignmentList.tsx`
    - **Authentication Gate**: Show "Sign in required" if no session (`useUser`)
    - **Data Fetching**: Use fetch wrapper returning `{ ok, status, data, error }`
    - **Loading States**: Skeleton UI during data fetch
@@ -232,37 +239,50 @@ Build a minimal, working assignment list that proves the entire data flow from a
    - **Assignment Display**: Name, due date, points, status, Canvas link
 
 2. **Implement Standardized API Client** (`lib/api/studentData.ts`)
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/lib/api/studentData.ts`
    - **Retry Logic**: Exponential backoff for 5xx errors only
    - **Request Deduplication**: Drop stale queries on student switch
    - **Error Classification**: Distinguish 401/403 (terminal) from retryable errors
    - **Standardized Response**: `{ ok, status, data | error }` format
    - **AbortController**: Cancel in-flight requests on component unmount
+   - **Retry Policy**: **Do not retry 401/403; surface terminal error with 'Sign in required'. Only retry 5xx/`ECONNRESET` with backoff.**
 
 3. **Create Canvas Link Helper** (`lib/derive/canvasLinks.ts`)
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/lib/derive/canvasLinks.ts`
    - **URL Generation**: `buildCanvasAssignmentUrl(courseId, assignmentId)`
    - **Configuration**: Support different Canvas instances
    - **Security**: `rel="noopener noreferrer"` for external links
    - **Tests**: Comprehensive URL generation test cases
 
 4. **Add Error Boundary** (`components/ErrorBoundary.tsx`)
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/components/ErrorBoundary.tsx`
    - **Error Catching**: React error boundary with fallback UI
    - **Sentry Integration**: Report errors with PII scrubbing
    - **Retry Mechanism**: "Try again" button for user-initiated retry
    - **User-Friendly Messages**: Clear, actionable error descriptions
 
 5. **Create Assignment List Page** (`app/assignments/page.tsx`)
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/app/assignments/page.tsx`
    - **Server Component**: Initial page structure and metadata
    - **Client Wrapper**: Interactive components with proper hydration
    - **URL State**: Student selection via query parameters
    - **Error Handling**: Graceful degradation for missing data
 
 6. **Add MSW Handlers** (`mocks/handlers.ts`)
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/mocks/handlers.ts`
    - **Processed Data Only**: Mock `/api/student-data` responses (not raw Canvas)
    - **Realistic Scenarios**: Multiple students, various assignment statuses
    - **Error Simulation**: 401, 403, 500 responses for testing
    - **Never Mock Auth**: No `/api/auth/*` mocking in dev
 
 7. **Implement Student Selection**
+   - **Owner**: Frontend Team
+   - **Artifact**: `src/components/StudentSelector.tsx`
    - **URL State**: `?student=studentId` query parameter
    - **Persistence**: Selection survives page refresh
    - **Default Behavior**: First student if none selected
@@ -292,6 +312,7 @@ Build a minimal, working assignment list that proves the entire data flow from a
 - [ ] **Auth Verification**: `/api/auth/me` behavior confirmed (204/200)
 - [ ] **Real Data**: Assignment list renders with actual API data
 - [ ] **No Console Errors**: Clean browser console, no React warnings
+- [ ] **Console Cleanliness**: Zero `console.error` and zero React warnings in CI run (Playwright captures console)
 - [ ] **Error Boundary Demo**: Synthetic failure caught and handled
 - [ ] **Size-limit Pass**: Bundle under budget threshold
 - [ ] **E2E Smoke Green**: Auth flow test passes
@@ -304,6 +325,12 @@ Build a minimal, working assignment list that proves the entire data flow from a
 - **Guard Tests**: E2E auth smoke test prevents regressions
 - **Bundle Monitoring**: Size-limit CI check prevents bloat
 - **Error Classification**: Distinguish terminal (401/403) from retryable errors
+
+### Tagging Phase 2
+```bash
+git tag -a phase-2-stable -m "Phase 2 vertical slice stable"
+git push origin phase-2-stable
+```
 
 #### Definition of Done
 - [ ] Real data loads without errors
