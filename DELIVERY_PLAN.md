@@ -170,11 +170,12 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Basic routing structure
 
 5. **Add Link Helper Tests**
-   - **Centralized Canvas URL builder** (`lib/derive/canvasLinks.ts`)
+   - **Centralize Canvas link builder** (`lib/derive/canvasLinks.ts`)
    - **Link Helper Tests**: Prevent death-by-typo in Canvas URLs
    - **Happy Path Tests**: Valid course/assignment IDs generate correct URLs
    - **Malformed ID Tests**: Invalid IDs handled gracefully without crashes
    - **URL Validation**: Ensure all generated links are valid
+   - **Centralized Usage**: All components use same link builder
 
 ### Testing
 - **E2E Tests**: Complete data flow from API to UI
@@ -207,8 +208,9 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Implement URL state sync for selected student
 
 #### API Integration
-- [ ] Create `lib/api/studentData.ts` with **standardized return shape**: `{ ok, status, data, error }`
-- [ ] **AbortController + dedupe**: Drop stale queries on student switch
+- [ ] Create **single abortable, deduped fetch wrapper** for `/api/student-data`
+- [ ] **Drop stale requests** on student switch (AbortController)
+- [ ] **Standardized return shape**: `{ ok: boolean, status: number, data?: T, error?: string }`
 - [ ] **Typed result**: Full TypeScript typing for API responses
 - [ ] Add error handling for network failures
 - [ ] Implement retry logic with exponential backoff
@@ -231,7 +233,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Display: course name, assignment title, status, due date
 - [ ] Add Canvas links with `rel="noopener noreferrer"`
 - [ ] Implement basic styling (status colors)
-- [ ] **Retry with backoff**: Visible retry button in error state
+- [ ] **Retry with exponential backoff**: Visible retry button in error state
+- [ ] **Retry button**: Always visible in error states, not just toasts
 - [ ] **No console warnings**: Verify clean real data rendering
 
 #### Loading & Empty States
@@ -269,7 +272,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 **Data & Performance**:
 - [ ] **Real data renders** without console warnings
-- [ ] **Web Vitals within gates**: INP ≤ 200ms, CLS ≤ 0.1, LCP ≤ 2.5s
+- [ ] **Web Vitals Go/No-Go**: INP ≤ 200ms, CLS ≤ 0.1, LCP ≤ 2.5s on slice route
 - [ ] **Bundle size verified**: Route-level code splitting working
 - [ ] **ApexCharts**: Dynamic import confirmed, no hydration errors
 
@@ -279,9 +282,10 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] **PII protection**: No names/IDs in logs or telemetry
 
 **Accessibility**:
-- [ ] **VoiceOver pass**: Names read sensibly, controls reachable
-- [ ] **Keyboard navigation**: Complete workflow without mouse
+- [ ] **VoiceOver pass**: Names read sensibly, controls reachable (Phase 2 requirement)
+- [ ] **Keyboard-only path**: Complete workflow without mouse
 - [ ] **Screen reader**: Chart data accessible via table toggle
+- [ ] **Axe clean per PR**: Maintain color-contrast tokens
 
 **Error Handling**:
 - [ ] **Error boundaries**: Catch and report failures gracefully
@@ -293,6 +297,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] **Sentry synthetic error**: Trigger test error with PII scrubbed
 - [ ] **VoiceOver pass**: Names read sensibly, controls reachable
 - [ ] **Console warnings check**: Real data renders without warnings
+- [ ] **All tests added to Phase 2 DoD**: Canvas helper, console check, Sentry synthetic
 
 **If ANY criteria fail**: Stop and address before proceeding to Phase 3.
 
@@ -315,9 +320,9 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Center percentage/checkmark display
    - Hover tooltip with detailed breakdown
    - **"View as table" toggle** for screen readers and data copy
-   - **ARIA Summary**: Single sentence with numbers first (e.g., "Zach: 12 graded, 3 submitted, 2 missing, 1 lost; 78% on-time")
+   - **SR Summary**: One sentence with numbers first (e.g., "Zach: 12 graded, 3 submitted, 2 missing, 1 lost; 78% on-time")
    - **Focus Order**: Lands on summary, not chart segments
-   - **Table Focus**: "View as table" moves focus into table and back out cleanly
+   - **View as Table**: Toggle that manages focus correctly (into table and back out)
    - Keyboard navigation support
 
 2. **Implement Chart Data Logic**
@@ -341,7 +346,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 5. **Progressive Hydration & Error Handling**
    - **Progressive Rendering**: Show courses as they arrive, totals tolerate partials
-   - **Partial Data Guards**: "loaded count / expected count" for all aggregations
+   - **Partial-Data-Safe Totals**: "loaded count / expected count" for all aggregations
    - **Stale-While-Revalidate**: Show `lastLoadedAt` + "Refresh" affordance
    - **Error Boundaries**: Per-route and per-widget (chart/table) boundaries
    - **Sentry Integration**: All error boundaries report to Sentry
@@ -367,6 +372,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Bundle size within budget (or fallback ready)
 - [ ] **Modern Web Vitals**: INP ≤ 200ms, CLS ≤ 0.1, LCP ≤ 2.5s (4× CPU/Slow 4G)
 - [ ] **Bundle Analysis**: `@next/bundle-analyzer` + `size-limit` per entry
+- [ ] **CI Integration**: Ensure size-limit runs in CI (permissions set)
+- [ ] **Route-level checks**: Bundle analyzer for route-level verification
 - [ ] **ApexCharts**: Route-level code splitting verified
 - [ ] Accessibility gate: axe passes, keyboard demo
 
@@ -624,6 +631,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Component logic
    - Edge cases and error conditions
    - **Coverage gates per PR**: utilities 100%, components 90%+
+   - **Enforce per PR**: Coverage gates must pass before merge
 
 2. **Component Tests** (React Testing Library)
    - User interactions
@@ -651,6 +659,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - **E2E Tests**: Hit real backend or use Playwright route mocks for failure paths
    - **Integration Tests**: Use real API with MSW for error scenarios
    - **Golden Fixture**: Single JSON from prod-like data, regenerate intentionally
+   - **Test Layers**: UI tests mock, E2E hits real backend
 
 ### Manual Testing
 1. **User Acceptance Testing**
@@ -688,6 +697,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - **Deprecation Policy**: Support N and N-1 versions for 30 days
 - **Breaking Changes**: Bump `apiVersion` and add `x-deprecated` notes in schema
 - **Migration Window**: 30-day overlap for client updates
+- **Client Requests**: Include `apiVersion: 1` in all API calls
+- **Version Header**: Add `X-API-Version: 1` to all requests
 
 ### Metadata Contract Definition
 **Student Metadata** (editable via Settings):
@@ -709,6 +720,13 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - Period must be valid integer 1-8
 - Assignment types and statuses must match enum values
 - Changes persist immediately to `metaData` endpoint
+
+**Scope Creep Prevention**:
+- **Student Metadata**: Only `legalName` and `preferredName` editable
+- **Course Metadata**: Only `shortName`, `teacher`, and `period` editable
+- **Assignment Metadata**: Read-only (backend-managed)
+- **No Additional Fields**: Settings UI cannot add new metadata fields
+- **Validation**: Server-side validation enforces field limits
 
 ## Phase 1 Learnings Applied to Future Phases
 
@@ -744,7 +762,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - **Release Tagging**: Enable release tags + source map upload
 - **Sampling**: 10% trace sampling for performance monitoring
 - **PII Scrubbing**: Student names/IDs scrubbed in `beforeSend` hook
-- **Custom Breadcrumbs**: Request start/finish with counts, retries, rate-limit backoffs, retry attempts, "render with partial data"
+- **Synthetic Error Path**: Test error reporting with PII scrubbed
+- **Custom Breadcrumbs**: Request start/finish with counts, retries/backoffs, "render with partial data"
 
 **Metrics Collection**:
 - **Web Vitals**: Log INP/CLS per route to console in dev
@@ -757,14 +776,15 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 **Content Security Policy**:
 - **Default CSP**: `default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://*.instructure.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'`
 - **No Inline Scripts**: All scripts must be from trusted sources
-- **Restricted Resources**: Limit img/script/connect to necessary domains only
+- **Restrict connect-src**: Only to your API + Canvas domains
 - **Canvas Integration**: Allow Canvas domains for assignment links
 
 **PII Protection**:
 - **No Logging**: Student names/IDs never logged in console or telemetry
 - **Hashed IDs**: Use stable hashed IDs for tracking instead of real IDs
 - **Error Masking**: Mask tokens/URLs in error payloads
-- **RLS Verification**: Confirm Row-Level Security on every data call
+- **RLS Verification**: Every data call goes through protected endpoints
+- **Enforce No PII**: All logs/telemetry must use hashed IDs only
 
 **Data Handling**:
 - **Client-Side**: No PII stored in localStorage or sessionStorage
