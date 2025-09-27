@@ -1,112 +1,63 @@
 /**
- * Centralized Canvas link generation to avoid URL mismatches
+ * Canvas Link Helper
+ * 
+ * Generates Canvas assignment URLs with proper configuration
+ * and security attributes.
  */
 
-/**
- * Generate Canvas assignment link
- */
-export const linkToAssignment = (courseId: string, assignmentId: string): string => {
-  // Extract the base URL from environment or use default
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  
-  // Remove trailing slash from base URL
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/courses/${courseId}/assignments/${assignmentId}`
+export interface CanvasConfig {
+  baseUrl: string
+}
+
+// Default Canvas configuration
+const DEFAULT_CANVAS_CONFIG: CanvasConfig = {
+  baseUrl: 'https://djusd.instructure.com'
 }
 
 /**
- * Generate Canvas course link
+ * Builds a Canvas assignment URL
+ * 
+ * @param courseId - Canvas course ID
+ * @param assignmentId - Canvas assignment ID
+ * @param config - Optional Canvas configuration
+ * @returns Complete Canvas assignment URL
  */
-export const linkToCourse = (courseId: string): string => {
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/courses/${courseId}`
+export function buildCanvasAssignmentUrl(
+  courseId: string | number,
+  assignmentId: string | number,
+  config: CanvasConfig = DEFAULT_CANVAS_CONFIG
+): string {
+  const baseUrl = config.baseUrl.replace(/\/$/, '') // Remove trailing slash
+  return `${baseUrl}/courses/${courseId}/assignments/${assignmentId}`
 }
 
 /**
- * Generate Canvas submission link
+ * Builds a Canvas course URL
+ * 
+ * @param courseId - Canvas course ID
+ * @param config - Optional Canvas configuration
+ * @returns Complete Canvas course URL
  */
-export const linkToSubmission = (courseId: string, assignmentId: string, submissionId: string): string => {
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/courses/${courseId}/assignments/${assignmentId}/submissions/${submissionId}`
+export function buildCanvasCourseUrl(
+  courseId: string | number,
+  config: CanvasConfig = DEFAULT_CANVAS_CONFIG
+): string {
+  const baseUrl = config.baseUrl.replace(/\/$/, '') // Remove trailing slash
+  return `${baseUrl}/courses/${courseId}`
 }
 
 /**
- * Generate Canvas user profile link
+ * Validates a Canvas URL
+ * 
+ * @param url - URL to validate
+ * @returns true if URL appears to be a valid Canvas URL
  */
-export const linkToUser = (userId: string): string => {
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/users/${userId}`
-}
-
-/**
- * Validate Canvas URL format
- */
-export const isValidCanvasUrl = (url: string): boolean => {
+export function isValidCanvasUrl(url: string): boolean {
   try {
-    const parsedUrl = new URL(url)
-    return parsedUrl.protocol === 'https:' && 
-           (parsedUrl.hostname.includes('canvas.instructure.com') || 
-            parsedUrl.hostname.includes('canvas.'))
+    const parsed = new URL(url)
+    return parsed.hostname.includes('instructure.com') || 
+           parsed.hostname.includes('canvas')
   } catch {
     return false
   }
-}
-
-/**
- * Extract course ID from Canvas URL
- */
-export const extractCourseIdFromUrl = (url: string): string | null => {
-  try {
-    const parsedUrl = new URL(url)
-    const pathParts = parsedUrl.pathname.split('/')
-    const coursesIndex = pathParts.indexOf('courses')
-    
-    if (coursesIndex !== -1 && pathParts[coursesIndex + 1]) {
-      return pathParts[coursesIndex + 1]
-    }
-    
-    return null
-  } catch {
-    return null
-  }
-}
-
-/**
- * Extract assignment ID from Canvas URL
- */
-export const extractAssignmentIdFromUrl = (url: string): string | null => {
-  try {
-    const parsedUrl = new URL(url)
-    const pathParts = parsedUrl.pathname.split('/')
-    const assignmentsIndex = pathParts.indexOf('assignments')
-    
-    if (assignmentsIndex !== -1 && pathParts[assignmentsIndex + 1]) {
-      return pathParts[assignmentsIndex + 1]
-    }
-    
-    return null
-  } catch {
-    return null
-  }
-}
-
-/**
- * Generate link with proper security attributes
- */
-export const generateSecureLink = (url: string, text: string): string => {
-  return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
-}
-
-/**
- * Get Canvas base URL from environment
- */
-export const getCanvasBaseUrl = (): string => {
-  return process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
 }
