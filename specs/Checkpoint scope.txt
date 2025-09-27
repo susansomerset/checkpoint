@@ -1,0 +1,81 @@
+
+Authorization:
+* User cannot access the site or api platform without Auth0 authentication.
+
+Metadata Management:
+* User can set metadata for a Student ID to see their legal name and their preferred name, which can be manually set in a popup accessed through the UI from a "Settings > Student Metadata" menu option and the preferred name is used in the UI whenever the student is referenced.
+* User can similarly set metadata for the courses found in response to the Canvas courses endpoint through a "Settings > Course Metadata" menu option.  The metadata includes "Short Name", "Teacher" and "Period", and these data elements are also heavily referenced in the display of information in the UI, particularly Period, which allows the application to sequence the course information intuitively for the student.  
+* When the user navigates to Settings, she sees the metadata organized nicely in a table or viewer.
+Student Data Management
+* User can force a full refresh of the data with refresh > Full Refresh menu option in the navigation, and while the refresh is loading, the icon spins, but the user continues to have access to the current student data.  When the refresh completes, refresh the UI so that all the UI pages reflect the new current student data array.
+* In the Settings > Autorefresh popup menu, the user can toggle a daily automated full refresh of the student data to happen via a scheduled job at midnight.  When toggled off, the data is not automatically fully refreshed every night.  When toggled on, the system runs a "headless" full refresh of the data at midnight Pacific time.
+* Also in the Autorefresh settings panel, the user can  and how many minutes between the AUTO quick update, between 0 and 60, where 0 means it is disabled, and 1 would mean it would auto quick update every minute.
+* User can also force a quick update from the refresh > Quick Update menu option, which should indicate with a timer icon if the auto-refresh is enabled or not.  Same for Full refresh menu option.
+
+Student Select:  There should be toggle buttons for students, labelled with their preferred name, so that the selected student's data reflects in all the charts and tables in the UI.
+
+Progress Charts: 
+See image of six period progress header charts, and reuse the custom react component we build for canvas-checkpoint's react UI.  The radial is four composite charts layered to represent the summary of points Earned (graded), Submitted (on time or otherwise), Missing, and Lost (the difference between the total possible and the score earned.). The percentage in the center is the number of points Earned, lost, submitted (on time or otherwise) divided by the total possible points to give the "turned in" percentage.  If there are no missing points, then 100% is replaced with a cheerful checkmark.
+
+Include the popup details as seen during over in the second image. These charts are visible on all UI interfaces, so if the user is looking at Progress, they see the charts,and if they switch to Assignments page, the charts remain visible (not duplicated, just outside of the component that serves those pages).
+
+Student Progress View:
+Refer to the third image: an aggregated, collapsible table that displays the student's courses in period order, subgroups by assignment status for four statuses in this order:  Missing, Submitted, Submitted (On time), and Graded.  (There are more statuses but they are filtered from this view.
+The columns give the count of assignments for aggregated groups, the total points possible, and the graded points summed, with a percentage of the graded points divided by the possible points, giving 0 points graded to Missing assignments and submitted assignments. All assignments are listed under their status heading with their due dates in parentheses, and they hyperlink to their canvas assignment url.  THe data is filtered for the selected Student only.
+
+Assignments View:
+The Assignments View shows a summary of all assignments for the course for the given week.  See the fourth image for reference. Row headers have the course short name displayed in order by period.  The student listed is filtered by the selected Student.
+
+Assigned Summary: A header above the table that summarizes how many assignments on the page are in which status -- Zach (⚠️: 15 / ❓: 5 / 👍: 5 / ✅: 0)
+
+Column 1: Class Short Name
+Column 2: Past Due Assignments "Past Due"
+Column 3: Assignments due Monday of the current week, or coming week if it is Saturday or Sunday. "Monday (m/d)"
+Columns 4-7: Assignments due Tuesday through Friday "{Day of week} (m/d)"
+Column 8: Assignments due next week "Next Week"
+Column 9: Summary link to Ungraded, unlocked assignments with No Due Date "## due (#,### points)"
+
+For columns 2 through 7, the assignment display follows these rules:
+* Left justified bulleted lists with different icon bullets depending on the status of the assignment.
+* If late by one or fewer "weekdays" (that is, Friday is the day before for Saturday, Sunday and Monday), then the bullet is a question mark emoji, and the font is red.
+* If late by more than one weekday, then it gets a warning emoji bullet, red font with yellow highlighting.
+* If the assignment is completed and due , Show a green checkmark emoji bullet and use green font
+* If the assignment is due and not completed, but not late, then use a thumbs up emoji and blue font.
+* All assignments are hyperlinked to their canvas page.
+* The current day's column (Monday if it is Saturday or Sunday) is highlighted in pale yellow.
+
+Assignment links, always bulleted by status, always link to assignment in Canvas:
+* Column 2: Due date, assignment name, number of points -- 8/29: Supply Check (5)
+* Column 3-7: Assignment name, points assigned -- DYOE #3 (20)
+* Column 8: Day due, name of assignment, points assigned -- Wed: Final Report Requirements (50)
+* Font size is smaller than normal for assignments between 5-9 points.  They are "normal" size for 10-29 points, and they are large and bold if they are worth 30+ points. Bullet sizes should not be altered based on point range.
+
+Detail View:
+A "kitchen sink report" of all assignments for the students displayed in a filterable sortable table (filter by column headings in combination) that will display all the assignment information including its course information and submission details.  Each assignment has a link to its canvas page.
+
+That's it.  That's the whole scope.  Simple, elegant, powerful.
+
+
+I forgot to include the data spec.  It's very simple.  there are two "persistent" json nodes off of root: studentData and metaData.  studentData is either fully refreshed as described in the UI functionality, or it is modified with activity stream updates from Canvas to keep assignments and status up to date.  Those functions to refresh to json node do NOT write to the persistent node until it is completed successfully, then it replaces studentData from root.  It does NOT replace metaData.
+
+The UI allows for the metaData to be modified based on what was specified above, and directly updates the metaData node.
+
+The studentData JSON Node will have this structure:
+- Student
+-- Student Metadata fields
+-- Student Courses
+--- Course Metadata
+--- Canvas Course Data Fields from courses endpoint
+--- Course Assignments
+---- Canvas Assignment Data Fields from assignments endpoint
+---- Assignment Submissions
+----- Canvas Submission Data fields from submissions endpoint
+
+Each node and subnode must be indexed by their appropriate ID value (StudentId, CourseID, AssignmentId, SubmissionId) so that the objects can be referenced easily.
+
+As indicated, each node should include any internal metadata fields as well as all the returned Canvas meta data for the object.
+
+The root should also include a timestamp of the last successful load of student data.
+
+We want to be VERY METHODICAL about how we build the load scripts for this application, because if we are not careful, we have to make 800 API calls to Canvas to refresh the data.Oft0hgALGYczF5q6aO9IuJcCGqVlYfaR
+

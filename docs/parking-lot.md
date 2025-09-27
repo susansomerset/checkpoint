@@ -17,3 +17,4 @@
 - [ ] Add `npm run dev:check-port` preflight (refuse to start if 3000 is busy).
 - [ ] Pre-commit: `typecheck`, `lint`, and forbid "smoke routes" on `main` via a simple check.
 
+
