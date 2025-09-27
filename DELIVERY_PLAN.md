@@ -9,15 +9,16 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 ## Table of Contents
 
 1. [Phase 1: Foundation & Setup](#phase-1-foundation--setup)
-2. [Phase 2: Vertical Slice (End-to-End Foundation)](#phase-2-vertical-slice-end-to-end-foundation)
-3. [Phase 3: Progress Header](#phase-3-progress-header)
-4. [Phase 4: Student Progress Table](#phase-4-student-progress-table)
-5. [Phase 5: Weekly Grid](#phase-5-weekly-grid)
-6. [Phase 6: Detail Table](#phase-6-detail-table)
-7. [Phase 7: Settings & Metadata](#phase-7-settings--metadata)
-8. [Phase 8: Integration & Polish](#phase-8-integration--polish)
-9. [Testing Strategy](#testing-strategy)
-10. [Success Metrics](#success-metrics)
+2. [Phase 2 Reset: Clean Baseline Restoration](#phase-2-reset-clean-baseline-restoration)
+3. [Phase 2: Vertical Slice (End-to-End Foundation)](#phase-2-vertical-slice-end-to-end-foundation)
+4. [Phase 3: Progress Header](#phase-3-progress-header)
+5. [Phase 4: Student Progress Table](#phase-4-student-progress-table)
+6. [Phase 5: Weekly Grid](#phase-5-weekly-grid)
+7. [Phase 6: Detail Table](#phase-6-detail-table)
+8. [Phase 7: Settings & Metadata](#phase-7-settings--metadata)
+9. [Phase 8: Integration & Polish](#phase-8-integration--polish)
+10. [Testing Strategy](#testing-strategy)
+11. [Success Metrics](#success-metrics)
 
 ---
 
@@ -131,106 +132,178 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 ---
 
+## Phase 2 Reset: Clean Baseline Restoration
+
+*"Clean slate, clear mind, confident progress."*
+
+### Purpose
+Reset to the stable Phase 1 baseline and re-apply only the essential fixes discovered during triage. This eliminates configuration landmines and provides a clean foundation for Phase 2.
+
+### Deliverables
+- [ ] Clean rollback to `phase-1-stable` tag
+- [ ] Essential auth fixes re-applied cleanly
+- [ ] Guard tests to prevent regressions
+- [ ] Clean commit history with minimal, focused changes
+
+### Tasks
+
+1. **Branch Off Current Work (Safekeeping)**
+   ```bash
+   git checkout -b triage-snapshot
+   git push -u origin triage-snapshot
+   ```
+
+2. **Return to Clean Baseline**
+   ```bash
+   git checkout phase-1-stable
+   git checkout -b phase-2-rebuild
+   ```
+
+3. **Re-apply Essential Fixes (KEEP List)**
+   - ✅ **Auth0 Route Correctness**: Use SDK's `app/api/auth/[auth0]/route.ts` (node runtime), no custom `/api/auth/me`
+   - ✅ **UserProvider Client Wrapper**: Move `UserProvider` to client component at app root
+   - ✅ **Environment Configuration**: `AUTH0_DEBUG=1` (dev only), correct domain/issuer/clientId
+   - ✅ **Auth Behavior Verification**: `/api/auth/me` returns 204 (logged out) / 200 (logged in)
+   - ✅ **Canvas Link Helper**: Re-implement with tests
+   - ✅ **Size-limit Script**: Bundle budget checks in CI
+   - ✅ **Sentry Integration**: DSN-gated init with PII scrubbing
+
+4. **Add Guard Tests (Prevent Regressions)**
+   - **E2E Smoke Test**: 
+     - Visit `/api/auth/me` logged out → expects 204
+     - Complete login flow → `/api/auth/me` returns 200 with `sub`
+   - **Unit Tests**: Canvas link helper tests
+   - **Bundle Budget**: Size-limit CI check
+
+5. **Verification Steps**
+   ```bash
+   rm -rf .next
+   npm run dev
+   # Verify /api/auth/me -> 204 logged out; 200 with JSON after login
+   ```
+
+### Success Criteria
+- [ ] Clean rollback to `phase-1-stable` completed
+- [ ] All KEEP items re-applied in minimal, focused commits
+- [ ] Guard tests prevent auth regressions
+- [ ] `/api/auth/me` behavior verified: 204/200
+- [ ] No triage-era configuration artifacts remain
+- [ ] Clean commit history with logical, atomic changes
+
+### Definition of Done
+- **Auth Contract**: `/api/auth/me` returns 204 (logged out) / 200 (logged in)
+- **Client Hydration**: `UserProvider` in client component wrapper
+- **Guard Tests**: E2E auth smoke test passes
+- **Bundle Budget**: Size-limit under threshold
+- **Clean History**: No triage artifacts, focused commits only
+
+### Commit Strategy
+- **"chore: reapply minimal auth + observability baseline"** - Essential fixes
+- **"test: auth smoke + canvas link helper"** - Guard tests
+- **"chore: phase-2-reset complete"** - Final verification
+
+---
+
 ## Phase 2: Vertical Slice (End-to-End Foundation)
 
 *"A journey of a thousand miles begins with a single step."*
 
+### Purpose
+Build a minimal, working assignment list that proves the entire data flow from authentication through Canvas links. This vertical slice validates our architecture and provides a solid foundation for subsequent phases.
+
 ### Deliverables
-- [ ] Basic assignment list view
-- [ ] Real API integration
-- [ ] Loading and error states
-- [ ] Canvas link functionality
-- [ ] Data contract validation
+- [ ] `/assignments` page with real data flow
+- [ ] Authentication integration (sign-in required)
+- [ ] Data fetching with standardized error handling
+- [ ] Loading, empty, and error states
+- [ ] Canvas assignment links with proper URL generation
+- [ ] Student selection with URL state
+- [ ] Guard tests to prevent regressions
 
 ### Tasks
-1. **Create Basic Assignment List**
-   - Simple HTML table showing assignments
-   - Student selection dropdown
-   - Status display with basic styling
-   - Canvas links for each assignment
 
-2. **Implement Real API Integration**
-   - Fetch from `/api/student-data` endpoint
-   - Handle RLS filtering
-   - Process real data through contracts
-   - Validate data contract compliance
+1. **Create Assignment List Component** (`components/AssignmentList.tsx`)
+   - **Authentication Gate**: Show "Sign in required" if no session (`useUser`)
+   - **Data Fetching**: Use fetch wrapper returning `{ ok, status, data, error }`
+   - **Loading States**: Skeleton UI during data fetch
+   - **Empty States**: "No assignments found" with helpful messaging
+   - **Error Boundary**: Retry functionality with user-friendly messages
+   - **Student Selector**: Simple dropdown with URL state sync
+   - **Assignment Display**: Name, due date, points, status, Canvas link
 
-3. **Add Essential UI States**
-   - Loading skeleton while fetching
-   - Error boundary with retry
-   - Empty state when no assignments
-   - Toast notifications for errors
+2. **Implement Standardized API Client** (`lib/api/studentData.ts`)
+   - **Retry Logic**: Exponential backoff for 5xx errors only
+   - **Request Deduplication**: Drop stale queries on student switch
+   - **Error Classification**: Distinguish 401/403 (terminal) from retryable errors
+   - **Standardized Response**: `{ ok, status, data | error }` format
+   - **AbortController**: Cancel in-flight requests on component unmount
 
-4. **Implement Basic Navigation**
-   - Student selection persistence
-   - URL state management
-   - Basic routing structure
+3. **Create Canvas Link Helper** (`lib/derive/canvasLinks.ts`)
+   - **URL Generation**: `buildCanvasAssignmentUrl(courseId, assignmentId)`
+   - **Configuration**: Support different Canvas instances
+   - **Security**: `rel="noopener noreferrer"` for external links
+   - **Tests**: Comprehensive URL generation test cases
 
-### Testing
-- **E2E Tests**: Complete data flow from API to UI
-- **Contract Tests**: Real API responses match expected types
-- **Error Tests**: Network failures, empty responses, malformed data
-- **Manual Tests**: Real data loading and display
+4. **Add Error Boundary** (`components/ErrorBoundary.tsx`)
+   - **Error Catching**: React error boundary with fallback UI
+   - **Sentry Integration**: Report errors with PII scrubbing
+   - **Retry Mechanism**: "Try again" button for user-initiated retry
+   - **User-Friendly Messages**: Clear, actionable error descriptions
+
+5. **Create Assignment List Page** (`app/assignments/page.tsx`)
+   - **Server Component**: Initial page structure and metadata
+   - **Client Wrapper**: Interactive components with proper hydration
+   - **URL State**: Student selection via query parameters
+   - **Error Handling**: Graceful degradation for missing data
+
+6. **Add MSW Handlers** (`mocks/handlers.ts`)
+   - **Processed Data Only**: Mock `/api/student-data` responses (not raw Canvas)
+   - **Realistic Scenarios**: Multiple students, various assignment statuses
+   - **Error Simulation**: 401, 403, 500 responses for testing
+   - **Never Mock Auth**: No `/api/auth/*` mocking in dev
+
+7. **Implement Student Selection**
+   - **URL State**: `?student=studentId` query parameter
+   - **Persistence**: Selection survives page refresh
+   - **Default Behavior**: First student if none selected
+   - **Validation**: Only show authorized students
 
 ### Success Criteria
-- [ ] Real data loads and displays correctly
-- [ ] All Canvas links work
-- [ ] Loading states prevent confusion
-- [ ] Error states are user-friendly
-- [ ] Student selection works
-- [ ] Data contracts are validated
-- [ ] No console errors with real data
+- [ ] **Authentication Flow**: Sign-in required, proper redirects
+- [ ] **Data Loading**: Real assignments display with proper formatting
+- [ ] **Canvas Links**: Clickable links open correct Canvas assignments
+- [ ] **Error Handling**: Graceful error states with retry options
+- [ ] **Student Selection**: URL state works, selection persists
+- [ ] **Loading States**: Smooth skeleton UI during data fetch
+- [ ] **Responsive Design**: Works on mobile and desktop
+- **Performance**: Page loads in < 2 seconds, bundle under budget
 
-### Phase 0.5 Implementation Checklist
+### Definition of Done
+- **Auth Contract**: `/api/auth/me` returns 204 (logged out) / 200 (logged in)
+- **Data Flow**: Real API data displays correctly
+- **Error States**: All error scenarios handled gracefully
+- **Canvas Links**: External links work and are secure
+- **URL State**: Student selection persists across refreshes
+- **Bundle Budget**: Size-limit under threshold
+- **Test Coverage**: 90%+ for new components
+- **E2E Tests**: Auth smoke test passes
 
-*"A journey of a thousand miles begins with a single step."*
+### Go/No-Go Gates (Must Pass Before Phase 3)
+- [ ] **Auth Verification**: `/api/auth/me` behavior confirmed (204/200)
+- [ ] **Real Data**: Assignment list renders with actual API data
+- [ ] **No Console Errors**: Clean browser console, no React warnings
+- [ ] **Error Boundary Demo**: Synthetic failure caught and handled
+- [ ] **Size-limit Pass**: Bundle under budget threshold
+- [ ] **E2E Smoke Green**: Auth flow test passes
+- [ ] **Component Tests Green**: All unit tests pass
 
-#### Routes & Pages
-- [ ] Create `/assignments` route with basic layout
-- [ ] Add student selection dropdown (preferred names from metadata)
-- [ ] Implement URL state sync for selected student
-
-#### API Integration
-- [ ] Create `lib/api/studentData.ts` with fetch wrapper
-- [ ] Add error handling for network failures
-- [ ] Implement retry logic with exponential backoff
-- [ ] Add loading states during fetch
-
-#### MSW Handlers
-- [ ] Mock `/api/student-data` endpoint
-- [ ] Mock `/api/metadata` endpoint
-- [ ] Add error scenarios (network failure, 403, 500)
-- [ ] Create fixtures with realistic data
-
-#### Error Boundary
-- [ ] Create `components/ErrorBoundary.tsx`
-- [ ] Add Sentry integration (gated by env)
-- [ ] Implement PII scrubbing in beforeSend
-- [ ] Add friendly error message with retry button
-
-#### Basic Assignment List
-- [ ] Create `components/AssignmentList.tsx`
-- [ ] Display: course name, assignment title, status, due date
-- [ ] Add Canvas links with `rel="noopener noreferrer"`
-- [ ] Implement basic styling (status colors)
-
-#### Loading & Empty States
-- [ ] Add skeleton loading for assignment list
-- [ ] Create empty state when no assignments
-- [ ] Add error state with retry functionality
-- [ ] Implement toast notifications for errors
-
-#### Bundle Size Monitoring
-- [ ] Add `size-limit` package
-- [ ] Configure size-limit script in package.json
-- [ ] Set initial budget: 250KB (gzip)
-- [ ] Add CI check for bundle size
-
-#### Testing
-- [ ] E2E test: complete data flow
-- [ ] Component test: error boundary behavior
-- [ ] Integration test: MSW handlers work
-- [ ] Manual test: real data loading
+### Lessons Learned Integration
+- **No Custom Auth Routes**: Use SDK's built-in handlers only
+- **Client Component Wrapper**: `UserProvider` in client component
+- **Standardized API Responses**: Consistent `{ ok, status, data | error }` format
+- **Guard Tests**: E2E auth smoke test prevents regressions
+- **Bundle Monitoring**: Size-limit CI check prevents bloat
+- **Error Classification**: Distinguish terminal (401/403) from retryable errors
 
 #### Definition of Done
 - [ ] Real data loads without errors
@@ -949,6 +1022,43 @@ Each phase builds on the previous one, with testing gates between phases to ensu
 - **Decision**: Use Playwright visual diffs on key screens (no Storybook/Chromatic)
 - MSW across unit + E2E (no real Canvas hits)
 - **Coverage gates per PR**: utilities 100%, components 90%+
+
+---
+
+## Phase 2 Reset & Revised Phase 2 Summary
+
+*"Clean slate, clear progress, confident delivery."*
+
+### Key Changes Made
+
+#### Phase 2 Reset (New Phase)
+- **Purpose**: Clean rollback to `phase-1-stable` with essential fixes only
+- **KEEP List**: Auth0 route correctness, UserProvider client wrapper, environment config, Canvas link helper, size-limit, Sentry
+- **PURGE List**: Custom auth routes, middleware intercepts, webpack tweaks, MSW auth mocking, timeout hacks
+- **Guard Tests**: E2E auth smoke test, Canvas link helper tests, bundle budget checks
+
+#### Revised Phase 2 (Updated)
+- **Purpose**: Vertical slice proving end-to-end data flow from auth to Canvas links
+- **Key Learnings Integrated**:
+  - No custom auth routes (use SDK only)
+  - UserProvider in client component wrapper
+  - Standardized API responses `{ ok, status, data | error }`
+  - Guard tests prevent regressions
+  - Bundle monitoring prevents bloat
+  - Error classification (terminal vs retryable)
+- **Go/No-Go Gates**: Auth verification, real data rendering, no console errors, error boundary demo, size-limit pass, E2E smoke green
+
+### Benefits of This Approach
+1. **Clean Foundation**: Eliminates triage-era configuration landmines
+2. **Focused Fixes**: Only essential changes re-applied deliberately
+3. **Guard Rails**: Tests prevent regression of critical fixes
+4. **Clear Progress**: Clean commit history with logical, atomic changes
+5. **Confident Delivery**: Go/No-Go gates ensure quality before proceeding
+
+### Next Steps
+1. **Phase 2 Reset**: Rollback to `phase-1-stable`, re-apply KEEP items, add guard tests
+2. **Phase 2 Implementation**: Build vertical slice with clean architecture
+3. **Phase 3+**: Continue with confidence on solid foundation
 
 ---
 
