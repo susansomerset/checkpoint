@@ -26,58 +26,59 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 *"Measure twice, cut once."*
 
 ### Deliverables
-- [ ] Project structure and dependencies
-- [ ] Data contracts and type definitions
-- [ ] Core utility functions (pure helpers)
-- [ ] Test infrastructure setup
-- [ ] MSW handlers and mocks
-- [ ] Observability setup
+- [x] Project structure and dependencies
+- [x] Data contracts and type definitions
+- [x] Core utility functions (pure helpers)
+- [x] Test infrastructure setup
+- [x] MSW handlers and mocks
+- [x] Observability setup
 
 ### Tasks
-1. **Setup Dependencies**
-   - Install required packages: `apexcharts`, `react-apexcharts`, `@headlessui/react`
-   - Install testing: `@testing-library/jest-dom`, `msw`, `@storybook/react` (if using Chromatic)
-   - Install observability: `@sentry/nextjs`
-   - Configure TypeScript paths for `@/components`, `@/lib`
-   - Setup Jest + React Testing Library + Playwright
+1. **Setup Dependencies** ✅
+   - [x] Install required packages: `apexcharts`, `react-apexcharts`, `@headlessui/react`
+   - [x] Install testing: `@testing-library/jest-dom`, `msw`, `@playwright/test`
+   - [x] Install observability: `@sentry/nextjs`
+   - [x] Configure TypeScript paths for `@/components`, `@/lib`
+   - [x] Setup Jest + React Testing Library + Playwright
 
-2. **Define Data Contracts** (`lib/contracts/`)
-   - `types.ts` - Core types: `Student`, `Course`, `Assignment`, `Submission`, `DerivedAssignment`
-   - `api.ts` - API response types with versioning (`apiVersion: 1`)
-   - `mocks.ts` - MSW handlers mirroring `/api/student-data` responses
-   - Version contracts: breaking changes bump `apiVersion`
+2. **Define Data Contracts** (`lib/contracts/`) ✅
+   - [x] `types.ts` - Core types: `Student`, `Course`, `Assignment`, `Submission`, `DerivedAssignment`
+   - [x] `api.ts` - API response types with versioning (`apiVersion: 1`)
+   - [x] `mocks.ts` - MSW handlers mirroring `/api/student-data` responses
+   - [x] Version contracts: breaking changes bump `apiVersion`
 
-3. **Create Status Logic Module** (`lib/status/`)
-   - `statusResolver.ts` - Pure status determination logic
-   - `statusBuckets.ts` - Status grouping and ordering
-   - `vectorFilter.ts` - Vector assignment filtering predicate
-   - Comprehensive unit tests with fixtures
-   - Isolated from UI concerns
+3. **Create Status Logic Module** (`lib/status/`) ⚠️ **CHANGED APPROACH**
+   - ~~`statusResolver.ts` - Pure status determination logic~~ **REMOVED**
+   - ~~`statusBuckets.ts` - Status grouping and ordering~~ **REMOVED**
+   - ~~`vectorFilter.ts` - Vector assignment filtering predicate~~ **REMOVED**
+   - ~~Comprehensive unit tests with fixtures~~ **REMOVED**
+   - ~~Isolated from UI concerns~~ **REMOVED**
+   - **NEW APPROACH**: Frontend trusts backend `checkpointStatus` completely
 
-4. **Create Core Utilities** (`lib/derive/`)
-   - `courseAggregates.ts` - Course-level calculations
-   - `turnedInPct.ts` - Turned-in percentage calculations
-   - `weekWindow.ts` - Timezone-aware date/weekday logic (configurable TZ)
-   - `labels.ts` - Column-specific label formatting
-   - `pointsSizing.ts` - Font size rules by point value
-   - `canvasLinks.ts` - Centralized Canvas link generation
+4. **Create Core Utilities** (`lib/derive/`) ✅
+   - [x] `courseAggregates.ts` - Course-level calculations
+   - [x] `turnedInPct.ts` - Turned-in percentage calculations
+   - [x] `weekWindow.ts` - Timezone-aware date/weekday logic (configurable TZ)
+   - [x] `labels.ts` - Column-specific label formatting
+   - [x] `pointsSizing.ts` - Font size rules by point value
+   - [x] `canvasLinks.ts` - Centralized Canvas link generation
 
-5. **Setup Observability**
-   - Sentry integration for error reporting
-   - Client logger for fetch timings, pagination counts, rate limits
-   - Dev health panel: last refresh, counts, errors
+5. **Setup Observability** ✅
+   - [x] Sentry integration for error reporting
+   - [x] Client logger for fetch timings, pagination counts, rate limits
+   - [x] Dev health panel: last refresh, counts, errors
 
-6. **Create Test Fixtures**
-   - **Use real data from `/api/student-data`** for comprehensive testing
-   - Generate MSW handlers from real API responses
-   - Create synthetic data only for error scenarios we can't reproduce
-   - Ensure real data covers edge cases: weekend boundaries, late assignments, Vector types, DST transitions
+6. **Create Test Fixtures** ✅
+   - [x] **Use real data from `/api/student-data`** for comprehensive testing
+   - [x] Generate MSW handlers from real API responses
+   - [x] Create synthetic data only for error scenarios we can't reproduce
+   - [x] Ensure real data covers edge cases: weekend boundaries, late assignments, Vector types, DST transitions
 
-### Testing
-- **Unit Tests**: All utility functions with edge cases
-- **Contract Tests**: Type compilation, MSW fixture validation
-- **Integration Tests**: Utility function combinations
-- **Manual Tests**: Verify timezone handling, DST edge cases
+### Testing ✅
+- [x] **Unit Tests**: All utility functions with edge cases
+- [x] **Contract Tests**: Type compilation, MSW fixture validation
+- [x] **Integration Tests**: Utility function combinations
+- [x] **Manual Tests**: Verify timezone handling, DST edge cases
 
 ### Success Criteria
 - [x] All utility functions pass 100% test coverage
