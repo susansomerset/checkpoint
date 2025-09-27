@@ -12,6 +12,5 @@
     "env": {
       "NODE_ENV": "production"
     }
-  },
-  "testCommand": "npm test"
+  }
 }
