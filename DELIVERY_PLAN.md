@@ -198,8 +198,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 #### Schema Finalization
 - [ ] **Publish assignment.meta enums**: Zod + TypeScript schemas
-- [ ] **assignmentType enum**: `'vector' | 'graded' | 'practice' | 'bonus' | 'unknown'`
-- [ ] **checkpointStatus enum**: `'Missing' | 'Submitted' | 'Graded' | 'Due' | 'Locked' | 'Closed' | 'Cancelled' | 'Vector'`
+- [ ] **assignmentType enum**: `'Pointed' | 'Vector'`
+- [ ] **checkpointStatus enum**: `'Locked' | 'Closed' | 'Due' | 'Missing' | 'Vector' | 'Submitted' | 'Graded' | 'Cancelled'`
 - [ ] **Type narrowing**: Enable proper TypeScript type checking
 
 #### Routes & Pages
@@ -329,7 +329,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Course aggregation by period (with tie-breakers)
    - Status calculations using backend `checkpointStatus` directly
    - Turned-in percentage computation (associative totals)
-   - Vector assignment filtering via `assignmentType` field
+   - Vector assignment filtering via `assignmentType === 'Vector'` field
 
 3. **Add ProgressHeader Wrapper**
    - Student selection integration
@@ -365,7 +365,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Hover tooltip shows accurate data
 - [ ] Center shows percentage or checkmark appropriately
 - [ ] Courses ordered by period (with consistent tie-breakers)
-- [ ] Vector assignments excluded via `assignmentType` filtering
+- [ ] Vector assignments excluded via `assignmentType === 'Vector'` filtering
 - [ ] Screen reader announces chart data
 - [ ] Keyboard navigation works
 - [ ] Error boundary catches failures gracefully
@@ -398,7 +398,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 2. **Implement Status Logic**
    - Use backend `checkpointStatus` directly (no frontend status logic)
-   - Vector assignment filtering via `assignmentType` field
+   - Vector assignment filtering via `assignmentType === 'Vector'` field
    - Due date formatting
    - Canvas link generation
 
@@ -419,7 +419,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] All assignments link to Canvas
 - [ ] Expand/collapse works smoothly
 - [ ] Student filtering works correctly
-- [ ] Vector assignments hidden (via `assignmentType` filtering)
+- [ ] Vector assignments hidden (via `assignmentType === 'Vector'` filtering)
 
 ---
 
@@ -740,7 +740,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - **Reason**: User directive "Do NOT GO SQUIRRELLY" - frontend should not make status assumptions
 - **Impact on Future Phases**:
   - All status calculations use `assignment.meta.checkpointStatus` directly
-  - Vector filtering uses `assignment.meta.assignmentType` field
+  - Vector filtering uses `assignment.meta.assignmentType === 'Vector'` field
   - No frontend status logic modules needed
   - Simplified architecture, better separation of concerns
 
@@ -1110,7 +1110,7 @@ Each phase builds on the previous one, with testing gates between phases to ensu
 ### Status Logic Package
 - **Backend status contract** - frontend trusts `checkpointStatus` completely
 - Frontend uses `assignment.meta.checkpointStatus` directly
-- Vector filtering via `assignment.meta.assignmentType` field
+- Vector filtering via `assignment.meta.assignmentType === 'Vector'` field
 
 ### Bundle Budget
 - **Initial route JS (gzip)**: ≤ 250–300 KB

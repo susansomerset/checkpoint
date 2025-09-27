@@ -73,9 +73,9 @@ export type DerivedAssignment = z.infer<typeof DerivedAssignmentSchema>
 
 // Course meta schema
 export const CourseMetaSchema = z.object({
-  shortName: z.string().optional(),
-  teacher: z.string().optional(),
-  period: z.number().int().optional(),
+  shortName: z.string().max(20).optional(),
+  teacher: z.string().max(50).optional(),
+  period: z.number().int().min(1).max(8).optional(),
 })
 export type CourseMeta = z.infer<typeof CourseMetaSchema>
 
@@ -91,8 +91,8 @@ export type Course = z.infer<typeof CourseSchema>
 
 // Student meta schema
 export const StudentMetaSchema = z.object({
-  legalName: z.string().optional(),
-  preferredName: z.string().optional(),
+  legalName: z.string().max(100).optional(),
+  preferredName: z.string().max(50).optional(),
 })
 export type StudentMeta = z.infer<typeof StudentMetaSchema>
 

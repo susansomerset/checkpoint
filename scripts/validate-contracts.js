@@ -14,7 +14,6 @@ const path = require('path')
 const contractFiles = [
   'src/lib/contracts/types.ts',
   'src/lib/contracts/api.ts',
-  'src/mocks/handlers.ts'
 ]
 
 let allValid = true

@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono as GeistMono } from "next/font/google";
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Inter } from "next/font/google";
+import { ClientAuthProvider } from '@/components/ClientAuthProvider';
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = GeistMono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -29,11 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} antialiased`}
       >
-        <UserProvider>
+        <ClientAuthProvider>
           {children}
-        </UserProvider>
+        </ClientAuthProvider>
       </body>
     </html>
   );

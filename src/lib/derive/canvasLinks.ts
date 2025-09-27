@@ -1,59 +1,93 @@
 /**
- * Centralized Canvas link generation to avoid URL mismatches
+ * Centralized Canvas link builder
+ * Prevents death-by-typo in Canvas URLs across all components
  */
 
-/**
- * Generate Canvas assignment link
- */
-export const linkToAssignment = (courseId: string, assignmentId: string): string => {
-  // Extract the base URL from environment or use default
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  
-  // Remove trailing slash from base URL
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/courses/${courseId}/assignments/${assignmentId}`
+export interface CanvasLinkOptions {
+  courseId: string
+  assignmentId?: string
+  baseUrl?: string
 }
 
 /**
- * Generate Canvas course link
+ * Generate Canvas assignment URL
+ * @param options - Canvas link options
+ * @returns Complete Canvas URL or null if invalid
  */
-export const linkToCourse = (courseId: string): string => {
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/courses/${courseId}`
+export function buildCanvasAssignmentUrl(options: CanvasLinkOptions): string | null {
+  const { courseId, assignmentId, baseUrl = 'https://djusd.instructure.com' } = options
+
+  // Validate required parameters
+  if (!courseId || !assignmentId) {
+    console.warn('Canvas link builder: Missing required courseId or assignmentId', { courseId, assignmentId })
+    return null
+  }
+
+  // Validate ID format (basic check for non-empty strings)
+  if (typeof courseId !== 'string' || courseId.trim() === '') {
+    console.warn('Canvas link builder: Invalid courseId format', { courseId })
+    return null
+  }
+
+  if (typeof assignmentId !== 'string' || assignmentId.trim() === '') {
+    console.warn('Canvas link builder: Invalid assignmentId format', { assignmentId })
+    return null
+  }
+
+  try {
+    // Build Canvas assignment URL
+    const url = `${baseUrl}/courses/${encodeURIComponent(courseId)}/assignments/${encodeURIComponent(assignmentId)}`
+    
+    // Validate the constructed URL
+    new URL(url)
+    return url
+  } catch (error) {
+    console.error('Canvas link builder: Failed to construct URL', { 
+      courseId, 
+      assignmentId, 
+      baseUrl, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    })
+    return null
+  }
 }
 
 /**
- * Generate Canvas submission link
+ * Generate Canvas course URL
+ * @param courseId - Canvas course ID
+ * @param baseUrl - Canvas base URL (optional)
+ * @returns Complete Canvas course URL or null if invalid
  */
-export const linkToSubmission = (courseId: string, assignmentId: string, submissionId: string): string => {
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/courses/${courseId}/assignments/${assignmentId}/submissions/${submissionId}`
-}
+export function buildCanvasCourseUrl(courseId: string, baseUrl: string = 'https://djusd.instructure.com'): string | null {
+  if (!courseId || typeof courseId !== 'string' || courseId.trim() === '') {
+    console.warn('Canvas link builder: Invalid courseId for course URL', { courseId })
+    return null
+  }
 
-/**
- * Generate Canvas user profile link
- */
-export const linkToUser = (userId: string): string => {
-  const baseUrl = process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  return `${cleanBaseUrl}/users/${userId}`
+  try {
+    const url = `${baseUrl}/courses/${encodeURIComponent(courseId)}`
+    new URL(url)
+    return url
+  } catch (error) {
+    console.error('Canvas link builder: Failed to construct course URL', { 
+      courseId, 
+      baseUrl, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    })
+    return null
+  }
 }
 
 /**
  * Validate Canvas URL format
+ * @param url - URL to validate
+ * @returns true if valid Canvas URL format
  */
-export const isValidCanvasUrl = (url: string): boolean => {
+export function isValidCanvasUrl(url: string): boolean {
   try {
-    const parsedUrl = new URL(url)
-    return parsedUrl.protocol === 'https:' && 
-           (parsedUrl.hostname.includes('canvas.instructure.com') || 
-            parsedUrl.hostname.includes('canvas.'))
+    const parsed = new URL(url)
+    return parsed.hostname.includes('canvas.instructure.com') || 
+           parsed.hostname.includes('instructure.com')
   } catch {
     return false
   }
@@ -61,18 +95,14 @@ export const isValidCanvasUrl = (url: string): boolean => {
 
 /**
  * Extract course ID from Canvas URL
+ * @param url - Canvas URL
+ * @returns Course ID or null if not found
  */
-export const extractCourseIdFromUrl = (url: string): string | null => {
+export function extractCourseIdFromUrl(url: string): string | null {
   try {
-    const parsedUrl = new URL(url)
-    const pathParts = parsedUrl.pathname.split('/')
-    const coursesIndex = pathParts.indexOf('courses')
-    
-    if (coursesIndex !== -1 && pathParts[coursesIndex + 1]) {
-      return pathParts[coursesIndex + 1]
-    }
-    
-    return null
+    const parsed = new URL(url)
+    const match = parsed.pathname.match(/\/courses\/(\d+)/)
+    return match ? match[1] : null
   } catch {
     return null
   }
@@ -80,33 +110,15 @@ export const extractCourseIdFromUrl = (url: string): string | null => {
 
 /**
  * Extract assignment ID from Canvas URL
+ * @param url - Canvas URL
+ * @returns Assignment ID or null if not found
  */
-export const extractAssignmentIdFromUrl = (url: string): string | null => {
+export function extractAssignmentIdFromUrl(url: string): string | null {
   try {
-    const parsedUrl = new URL(url)
-    const pathParts = parsedUrl.pathname.split('/')
-    const assignmentsIndex = pathParts.indexOf('assignments')
-    
-    if (assignmentsIndex !== -1 && pathParts[assignmentsIndex + 1]) {
-      return pathParts[assignmentsIndex + 1]
-    }
-    
-    return null
+    const parsed = new URL(url)
+    const match = parsed.pathname.match(/\/assignments\/(\d+)/)
+    return match ? match[1] : null
   } catch {
     return null
   }
-}
-
-/**
- * Generate link with proper security attributes
- */
-export const generateSecureLink = (url: string, text: string): string => {
-  return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
-}
-
-/**
- * Get Canvas base URL from environment
- */
-export const getCanvasBaseUrl = (): string => {
-  return process.env.CANVAS_BASE_URL || 'https://canvas.instructure.com'
 }

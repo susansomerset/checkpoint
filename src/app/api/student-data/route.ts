@@ -5,7 +5,15 @@ import { StudentDataSchema } from '@/lib/student/schema';
 import * as kv from '@/lib/storage/kv';
 
 export async function GET(req: NextRequest) {
-  await requireSession(req);
+  try {
+    await requireSession(req);
+  } catch (error) {
+    console.info('ZXQ auth.required: No session found');
+    return Response.json(
+      { error: 'AUTH_REQUIRED' },
+      { status: 401 }
+    );
+  }
   
       // Try to get student data from storage
       try {
