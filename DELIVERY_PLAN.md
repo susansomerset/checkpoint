@@ -151,7 +151,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Canvas links for each assignment
 
 2. **Implement Real API Integration**
-   - Fetch from `/api/student-data` endpoint
+   - Fetch from `/api/student-data` endpoint with **AbortController**
+   - **Request deduplication** (drop stale queries on student switch)
    - Handle RLS filtering
    - Process real data through contracts
    - Validate data contract compliance
@@ -188,7 +189,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Data contracts are validated
 - [ ] No console errors with real data
 
-### Phase 0.5 Implementation Checklist
+### Phase 2 Implementation Checklist
 
 *"A journey of a thousand miles begins with a single step."*
 
@@ -198,7 +199,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Implement URL state sync for selected student
 
 #### API Integration
-- [ ] Create `lib/api/studentData.ts` with fetch wrapper
+- [ ] Create `lib/api/studentData.ts` with **standardized return shape**: `{ ok, status, data, error }`
 - [ ] Add error handling for network failures
 - [ ] Implement retry logic with exponential backoff
 - [ ] Add loading states during fetch
@@ -244,7 +245,7 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] All Canvas links open correctly
 - [ ] Error boundary catches and reports failures
 - [ ] Loading states prevent UI confusion
-- [ ] Bundle size under 250KB (gzip)
+- [ ] **Bundle Budget**: Initial route JS ≤ 300KB, Per-route total ≤ 400KB
 - [ ] All tests pass
 - [ ] No console errors or warnings
 
@@ -296,8 +297,9 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - Center percentage/checkmark display
    - Hover tooltip with detailed breakdown
    - **"View as table" toggle** for screen readers and data copy
-   - **ARIA Summary**: Totals and per-segment counts in `aria-live` region
+   - **ARIA Summary**: Single sentence with numbers first (e.g., "Zach: 12 graded, 3 submitted, 2 missing, 1 lost; 78% on-time")
    - **Focus Order**: Lands on summary, not chart segments
+   - **Table Focus**: "View as table" moves focus into table and back out cleanly
    - Keyboard navigation support
 
 2. **Implement Chart Data Logic**
@@ -316,10 +318,12 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 4. **Add Bundle Optimization**
    - Code splitting for chart components
    - Bundle size monitoring
-   - Fallback SVG radial chart (if needed)
+   - **Feature Flag**: `NEXT_PUBLIC_USE_LIGHT_CHART=true` for SVG fallback
+   - Fallback SVG radial chart (if ApexCharts busts budgets)
 
 5. **Progressive Hydration & Error Handling**
    - **Progressive Rendering**: Show courses as they arrive, totals tolerate partials
+   - **Partial Data Guards**: "loaded count / expected count" for all aggregations
    - **Stale-While-Revalidate**: Show `lastLoadedAt` + "Refresh" affordance
    - **Error Boundaries**: Per-route and per-widget (chart/table) boundaries
    - **Sentry Integration**: All error boundaries report to Sentry
@@ -624,9 +628,10 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
    - **Solution**: Simplified MSW tests, focus on real API integration
    - **Status**: Basic MSW handlers working, complex tests temporarily disabled
 
-6. **Alternative Testing Stack** (If MSW Issues Persist)
-   - **Vitest**: ESM-native unit testing (replace Jest if needed)
-   - **Playwright Route Mocks**: `page.route(...)` for E2E failure paths
+6. **Testing Strategy Clarification**
+   - **UI Tests**: Mock processed `/api/student-data` responses (MSW or Vitest)
+   - **E2E Tests**: Hit real backend or use Playwright route mocks for failure paths
+   - **Integration Tests**: Use real API with MSW for error scenarios
    - **Golden Fixture**: Single JSON from prod-like data, regenerate intentionally
 
 ### Manual Testing
@@ -676,10 +681,15 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - `teacher`: string, max 50 chars
 - `period`: number, 1-8 (drives ordering)
 
+**Assignment Meta Enums** (explicit contract):
+- `assignment.meta.assignmentType`: `'vector' | 'graded' | 'practice' | 'bonus' | 'unknown'`
+- `assignment.meta.checkpointStatus`: `'Missing' | 'Submitted' | 'Graded' | 'Due' | 'Locked' | 'Closed' | 'Cancelled' | 'Vector'`
+
 **Validation Rules**:
 - All metadata fields have max length constraints
 - Required fields cannot be empty
 - Period must be valid integer 1-8
+- Assignment types and statuses must match enum values
 - Changes persist immediately to `metaData` endpoint
 
 ## Phase 1 Learnings Applied to Future Phases
@@ -716,16 +726,18 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - **Release Tagging**: Enable release tags + source map upload
 - **Sampling**: 10% trace sampling for performance monitoring
 - **PII Scrubbing**: Student names/IDs scrubbed in `beforeSend` hook
-- **Custom Breadcrumbs**: Fetch start/end with counts, retries, rate-limit backoffs
+- **Custom Breadcrumbs**: Request start/finish with counts, retries, rate-limit backoffs, retry attempts, "render with partial data"
 
 **Metrics Collection**:
 - **Web Vitals**: Log INP/CLS per route to console in dev
 - **Production Tags**: Send INP/CLS to Sentry as tags in prod
+- **Event Tagging**: Tag Sentry events with `apiVersion`, `studentCount`, `courseCount`
 - **Performance Tracking**: Route-level performance monitoring
 
 ### Security & Privacy (Student Data Protection)
 
 **Content Security Policy**:
+- **Default CSP**: `default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://*.instructure.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'`
 - **No Inline Scripts**: All scripts must be from trusted sources
 - **Restricted Resources**: Limit img/script/connect to necessary domains only
 - **Canvas Integration**: Allow Canvas domains for assignment links
@@ -939,7 +951,7 @@ export const errorScenarios = {
 - [ ] 90%+ test coverage for components
 - [ ] Zero TypeScript errors
 - [ ] Lighthouse score >90
-- [ ] Bundle size <500KB
+- [ ] **Bundle Budget**: Initial route JS ≤ 300KB, Per-route total ≤ 400KB
 
 ### Functional Metrics
 - [ ] All rendering rules implemented exactly
@@ -981,7 +993,7 @@ export const errorScenarios = {
 - **Phase 1**: All utilities tested; contracts defined; MSW working; **contract test stop rule passed**
 - **Phase 2**: Real data loads; Canvas links work; error states handled
 - **Phase 3**: Chart renders; screen reader works; bundle optimized
-- **Phase 4**: Status ordering correct; Vector filtering works
+- **Phase 4**: Renders in backend order (Missing → Submitted → On-time → Graded); Filters via `assignmentType` enum
 - **Phase 5**: Date logic handles DST; rendering rules exact
 - **Phase 6**: All fields displayed; filtering/sorting works
 - **Phase 7**: Metadata persists; undo works; autorefresh shows status
