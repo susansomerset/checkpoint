@@ -172,6 +172,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 5. **Add Link Helper Tests**
    - **Centralized Canvas URL builder** (`lib/derive/canvasLinks.ts`)
    - **Link Helper Tests**: Prevent death-by-typo in Canvas URLs
+   - **Happy Path Tests**: Valid course/assignment IDs generate correct URLs
+   - **Malformed ID Tests**: Invalid IDs handled gracefully without crashes
    - **URL Validation**: Ensure all generated links are valid
 
 ### Testing
@@ -193,6 +195,12 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 *"A journey of a thousand miles begins with a single step."*
 
+#### Schema Finalization
+- [ ] **Publish assignment.meta enums**: Zod + TypeScript schemas
+- [ ] **assignmentType enum**: `'vector' | 'graded' | 'practice' | 'bonus' | 'unknown'`
+- [ ] **checkpointStatus enum**: `'Missing' | 'Submitted' | 'Graded' | 'Due' | 'Locked' | 'Closed' | 'Cancelled' | 'Vector'`
+- [ ] **Type narrowing**: Enable proper TypeScript type checking
+
 #### Routes & Pages
 - [ ] Create `/assignments` route with basic layout
 - [ ] Add student selection dropdown (preferred names from metadata)
@@ -200,6 +208,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 
 #### API Integration
 - [ ] Create `lib/api/studentData.ts` with **standardized return shape**: `{ ok, status, data, error }`
+- [ ] **AbortController + dedupe**: Drop stale queries on student switch
+- [ ] **Typed result**: Full TypeScript typing for API responses
 - [ ] Add error handling for network failures
 - [ ] Implement retry logic with exponential backoff
 - [ ] Add loading states during fetch
@@ -221,6 +231,8 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] Display: course name, assignment title, status, due date
 - [ ] Add Canvas links with `rel="noopener noreferrer"`
 - [ ] Implement basic styling (status colors)
+- [ ] **Retry with backoff**: Visible retry button in error state
+- [ ] **No console warnings**: Verify clean real data rendering
 
 #### Loading & Empty States
 - [ ] Add skeleton loading for assignment list
@@ -275,6 +287,12 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 - [ ] **Error boundaries**: Catch and report failures gracefully
 - [ ] **Retry logic**: Backoff and retry buttons work
 - [ ] **Progressive rendering**: Partial data doesn't break UI
+
+**Specific Tests Required**:
+- [ ] **Canvas link helper tests**: Happy path + malformed IDs
+- [ ] **Sentry synthetic error**: Trigger test error with PII scrubbed
+- [ ] **VoiceOver pass**: Names read sensibly, controls reachable
+- [ ] **Console warnings check**: Real data renders without warnings
 
 **If ANY criteria fail**: Stop and address before proceeding to Phase 3.
 
