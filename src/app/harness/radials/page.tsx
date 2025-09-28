@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ProgressRadial from "@/components/ProgressRadial.client";
+import ProgressRadialStack from "@/components/ProgressRadialStack.client";
 
 // Golden fixture data for deterministic testing
 const GOLDEN_FIXTURE = {
@@ -120,46 +120,29 @@ export default function RadialHarnessPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {GOLDEN_FIXTURE.courses.map((course) => {
                 const { progress } = course;
-            // const turnedInPercentage = progress.total > 0 
-            //   ? Math.round(((progress.earned + progress.submitted) / progress.total) * 100)
-            //   : 0;
                 
-                const earnedPercentage = progress.total > 0 
-                  ? Math.round((progress.earned / progress.total) * 100)
+                // Calculate the main percentage (earned + submitted) for center display
+                // Use the SAME denominator as the individual buckets
+                const total = progress.earned + progress.submitted + progress.missing + progress.lost;
+                const mainPercentage = total > 0 
+                  ? ((progress.earned + progress.submitted) / total) * 100
                   : 0;
 
-                const submittedPercentage = progress.total > 0 
-                  ? Math.round((progress.submitted / progress.total) * 100)
-                  : 0;
-
-                const missingPercentage = progress.total > 0 
-                  ? Math.round((progress.missing / progress.total) * 100)
-                  : 0;
-
-                const lostPercentage = progress.total > 0 
-                  ? Math.round((progress.lost / progress.total) * 100)
-                  : 0;
-
-                const series = [
-                  earnedPercentage,
-                  submittedPercentage,
-                  missingPercentage,
-                  lostPercentage
-                ];
-
-                const labels = ['Earned', 'Submitted', 'Missing', 'Lost'];
-                const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+                // Create buckets for the four stacked rings
+                const buckets = {
+                  earned: progress.earned,
+                  submitted: progress.submitted,
+                  missing: progress.missing,
+                  lost: progress.lost
+                };
 
                 return (
-                  <ProgressRadial
+                  <ProgressRadialStack
                     key={course.courseId}
-                    series={series}
-                    labels={labels}
-                    colors={colors}
+                    buckets={buckets}
+                    percent={mainPercentage}
                     title={`Period ${course.period}`}
                     subtitle={course.courseName}
-                    showPercentage={true}
-                    showCheckmark={progress.missing === 0 && progress.total > 0}
                     className="w-full"
                     testMode={true} // Disable animations for deterministic testing
                   />

@@ -54,3 +54,88 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+/* Stacked radial chart layout - four layers positioned absolutely */
+.donut-stack {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  min-height: 220px;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center percentage overlay - HTML, not Apex labels */
+.center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.value {
+  font-weight: 800;
+  font-size: 32px;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* Custom tooltip matching original design */
+.tooltip {
+  position: absolute;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  z-index: 20;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+}
+
+.tooltip strong {
+  display: block;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.tooltip ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tooltip li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.tooltip li:last-child {
+  margin-bottom: 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot.earned { background-color: #22c55e; }
+.dot.submitted { background-color: #3b82f6; }
+.dot.missing { background-color: #f59e0b; }
+.dot.lost { background-color: #ef4444; }

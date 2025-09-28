@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { useStudent } from "@/contexts/StudentContext";
-import ProgressRadial from "./ProgressRadial.client";
+import ProgressRadialStack from "./ProgressRadialStack.client";
 
 interface ProgressData {
   earned: number;
@@ -140,27 +140,27 @@ function ProgressHeader() {
             //   : 0;
             
             // Calculate the main percentage (earned + submitted) for center display
-            const mainPercentage = progress.total > 0 
-              ? Math.round(((progress.earned + progress.submitted) / progress.total) * 100)
+            // Use the SAME denominator as the individual buckets
+            const total = progress.earned + progress.submitted + progress.missing + progress.lost;
+            const mainPercentage = total > 0 
+              ? ((progress.earned + progress.submitted) / total) * 100
               : 0;
 
-            // For now, use single series with main percentage
-            // TODO: Implement 4-layer composite chart if needed
-            const series = [mainPercentage];
-
-            const labels = ['Earned', 'Submitted', 'Missing', 'Lost'];
-            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+            // Create buckets for the four stacked rings
+            const buckets = {
+              earned: progress.earned,
+              submitted: progress.submitted,
+              missing: progress.missing,
+              lost: progress.lost
+            };
 
             return (
-              <ProgressRadial
+              <ProgressRadialStack
                 key={course.courseId}
-                series={series}
-                labels={labels}
-                colors={colors}
+                buckets={buckets}
+                percent={mainPercentage}
                 title={`Period ${course.period}`}
                 subtitle={course.courseName}
-                showPercentage={true}
-                showCheckmark={progress.missing === 0 && progress.total > 0}
                 className="w-full"
                 testMode={process.env.NODE_ENV === 'test'}
               />
