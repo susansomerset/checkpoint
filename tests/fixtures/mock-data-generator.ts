@@ -1,6 +1,6 @@
 // tests/fixtures/mock-data-generator.ts
 import { StudentData, Student, Course, Assignment, Submission } from '@/lib/contracts/types'
-import { StudentDataSchema } from '@/lib/student/schema'
+import { StudentDataSchema } from '@/lib/contracts/types'
 
 /**
  * Generates mock data that exactly matches the backend API response structure
@@ -208,7 +208,9 @@ export function generateMockStudentData(): StudentData {
           }
         }
       }
-    }
+    },
+    lastLoadedAt: new Date().toISOString(),
+    apiVersion: '1'
   }
 
   return mockData
@@ -227,6 +229,8 @@ export function validateMockDataStructure(): boolean {
     
     console.log('✅ Mock data structure validation passed')
     console.log(`   - Students: ${Object.keys(validatedData.students).length}`)
+    console.log(`   - API Version: ${validatedData.apiVersion}`)
+    console.log(`   - Last Loaded: ${validatedData.lastLoadedAt}`)
     
     // Count total assignments across all courses
     let totalAssignments = 0
