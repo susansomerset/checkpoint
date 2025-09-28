@@ -2,6 +2,10 @@
   "name": "checkpoint",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x",
+    "npm": ">=9 <12"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
@@ -17,12 +21,11 @@
     "check-bundle-size": "node scripts/check-bundle-size.js",
     "test:sentry": "jest tests/integration/sentry.test.ts",
     "test:timezone": "TZ=America/Los_Angeles jest tests/lib/derive/timezone.test.ts",
-    "size-limit": "size-limit"
+    "size": "size-limit"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.8.0",
     "@headlessui/react": "^2.2.9",
-    "@playwright/test": "^1.55.1",
     "@sentry/nextjs": "^10.15.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
@@ -38,9 +41,12 @@
     "react": "^18.3.1",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.6.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@size-limit/preset-big-lib": "^11.2.0",
     "@types/node": "^20.14.15",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -61,7 +67,7 @@
     },
     {
       "path": ".next/static/chunks/app/*.js",
-      "limit": "400 KB", 
+      "limit": "400 KB",
       "name": "Total app per route"
     }
   ]

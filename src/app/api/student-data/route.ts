@@ -5,7 +5,15 @@ import { StudentDataSchema } from '@/lib/student/schema';
 import * as kv from '@/lib/storage/kv';
 
 export async function GET(req: NextRequest) {
-  await requireSession(req);
+  try {
+    await requireSession(req);
+  } catch (error) {
+    console.info('ZXQ auth.required: No session found');
+    return Response.json(
+      { error: 'AUTH_REQUIRED' },
+      { status: 401 }
+    );
+  }
   
       // Try to get student data from storage
       try {
@@ -14,7 +22,11 @@ export async function GET(req: NextRequest) {
         if (studentData) {
           const parsed = JSON.parse(studentData);
           console.info(`ZXQ get.storage: ${parsed.students ? Object.keys(parsed.students).length : 0} students, ${studentData.length} bytes`);
-          return Response.json(parsed);
+          return Response.json({
+            ok: true,
+            status: 200,
+            data: parsed
+          });
         }
       } catch {
         console.info('No student data found, falling back to regular data');
@@ -23,7 +35,11 @@ export async function GET(req: NextRequest) {
   // Fall back to regular data
   console.info(`ZXQ get.fallback: Using loadStudentData()`);
   const data = await loadStudentData();
-  return Response.json(data ?? { students: [] });
+  return Response.json({
+    ok: true,
+    status: 200,
+    data: data ?? { students: [] }
+  });
 }
 
 export async function PUT(req: NextRequest) {

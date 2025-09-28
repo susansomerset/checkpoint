@@ -59,12 +59,12 @@ export default function DashboardPage() {
   React.useEffect(() => {
     async function validateSession() {
       try {
-        const res = await fetch('/api/auth/validate', { 
+        const res = await fetch('/api/auth/me', { 
           cache: 'no-store',
           credentials: 'include'
         });
-        const result = await res.json();
-        setSessionValid(result.valid);
+        // Auth0 returns 204 when not authenticated, 200 with user data when authenticated
+        setSessionValid(res.status === 200);
       } catch {
         setSessionValid(false);
       } finally {

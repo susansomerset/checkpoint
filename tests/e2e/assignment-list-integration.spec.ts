@@ -1,0 +1,123 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Assignment List Integration with Student Selector', () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to assignments page
+    await page.goto('/assignments');
+  });
+
+  test('should display assignments for selected student', async ({ page }) => {
+    // Wait for page to load
+    await page.waitForSelector('text=Student:');
+    
+    // Wait for assignments to load (either assignments or "No assignments found")
+    await page.waitForSelector('text=Assignments for', { timeout: 10000 });
+    
+    // Should see student name in assignment header
+    const assignmentHeader = page.locator('h2[class*="text-2xl font-bold text-gray-800"]');
+    await expect(assignmentHeader).toBeVisible();
+    
+    // Should contain "Assignments for [Student Name]"
+    const headerText = await assignmentHeader.textContent();
+    expect(headerText).toMatch(/Assignments for .+/);
+  });
+
+  test('should update assignments when student changes', async ({ page }) => {
+    // Wait for initial load
+    await page.waitForSelector('text=Student:');
+    await page.waitForSelector('text=Assignments for', { timeout: 10000 });
+    
+    // Get initial assignment header
+    const initialHeader = page.locator('h2[class*="text-2xl font-bold text-gray-800"]');
+    const initialText = await initialHeader.textContent();
+    
+    // Get student buttons
+    const studentButtons = page.locator('button[class*="px-3 py-1 text-sm font-medium rounded-md"]');
+    const buttonCount = await studentButtons.count();
+    
+    if (buttonCount > 1) {
+      // Click on second student
+      await studentButtons.nth(1).click();
+      
+      // Wait for assignments to update
+      await page.waitForTimeout(1000);
+      
+      // Check that assignment header has updated
+      const updatedHeader = page.locator('h2[class*="text-2xl font-bold text-gray-800"]');
+      const updatedText = await updatedHeader.textContent();
+      
+      // Header should have changed (different student name)
+      expect(updatedText).not.toBe(initialText);
+    }
+  });
+
+  test('should show loading state during student switch', async ({ page }) => {
+    // Wait for initial load
+    await page.waitForSelector('text=Student:');
+    await page.waitForSelector('text=Assignments for', { timeout: 10000 });
+    
+    // Get student buttons
+    const studentButtons = page.locator('button[class*="px-3 py-1 text-sm font-medium rounded-md"]');
+    const buttonCount = await studentButtons.count();
+    
+    if (buttonCount > 1) {
+      // Click on second student
+      await studentButtons.nth(1).click();
+      
+      // Should show loading state briefly
+      await expect(page.locator('text=Loading...')).toBeVisible({ timeout: 2000 });
+      
+      // Loading should disappear
+      await expect(page.locator('text=Loading...')).not.toBeVisible({ timeout: 5000 });
+    }
+  });
+
+  test('should handle no assignments gracefully', async ({ page }) => {
+    // Wait for page to load
+    await page.waitForSelector('text=Student:');
+    
+    // Wait for either assignments or "No assignments found"
+    await page.waitForSelector('text=No assignments found for this student', { timeout: 10000 });
+    
+    // Should show appropriate message
+    const noAssignmentsMessage = page.locator('text=No assignments found for this student');
+    await expect(noAssignmentsMessage).toBeVisible();
+  });
+
+  test('should display course information correctly', async ({ page }) => {
+    // Wait for page to load
+    await page.waitForSelector('text=Student:');
+    
+    // Wait for content to load
+    await page.waitForTimeout(2000);
+    
+    // Check if there are any course sections
+    const courseSections = page.locator('div[class*="bg-white shadow overflow-hidden sm:rounded-lg"]');
+    const courseCount = await courseSections.count();
+    
+    if (courseCount > 0) {
+      // Check that course information is displayed
+      const courseHeader = courseSections.first().locator('h3[class*="text-lg leading-6 font-medium text-gray-900"]');
+      await expect(courseHeader).toBeVisible();
+      
+      // Should contain course name, period, and teacher
+      const headerText = await courseHeader.textContent();
+      expect(headerText).toMatch(/\(.+\) - .+/); // Format: "Course Name (Period) - Teacher"
+    }
+  });
+
+  test('should handle authentication errors', async ({ page }) => {
+    // Navigate to assignments without authentication
+    await page.goto('/assignments');
+    
+    // Should either redirect to login or show auth required message
+    const authRequired = page.locator('text=Sign in required to view assignments');
+    const signInButton = page.locator('a[href="/api/auth/login"]');
+    
+    // One of these should be visible
+    const hasAuthRequired = await authRequired.isVisible();
+    const hasSignInButton = await signInButton.isVisible();
+    
+    expect(hasAuthRequired || hasSignInButton).toBeTruthy();
+  });
+});
