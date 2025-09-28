@@ -30,8 +30,8 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   centerValue,
   showTooltip = true,
   className = '',
-  courseId,
-  onCourseClick
+  courseId: _courseId,
+  onCourseClick: _onCourseClick
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const size = 150; // 60% of 250px (increased by 20%)
@@ -48,13 +48,13 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   const startAngle = 225; // Starting angle (-135 degrees)
  
   let currentAngle = startAngle;
-  const chartConfigs: any[] = [];
+  const chartConfigs: unknown[] = [];
 
-  normalizedSegments.forEach((segment, index) => {
+  normalizedSegments.forEach((segment, _index) => {
     if (segment.percentage > 0) {
     const segmentDegrees = Math.floor((segment.percentage / 100) * totalArcDegrees);
     const segmentStartAngle = currentAngle;
-    let segmentEndAngle = currentAngle + segmentDegrees;
+    const segmentEndAngle = currentAngle + segmentDegrees;
 
     // Handle crossing the 360° boundary
     if (segmentEndAngle >= 360) {

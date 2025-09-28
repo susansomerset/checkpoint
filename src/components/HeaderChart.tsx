@@ -59,7 +59,7 @@ export default function HeaderChart({
   const [fontsReady, setFontsReady] = useState(false);
 
   useEffect(() => {
-    const ready = (document as any)?.fonts?.ready;
+    const ready = (document as unknown as { fonts?: { ready?: Promise<void> } })?.fonts?.ready;
     if (ready?.then) ready.then(() => setFontsReady(true));
     else setFontsReady(true);
   }, []);
@@ -97,8 +97,8 @@ export default function HeaderChart({
   const pctOf = (name: string) =>
     buckets.find(s => s.label.toLowerCase() === name.toLowerCase())?.pct || 0;
 
-  const pointsOf = (name: string) =>
-    segments.find(s => s.label.toLowerCase() === name.toLowerCase())?.points ?? undefined;
+  // const pointsOf = (name: string) =>
+  //   segments.find(s => s.label.toLowerCase() === name.toLowerCase())?.points ?? undefined;
 
   // CENTER % RULE: "turned-in" = everything EXCEPT Missing  →  (total - Missing) / total
   const centerPct = useMemo(() => {
@@ -109,7 +109,7 @@ export default function HeaderChart({
     const missingPct = pctOf("Missing");
     const turnedIn = totalPct - missingPct; // includes Earned + Submitted + Lost
     return clamp0to100(Math.round(turnedIn));
-  }, [buckets, centerValueOverride]);
+  }, [buckets, centerValueOverride, pctOf]);
 
   // Build contiguous angle spans for each normalized segment (sum near 100).
   const spans = useMemo(() => {

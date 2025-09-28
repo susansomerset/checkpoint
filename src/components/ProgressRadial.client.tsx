@@ -34,7 +34,7 @@ export default function ProgressRadial({
 }: ProgressRadialProps) {
   
   const chartOptions = useMemo(() => {
-    const centerValue = Math.round(series[0] || 0);
+    // const centerValue = Math.round(series[0] || 0);
     const isComplete = series.every(val => val === 100);
     
     return {
@@ -139,7 +139,7 @@ export default function ProgressRadial({
         }
       }]
     };
-  }, [series, labels, colors, showPercentage, showCheckmark, testMode]);
+  }, [series, labels, colors, showPercentage, showCheckmark]);
 
   // const centerText = useMemo(() => {
   //   if (showCheckmark && series.every(val => val === 100)) {

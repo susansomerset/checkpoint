@@ -82,7 +82,7 @@ export default function ProgressRadialStack({
     tooltip: {
       enabled: false  // We use custom tooltip
     }
-  }), [testMode]);
+  }), []);
 
   // Four distinct options with different hollow sizes and colors
   const options = useMemo(() => {

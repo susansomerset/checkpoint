@@ -25,11 +25,20 @@ const COLORS: Record<Bucket, string> = {
 };
 
 // Core math: compute buckets from raw student+course data
-export function bucketsForCourse(student: any, courseId: string): BucketsPoints {
-  const course = student?.courses?.[courseId];
-  if (!course?.assignments) {
+export function bucketsForCourse(student: unknown, courseId: string): BucketsPoints {
+  // Type guard for student object
+  if (!student || typeof student !== 'object' || !('courses' in student)) {
     return { Earned: 0, Submitted: 0, Missing: 0, Lost: 0 };
   }
+  
+  const studentObj = student as { courses: Record<string, unknown> };
+  const course = studentObj.courses?.[courseId];
+  
+  if (!course || typeof course !== 'object' || !('assignments' in course)) {
+    return { Earned: 0, Submitted: 0, Missing: 0, Lost: 0 };
+  }
+  
+  const courseObj = course as { assignments: Record<string, unknown> };
 
   let earned = 0;
   let submitted = 0;
@@ -37,26 +46,36 @@ export function bucketsForCourse(student: any, courseId: string): BucketsPoints 
   let lost = 0;
 
   // Iterate through assignments and sum up points by status
-  Object.values(course.assignments).forEach((assignment: any) => {
-    const meta = assignment.meta;
-    if (!meta) return;
+  Object.values(courseObj.assignments).forEach((assignment: unknown) => {
+    if (!assignment || typeof assignment !== 'object' || !('meta' in assignment)) {
+      return;
+    }
+    
+    const assignmentObj = assignment as { meta: unknown };
+    const meta = assignmentObj.meta;
+    
+    if (!meta || typeof meta !== 'object' || !('assignmentType' in meta) || !('checkpointStatus' in meta) || !('points' in meta)) {
+      return;
+    }
+    
+    const metaObj = meta as { assignmentType: string; checkpointStatus: string; points: number };
 
     // Skip Vector assignments - they should not be included in radial calculations
-    if (meta.assignmentType === 'Vector') return;
+    if (metaObj.assignmentType === 'Vector') return;
 
     // Use the checkpointStatus from the backend
-    switch (meta.checkpointStatus) {
+    switch (metaObj.checkpointStatus) {
       case 'Graded':
-        earned += meta.checkpointEarnedPoints || 0;
+        earned += (meta as { checkpointEarnedPoints?: number }).checkpointEarnedPoints || 0;
         break;
       case 'Submitted':
-        submitted += meta.checkpointSubmittedPoints || 0;
+        submitted += (meta as { checkpointSubmittedPoints?: number }).checkpointSubmittedPoints || 0;
         break;
       case 'Missing':
-        missing += meta.checkpointMissingPoints || 0;
+        missing += (meta as { checkpointMissingPoints?: number }).checkpointMissingPoints || 0;
         break;
       case 'Lost':
-        lost += meta.checkpointLostPoints || 0;
+        lost += (meta as { checkpointLostPoints?: number }).checkpointLostPoints || 0;
         break;
       default:
         // Handle other statuses as needed

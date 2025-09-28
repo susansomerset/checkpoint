@@ -139,12 +139,8 @@ function ProgressHeader() {
             //   ? Math.round(((progress.earned + progress.submitted) / progress.total) * 100)
             //   : 0;
             
-            // Calculate percentages for each segment
+            // Calculate total for normalization
             const total = progress.earned + progress.submitted + progress.missing + progress.lost;
-            const earnedPct = total > 0 ? (progress.earned / total) * 100 : 0;
-            const submittedPct = total > 0 ? (progress.submitted / total) * 100 : 0;
-            const missingPct = total > 0 ? (progress.missing / total) * 100 : 0;
-            const lostPct = total > 0 ? (progress.lost / total) * 100 : 0;
 
             // Create segments for HeaderChart (using points for correctness)
             const segments: HeaderSegment[] = [
