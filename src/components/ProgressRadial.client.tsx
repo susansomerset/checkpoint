@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 
 // Dynamic import with SSR disabled to prevent hydration mismatches
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { 
@@ -34,56 +34,61 @@ export default function ProgressRadial({
 }: ProgressRadialProps) {
   
   const chartOptions = useMemo(() => {
-    // const isComplete = series.every(val => val === 100);
-    // const centerText = showCheckmark && isComplete ? "✓" : showPercentage ? `${Math.round(series[0] || 0)}%` : "";
+    const centerValue = Math.round(series[0] || 0);
+    const isComplete = series.every(val => val === 100);
     
     return {
       chart: {
         type: 'radialBar' as const,
         height: 200,
         animations: {
-          enabled: !testMode, // Disable animations in test mode
-          easing: 'easeinout',
-          speed: 800,
-          animateGradually: {
-            enabled: true,
-            delay: 150
-          },
-          dynamicAnimation: {
-            enabled: true,
-            speed: 350
-          }
+          enabled: false, // Disable animations for deterministic layout
         },
         toolbar: {
           show: false
+        },
+        sparkline: {
+          enabled: false
         },
         fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
       },
       plotOptions: {
         radialBar: {
-          startAngle: -90,
-          endAngle: 90,
+          startAngle: -135,       // Match original app
+          endAngle: 225,
+          hollow: {
+            size: "60%",          // Match original
+            background: "transparent",
+            margin: 0
+          },
           track: {
-            background: '#f1f5f9',
-            strokeWidth: '97%',
-            margin: 5,
-            shadow: {
-              enabled: false
-            }
+            background: "#F4F6F8",
+            strokeWidth: "100%",
+            margin: 0
           },
           dataLabels: {
-            name: {
-              show: false
+            show: true,
+            name: { 
+              show: false 
             },
             value: {
-              show: false
+              show: true,
+              fontSize: "32px",
+              fontWeight: 800,
+              offsetY: 8,
+              formatter: (val: number) => {
+                if (showCheckmark && isComplete) return "✓";
+                return `${Math.round(val)}%`;
+              },
+            },
+            total: { 
+              show: false 
             }
-          },
-          hollow: {
-            margin: 0,
-            size: '70%'
           }
         }
+      },
+      stroke: { 
+        lineCap: "round" 
       },
       fill: {
         type: 'gradient',
@@ -99,7 +104,7 @@ export default function ProgressRadial({
         }
       },
       colors: colors,
-      labels: labels,
+      labels: [], // We render labels below the donut
       legend: {
         show: false
       },
@@ -146,24 +151,30 @@ export default function ProgressRadial({
   //   return "";
   // }, [series, showPercentage, showCheckmark]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Add ResizeObserver safety net
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const ro = new ResizeObserver(() => {
+      // When size changes after mount, trigger apex redraw
+      window.dispatchEvent(new Event("resize"));
+    });
+    
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <div className={`chart-container ${className}`}>
-      <div className="relative">
+      <div ref={containerRef} className="radial-wrap">
         <ReactApexChart
           options={chartOptions}
           series={series}
           type="radialBar"
           height={200}
         />
-        
-        {/* Center text overlay - disabled for now */}
-        {/* {centerText && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-2xl font-bold text-gray-900">
-              {centerText}
-            </div>
-          </div>
-        )} */}
       </div>
       
       {/* Title and subtitle */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useStudent } from "@/contexts/StudentContext";
 import ProgressRadial from "./ProgressRadial.client";
 
@@ -21,6 +21,16 @@ interface CourseProgress {
 
 function ProgressHeader() {
   const { selectedStudentId, data, loading, error } = useStudent();
+  const [fontsReady, setFontsReady] = useState(false);
+
+  // Wait for fonts before rendering charts
+  useEffect(() => {
+    if (document?.fonts?.ready) {
+      document.fonts.ready.then(() => setFontsReady(true));
+    } else {
+      setFontsReady(true);
+    }
+  }, []);
 
   const courseProgress = useMemo((): CourseProgress[] => {
     if (!data || !selectedStudentId) return [];
@@ -81,12 +91,14 @@ function ProgressHeader() {
       .sort((a, b) => a.period - b.period); // Sort by period
   }, [data, selectedStudentId]);
 
-  if (loading) {
+  if (loading || !fontsReady) {
     return (
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-center">
-            <div className="text-gray-500">Loading progress data...</div>
+            <div className="text-gray-500">
+              {loading ? 'Loading progress data...' : 'Loading fonts...'}
+            </div>
           </div>
         </div>
       </div>
@@ -127,29 +139,14 @@ function ProgressHeader() {
             //   ? Math.round(((progress.earned + progress.submitted) / progress.total) * 100)
             //   : 0;
             
-            const earnedPercentage = progress.total > 0 
-              ? Math.round((progress.earned / progress.total) * 100)
+            // Calculate the main percentage (earned + submitted) for center display
+            const mainPercentage = progress.total > 0 
+              ? Math.round(((progress.earned + progress.submitted) / progress.total) * 100)
               : 0;
 
-            const submittedPercentage = progress.total > 0 
-              ? Math.round((progress.submitted / progress.total) * 100)
-              : 0;
-
-            const missingPercentage = progress.total > 0 
-              ? Math.round((progress.missing / progress.total) * 100)
-              : 0;
-
-            const lostPercentage = progress.total > 0 
-              ? Math.round((progress.lost / progress.total) * 100)
-              : 0;
-
-            // Create the series data for the radial chart
-            const series = [
-              earnedPercentage,
-              submittedPercentage,
-              missingPercentage,
-              lostPercentage
-            ];
+            // For now, use single series with main percentage
+            // TODO: Implement 4-layer composite chart if needed
+            const series = [mainPercentage];
 
             const labels = ['Earned', 'Submitted', 'Missing', 'Lost'];
             const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
