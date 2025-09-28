@@ -7,7 +7,7 @@ import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
 
 interface StudentContextType {
   selectedStudentId: string | null
-  setSelectedStudentId: (studentId: string | null) => void
+  setSelectedStudentId: (_studentId: string | null) => void
   students: Student[]
   data: StudentData | null
   loading: boolean
@@ -46,13 +46,14 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       if (!selectedStudentId && studentsArray.length > 0) {
         setSelectedStudentId(studentsArray[0].studentId)
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Suppress console logging for expected 401s, continue logging other errors
-      if (err.message.includes('401') || err.message.includes('AUTH_REQUIRED')) {
+      const errorMessage = err instanceof Error ? err.message : String(err)
+      if (errorMessage.includes('401') || errorMessage.includes('AUTH_REQUIRED')) {
         setError(null) // Clear error for expected auth failures
       } else {
         console.error('Failed to fetch student data:', err)
-        setError(err.message || 'Failed to load student data')
+        setError(errorMessage || 'Failed to load student data')
       }
     } finally {
       setLoading(false)
@@ -64,7 +65,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     if (user && !authLoading) {
       fetchData()
     }
-  }, [user, authLoading]) // Fetch when auth state changes
+  }, [user, authLoading, fetchData]) // Fetch when auth state changes
 
   // Auto-select first student when data loads
   useEffect(() => {

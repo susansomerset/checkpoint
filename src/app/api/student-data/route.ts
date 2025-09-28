@@ -7,7 +7,7 @@ import * as kv from '@/lib/storage/kv';
 export async function GET(req: NextRequest) {
   try {
     await requireSession(req);
-  } catch (error) {
+  } catch {
     console.info('ZXQ auth.required: No session found');
     return Response.json(
       { error: 'AUTH_REQUIRED' },

@@ -3,26 +3,17 @@
 
 import React from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
+import Link from 'next/link'
 import { Assignment, Course } from '@/lib/contracts/types'
 import { buildCanvasAssignmentUrl } from '@/lib/derive/canvasLinks'
 import { useStudent } from '@/contexts/StudentContext'
-
-interface AssignmentListProps {
-  // No longer need studentId prop - will get from context
-}
 
 interface CourseAssignmentData {
   course: Course
   assignments: Assignment[]
 }
 
-interface AssignmentDisplayData extends Assignment {
-  courseName: string
-  teacherName?: string
-  period?: number
-}
-
-export function AssignmentList({}: AssignmentListProps) {
+export function AssignmentList() {
   const { user, isLoading: authLoading } = useUser()
   const { selectedStudentId, data, loading, error } = useStudent()
 
@@ -52,12 +43,12 @@ export function AssignmentList({}: AssignmentListProps) {
     return (
       <div className="text-center py-8">
         <p className="text-lg text-red-600 mb-4">Sign in required to view assignments.</p>
-        <a
+        <Link
           href="/api/auth/login"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Sign In
-        </a>
+        </Link>
       </div>
     )
   }
