@@ -2,8 +2,83 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Assignment List Integration with Student Selector', () => {
   test.beforeEach(async ({ page }) => {
+    // Mock authentication - return authenticated user
+    await page.route('**/api/auth/me', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          sub: 'test-user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+          preferredName: 'Test User'
+        })
+      });
+    });
+
+    // Mock student data API
+    await page.route('**/api/student-data', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          status: 200,
+          data: {
+            students: {
+              '19904': {
+                studentId: '19904',
+                meta: {
+                  preferredName: 'Chuckles Somerset',
+                  legalName: 'Charles Somerset'
+                },
+                courses: {
+                  '123': {
+                    courseId: '123',
+                    canvas: { name: 'Math' },
+                    meta: { period: 1, teacher: 'Mr. Smith', shortName: 'Math' }
+                  }
+                }
+              },
+              '20682': {
+                studentId: '20682',
+                meta: {
+                  preferredName: 'Susan Somerset',
+                  legalName: 'Susan Somerset'
+                },
+                courses: {
+                  '456': {
+                    courseId: '456',
+                    canvas: { name: 'History' },
+                    meta: { period: 2, teacher: 'Ms. Jones', shortName: 'History' }
+                  }
+                }
+              }
+            },
+            assignments: {
+              'a1': {
+                assignmentId: 'a1',
+                courseId: '123',
+                canvas: { name: 'Math Assignment 1', due_at: '2024-01-15T23:59:59Z' },
+                meta: { checkpointStatus: 'Submitted', assignmentType: 'Assignment' },
+                pointsPossible: 100
+              },
+              'a2': {
+                assignmentId: 'a2',
+                courseId: '456',
+                canvas: { name: 'History Essay', due_at: '2024-01-20T23:59:59Z' },
+                meta: { checkpointStatus: 'Graded', assignmentType: 'Essay' },
+                pointsPossible: 50
+              }
+            }
+          }
+        })
+      });
+    });
+
     // Navigate to assignments page
     await page.goto('/assignments');
+    await page.waitForLoadState('networkidle');
   });
 
   test('should display assignments for selected student', async ({ page }) => {

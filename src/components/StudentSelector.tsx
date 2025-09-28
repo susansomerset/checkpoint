@@ -11,7 +11,7 @@ export function StudentSelector() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Fetch students data
+  // Fetch students data - only once on mount
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -41,7 +41,14 @@ export function StudentSelector() {
     }
 
     fetchStudents()
-  }, [selectedStudentId, setSelectedStudentId])
+  }, []) // ✅ Only run once on mount
+
+  // Auto-select first student if none selected (separate effect)
+  useEffect(() => {
+    if (!selectedStudentId && students.length > 0) {
+      setSelectedStudentId(students[0].studentId)
+    }
+  }, [selectedStudentId, students, setSelectedStudentId])
 
   if (loading) {
     return (
