@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
 import { StudentData, Student } from '@/lib/contracts/types'
 import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
@@ -26,7 +26,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
 
   // Fetch student data only when authenticated
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -58,7 +58,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedStudentId])
 
   // Fetch data only when user is authenticated
   useEffect(() => {

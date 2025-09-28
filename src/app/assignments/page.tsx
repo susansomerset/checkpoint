@@ -5,7 +5,7 @@ import { AssignmentList } from '@/components/AssignmentList'
 import { Toaster } from 'react-hot-toast'
 
 interface AssignmentsPageProps {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 function AssignmentListWrapper() {
@@ -18,7 +18,9 @@ function AssignmentListWrapper() {
   )
 }
 
-export default async function AssignmentsPage({ searchParams: _searchParams }: AssignmentsPageProps) {
+export default async function AssignmentsPage({ searchParams }: AssignmentsPageProps) {
+  // Await searchParams in Next.js 15
+  await searchParams
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
