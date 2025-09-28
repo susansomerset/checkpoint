@@ -207,12 +207,20 @@ export default function DashboardPage() {
     <main style={{ padding: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <h1 style={{ margin: 0 }}>Carbon</h1>
-        <button 
-          onClick={() => window.location.href = '/api/auth/logout'} 
-          style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
-        >
-          Log out
-        </button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <a 
+            href="/assignments" 
+            style={{ color: '#2563eb', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            View Assignments
+          </a>
+          <button 
+            onClick={() => window.location.href = '/api/auth/logout'} 
+            style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Log out
+          </button>
+        </div>
       </div>
       <p>Hello, {user.name || user.email || 'User'}! Retrieve the latest <code>studentData</code> JSON.</p>
       

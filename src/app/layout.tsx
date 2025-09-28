@@ -4,11 +4,15 @@ import { ClientAuthProvider } from '@/components/ClientAuthProvider';
 import { SessionChip } from '@/components/SessionChip';
 import { StudentSelector } from '@/components/StudentSelector';
 import { StudentProvider } from '@/contexts/StudentContext';
+import NavTabs from '@/components/NavTabs';
+import ProgressHeader from '@/components/ProgressHeader';
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -26,6 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body
         className={`${inter.variable} antialiased`}
       >
@@ -43,8 +51,15 @@ export default function RootLayout({
                       <SessionChip />
                     </div>
                   </div>
+                  <div className="border-t border-gray-200 pt-4">
+                    <NavTabs />
+                  </div>
                 </div>
               </header>
+              
+              {/* Progress Header - visible on all pages */}
+              <ProgressHeader />
+              
               <main>
                 {children}
               </main>
