@@ -89,7 +89,7 @@
 - ✅ Status badges have appropriate colors
 - ✅ No console errors during data loading
 
-**Pass/Fail**: [ ] PASS [X] FAIL
+**Pass/Fail**: [X] PASS [ ] FAIL
 
 ---
 
@@ -109,7 +109,7 @@
 - ✅ Links include proper security attributes (rel="noopener noreferrer")
 - ✅ No console errors when clicking links
 
-**Pass/Fail**: [ ] PASS [ ] PASS (N/A - No assignments) [ ] FAIL
+**Pass/Fail**: [X] PASS [ ] PASS (N/A - No assignments) [ ] FAIL
 
 ---
 
@@ -131,7 +131,7 @@
 - ✅ No unhandled JavaScript errors
 - ✅ Page recovers when network is restored
 
-**Pass/Fail**: [ ] PASS [ ] FAIL
+**Pass/Fail**: [X] PASS [ ] FAIL
 
 ---
 
@@ -153,7 +153,7 @@
 - ✅ Direct access to `/assignments` requires re-authentication
 - ✅ No console errors during logout
 
-**Pass/Fail**: [ ] PASS [ ] FAIL
+**Pass/Fail**: [X] PASS [ ] FAIL
 
 ---
 

@@ -1,54 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { StudentData, Student } from '@/lib/contracts/types'
-import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
+import React from 'react'
 import { useStudent } from '@/contexts/StudentContext'
 
 export function StudentSelector() {
-  const { selectedStudentId, setSelectedStudentId } = useStudent()
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // Fetch students data - only once on mount
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true)
-        const data = await fetchStudentDataWithRetry()
-        const studentsArray = Object.values(data.students)
-        
-        // Sort by preferred name
-        studentsArray.sort((a, b) => {
-          const nameA = a.meta.preferredName || a.meta.legalName || 'Unknown'
-          const nameB = b.meta.preferredName || b.meta.legalName || 'Unknown'
-          return nameA.localeCompare(nameB)
-        })
-        
-        setStudents(studentsArray)
-        
-        // Auto-select first student if none selected
-        if (!selectedStudentId && studentsArray.length > 0) {
-          setSelectedStudentId(studentsArray[0].studentId)
-        }
-      } catch (err: any) {
-        console.error('Failed to fetch students:', err)
-        setError(err.message || 'Failed to load students')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchStudents()
-  }, []) // ✅ Only run once on mount
-
-  // Auto-select first student if none selected (separate effect)
-  useEffect(() => {
-    if (!selectedStudentId && students.length > 0) {
-      setSelectedStudentId(students[0].studentId)
-    }
-  }, [selectedStudentId, students, setSelectedStudentId])
+  const { selectedStudentId, setSelectedStudentId, students, loading, error } = useStudent()
 
   if (loading) {
     return (

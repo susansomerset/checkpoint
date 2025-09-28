@@ -1,11 +1,9 @@
 // src/components/AssignmentList.tsx
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
-import toast from 'react-hot-toast'
-import { StudentData, Assignment, Course } from '@/lib/contracts/types'
-import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
+import { Assignment, Course } from '@/lib/contracts/types'
 import { buildCanvasAssignmentUrl } from '@/lib/derive/canvasLinks'
 import { useStudent } from '@/contexts/StudentContext'
 
@@ -26,66 +24,14 @@ interface AssignmentDisplayData extends Assignment {
 
 export function AssignmentList({}: AssignmentListProps) {
   const { user, isLoading: authLoading } = useUser()
-  const { selectedStudentId } = useStudent()
-  const [data, setData] = useState<StudentData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [retryCount, setRetryCount] = useState(0)
+  const { selectedStudentId, data, loading, error } = useStudent()
 
-  // Fetch data with retry logic
-  const fetchData = async (studentId?: string) => {
-    console.log('fetchData called with studentId:', studentId)
-    setLoading(true)
-    setError(null) // Clear previous errors
-    try {
-      const result = await fetchStudentDataWithRetry(studentId)
-      console.log('ZXQ fetchData result:', result)
-      console.log('ZXQ fetchData result.students:', result.students)
-      console.log('ZXQ fetchData result.students type:', typeof result.students)
-      console.log('ZXQ fetchData result.students keys:', result.students ? Object.keys(result.students) : 'no students')
-      setData(result)
-      toast.success('Assignments loaded successfully!')
-    } catch (err: any) {
-      console.error('Failed to fetch student data:', err)
-      if (err.message === 'AUTH_REQUIRED' || err.message.includes('401') || err.message.includes('403')) {
-        setError('AUTH_REQUIRED')
-        toast.error('Authentication required. Please sign in.')
-      } else {
-        setError(err.message || 'Failed to load assignments.')
-        toast.error(`Error: ${err.message || 'Failed to load assignments.'}`)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Initial data fetch - only when authenticated
-  useEffect(() => {
-    if (authLoading) {
-      // Still checking authentication - keep loading state
-      return
-    }
-
-    if (!user) {
-      // Not authenticated - show sign in required
-      setLoading(false)
-      setError('AUTH_REQUIRED')
-      return
-    }
-
-    // User is authenticated - fetch data
-    fetchData(selectedStudentId || undefined)
-  }, [selectedStudentId, user, authLoading])
-
-  // No longer need this effect since selectedStudentId comes from context
-
-  if (loading) {
+  // Handle authentication loading
+  if (authLoading) {
     return (
       <div className="space-y-4">
         <div className="text-center py-4">
-          <div className="text-sm text-gray-500">
-            {authLoading ? 'Checking authentication...' : 'Loading...'}
-          </div>
+          <div className="text-sm text-gray-500">Checking authentication...</div>
         </div>
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
@@ -101,7 +47,8 @@ export function AssignmentList({}: AssignmentListProps) {
     )
   }
 
-  if (error === 'AUTH_REQUIRED') {
+  // Handle authentication required
+  if (!user) {
     return (
       <div className="text-center py-8">
         <p className="text-lg text-red-600 mb-4">Sign in required to view assignments.</p>
@@ -115,12 +62,34 @@ export function AssignmentList({}: AssignmentListProps) {
     )
   }
 
+  // Handle data loading
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-4">
+          <div className="text-sm text-gray-500">Loading assignments...</div>
+        </div>
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="space-y-3">
+            <div className="h-16 bg-gray-200 rounded"></div>
+            <div className="h-16 bg-gray-200 rounded"></div>
+            <div className="h-16 bg-gray-200 rounded"></div>
+            <div className="h-16 bg-gray-200 rounded"></div>
+            <div className="h-16 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle data errors
   if (error) {
     return (
       <div className="text-center py-8">
         <p className="text-lg text-red-600 mb-4">Error loading assignments: {error}</p>
         <button
-          onClick={() => fetchData(selectedStudentId || undefined)}
+          onClick={() => window.location.reload()}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Retry
@@ -129,6 +98,7 @@ export function AssignmentList({}: AssignmentListProps) {
     )
   }
 
+  // Handle no data
   if (!data || !data.students || typeof data.students !== 'object' || Object.keys(data.students).length === 0) {
     return (
       <div className="text-center py-8">
@@ -142,10 +112,9 @@ export function AssignmentList({}: AssignmentListProps) {
   const assignmentsByCourse: CourseAssignmentData[] = []
 
   Object.values(currentStudent.courses).forEach(course => {
-    // Assignments are stored at the root level, not under each student
-    const allAssignments = Object.values(data.assignments || {})
-    const courseAssignments = allAssignments.filter(
-      assignment => assignment.courseId === course.courseId && assignment.meta.assignmentType !== 'Vector'
+    // Assignments are stored under each course, not at the root level
+    const courseAssignments = Object.values(course.assignments || {}).filter(
+      assignment => assignment.meta.assignmentType !== 'Vector'
     )
     if (courseAssignments.length > 0) {
       assignmentsByCourse.push({ course, assignments: courseAssignments })
