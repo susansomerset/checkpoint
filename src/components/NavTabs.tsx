@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navigation = [
-  { name: 'Progress', href: '/progress' },
-  { name: 'Assignments', href: '/assignments' },
-  { name: 'Detail', href: '/detail' },
-  { name: 'Settings', href: '/settings' },
-];
+  const navigation = [
+    { name: 'Progress', href: '/progress' },
+    { name: 'Assignments', href: '/assignments' },
+    { name: 'Detail', href: '/detail' },
+    { name: 'Settings', href: '/settings' },
+    { name: 'Scratchpad', href: '/scratchpad' },
+  ];
 
 function NavTabs() {
   const pathname = usePathname();

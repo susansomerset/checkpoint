@@ -21,8 +21,8 @@ test.describe('Radial Charts Visual Tests', () => {
     // Wait for fonts to load
     await page.evaluate(() => document.fonts.ready);
     
-    // Wait for charts to render
-    await page.waitForSelector('[data-testid="chart-container"], .chart-container', { timeout: 10000 });
+    // Wait for charts to render (HeaderChart uses different structure)
+    await page.waitForSelector('[aria-label*="% turned in"], .font-extrabold', { timeout: 10000 });
     
     // Wait for any animations to complete (even though they're disabled in test mode)
     await page.waitForTimeout(100);
@@ -84,8 +84,8 @@ test.describe('Radial Charts Visual Tests', () => {
     // Wait for fonts to load
     await page.evaluate(() => document.fonts.ready);
     
-    // Wait for charts to render
-    await page.waitForSelector('.chart-container', { timeout: 10000 });
+    // Wait for charts to render (HeaderChart uses different structure)
+    await page.waitForSelector('[aria-label*="% turned in"], .font-extrabold', { timeout: 10000 });
     
     // Wait for any animations to complete
     await page.waitForTimeout(100);
@@ -143,18 +143,18 @@ test.describe('Radial Charts Visual Tests', () => {
 
     await page.goto('/progress');
     
-    // Wait for charts to render
-    await page.waitForSelector('.chart-container', { timeout: 10000 });
+    // Wait for charts to render (HeaderChart uses different structure)
+    await page.waitForSelector('[aria-label*="% turned in"], .font-extrabold', { timeout: 10000 });
     
     // Check that charts have proper ARIA labels
-    const charts = await page.locator('.chart-container').all();
+    const charts = await page.locator('[aria-label*="% turned in"]').all();
     expect(charts.length).toBeGreaterThan(0);
     
-    // Each chart should have a title that serves as an accessible label
+    // Each chart should have a center percentage and labels
     for (const chart of charts) {
-      const title = await chart.locator('h3').textContent();
-      expect(title).toBeTruthy();
-      expect(title).toMatch(/Period \d+/);
+      const centerText = await chart.locator('.font-extrabold').textContent();
+      expect(centerText).toBeTruthy();
+      expect(centerText).toMatch(/\d+%/);
     }
   });
 

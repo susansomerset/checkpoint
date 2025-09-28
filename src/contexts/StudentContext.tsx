@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
 import { StudentData, Student } from '@/lib/contracts/types'
+import { resetRadialCache } from '@/selectors/cache'
 import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
 
 interface StudentContextType {
@@ -40,7 +41,10 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       })
       
       setStudents(studentsArray)
-      setData(result)
+      // Add versioning for cache invalidation
+      const versionedData = { ...result, version: Date.now() }
+      setData(versionedData)
+      resetRadialCache() // Clear cache when new data arrives
       
       // Auto-select first student if none selected
       if (!selectedStudentId && studentsArray.length > 0) {

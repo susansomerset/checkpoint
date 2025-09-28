@@ -1,0 +1,79 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - heading "Checkpoint" [level=1] [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]:
+              - generic [ref=e10]: "Student:"
+              - generic [ref=e11]:
+                - button "Johnny" [ref=e12] [cursor=pointer]
+                - button "Sarah" [ref=e13] [cursor=pointer]
+            - generic [ref=e14]:
+              - generic [ref=e16]:
+                - text: Signed in as
+                - generic [ref=e17]: Test User
+              - link "Sign out" [ref=e18] [cursor=pointer]:
+                - /url: /api/auth/logout
+        - navigation "Tabs" [ref=e20]:
+          - link "Progress" [ref=e21] [cursor=pointer]:
+            - /url: /progress
+          - link "Assignments" [ref=e22] [cursor=pointer]:
+            - /url: /assignments
+          - link "Detail" [ref=e23] [cursor=pointer]:
+            - /url: /detail
+          - link "Settings" [ref=e24] [cursor=pointer]:
+            - /url: /settings
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic:
+          - generic:
+            - generic: 100%
+        - generic:
+          - generic: Period 1
+          - generic: Algebra I
+      - generic [ref=e33]:
+        - generic:
+          - generic:
+            - generic: 100%
+        - generic:
+          - generic: Period 2
+          - generic: English Lit
+    - main [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - heading "Progress Overview" [level=1] [ref=e42]
+            - paragraph [ref=e43]: Progress charts are displayed above. This page provides additional details about your academic progress.
+          - generic [ref=e44]:
+            - link "Dashboard" [ref=e45] [cursor=pointer]:
+              - /url: /dashboard
+            - link "Assignments" [ref=e46] [cursor=pointer]:
+              - /url: /assignments
+        - generic [ref=e47]:
+          - 'heading "Student: Johnny" [level=2] [ref=e48]'
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - 'heading "Period 1: Algebra I" [level=3] [ref=e51]'
+              - paragraph [ref=e52]: Ms. Johnson
+              - generic [ref=e53]:
+                - generic [ref=e54]:
+                  - generic [ref=e55]: Points Earned
+                  - generic [ref=e56]: 20 / 35
+                - generic [ref=e60]: 57%
+            - generic [ref=e61]:
+              - 'heading "Period 2: English Lit" [level=3] [ref=e62]'
+              - paragraph [ref=e63]: Mr. Davis
+              - generic [ref=e64]:
+                - generic [ref=e65]:
+                  - generic [ref=e66]: Points Earned
+                  - generic [ref=e67]: 50 / 50
+                - generic [ref=e71]: 100%
+  - button "Open Next.js Dev Tools" [ref=e77] [cursor=pointer]:
+    - img [ref=e78] [cursor=pointer]
+  - alert [ref=e82]
+```

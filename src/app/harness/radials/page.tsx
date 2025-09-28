@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ProgressRadialStack from "@/components/ProgressRadialStack.client";
+import HeaderChart, { HeaderSegment } from "@/components/HeaderChart";
 
 // Golden fixture data for deterministic testing
 const GOLDEN_FIXTURE = {
@@ -121,30 +121,30 @@ export default function RadialHarnessPage() {
               {GOLDEN_FIXTURE.courses.map((course) => {
                 const { progress } = course;
                 
-                // Calculate the main percentage (earned + submitted) for center display
-                // Use the SAME denominator as the individual buckets
+                // Calculate percentages for each segment
                 const total = progress.earned + progress.submitted + progress.missing + progress.lost;
-                const mainPercentage = total > 0 
-                  ? ((progress.earned + progress.submitted) / total) * 100
-                  : 0;
+                const earnedPct = total > 0 ? (progress.earned / total) * 100 : 0;
+                const submittedPct = total > 0 ? (progress.submitted / total) * 100 : 0;
+                const missingPct = total > 0 ? (progress.missing / total) * 100 : 0;
+                const lostPct = total > 0 ? (progress.lost / total) * 100 : 0;
 
-                // Create buckets for the four stacked rings
-                const buckets = {
-                  earned: progress.earned,
-                  submitted: progress.submitted,
-                  missing: progress.missing,
-                  lost: progress.lost
-                };
+                // Create segments for HeaderChart (using points for correctness)
+                const segments: HeaderSegment[] = [
+                  { label: "Earned", color: "#22c55e", points: progress.earned },
+                  { label: "Submitted", color: "#3b82f6", points: progress.submitted },
+                  { label: "Missing", color: "#ef4444", points: progress.missing },
+                  { label: "Lost", color: "#0f172a", points: progress.lost }
+                ];
 
                 return (
-                  <ProgressRadialStack
+                  <HeaderChart
                     key={course.courseId}
-                    buckets={buckets}
-                    percent={mainPercentage}
-                    title={`Period ${course.period}`}
-                    subtitle={course.courseName}
+                    segments={segments}
+                    centerLabel={`Period ${course.period}`}
+                    centerSubLabel={course.courseName}
+                    sizePx={200}
                     className="w-full"
-                    testMode={true} // Disable animations for deterministic testing
+                    showTooltip={true}
                   />
                 );
               })}

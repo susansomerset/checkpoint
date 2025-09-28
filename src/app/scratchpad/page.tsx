@@ -1,0 +1,98 @@
+"use client";
+
+import { useStudent } from '@/contexts/StudentContext';
+import { getRadialVM } from '@/selectors/cache';
+
+export default function ScratchpadPage() {
+  const studentContext = useStudent();
+
+  // Get CourseRadialCard data for the first student and their courses
+  const getCourseRadialData = () => {
+    if (!studentContext?.data || !studentContext?.selectedStudentId) {
+      return { message: "No student selected or no data available" };
+    }
+
+    const student = studentContext.data.students[studentContext.selectedStudentId];
+    if (!student?.courses) {
+      return { message: "No courses found for selected student" };
+    }
+
+    const courseData = Object.entries(student.courses).map(([courseId, course]) => {
+      const vm = getRadialVM(studentContext.data, studentContext.selectedStudentId, courseId);
+      return {
+        courseId,
+        period: course.meta?.period || 0,
+        shortName: course.meta?.shortName || 'Unknown Course',
+        teacher: course.meta?.teacher || 'Unknown Teacher',
+        radialVM: vm
+      };
+    }).sort((a, b) => {
+      // Convert periods to numbers for proper sorting
+      const periodA = typeof a.period === 'number' ? a.period : 
+                     (typeof a.period === 'string' && !isNaN(Number(a.period))) ? Number(a.period) : 999;
+      const periodB = typeof b.period === 'number' ? b.period : 
+                     (typeof b.period === 'string' && !isNaN(Number(b.period))) ? Number(b.period) : 999;
+      
+      // Sort by period number, with non-numeric values (like 'tbd') at the end
+      return periodA - periodB;
+    });
+
+    return courseData;
+  };
+
+  const courseRadialData = getCourseRadialData();
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">CourseRadialCard Data Viewer</h1>
+        
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">CourseRadialCard Keys and Values</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Context State:</h3>
+              <div className="bg-gray-100 p-4 rounded border">
+                <pre className="text-sm overflow-auto">
+                  {JSON.stringify({
+                    selectedStudentId: studentContext?.selectedStudentId,
+                    studentsCount: studentContext?.students?.length || 0,
+                    hasData: !!studentContext?.data,
+                    loading: studentContext?.loading,
+                    error: studentContext?.error
+                  }, null, 2)}
+                </pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">CourseRadialCard Data (Sorted by Period):</h3>
+              <div className="bg-gray-100 p-4 rounded border max-h-96 overflow-auto">
+                <pre className="text-sm">
+                  {JSON.stringify(courseRadialData, null, 2)}
+                </pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Raw Student Data (First Student):</h3>
+              <div className="bg-gray-100 p-4 rounded border max-h-96 overflow-auto">
+                <pre className="text-sm">
+                  {studentContext?.selectedStudentId ? 
+                    JSON.stringify(
+                      studentContext?.data?.students?.[studentContext.selectedStudentId] || null, 
+                      null, 
+                      2
+                    ) : 
+                    "No student selected"
+                  }
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

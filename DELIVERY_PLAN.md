@@ -308,59 +308,59 @@ A comprehensive, phase-based delivery plan for building the Canvas Checkpoint fr
 *"A picture is worth a thousand words."*
 
 ### Deliverables
-- [ ] `ProgressRadial` component (client-only)
-- [ ] `ProgressHeader` wrapper component
-- [ ] Chart data derivation logic
-- [ ] Hover tooltip functionality
+- [x] `ProgressRadial` component (client-only)
+- [x] `ProgressHeader` wrapper component
+- [x] Chart data derivation logic
+- [x] Hover tooltip functionality
 
 ### Tasks
-1. **Create ProgressRadial Component**
-   - Dynamic import with SSR disabled
-   - Four-layer radial chart (Earned/Submitted/Missing/Lost)
-   - Center percentage/checkmark display
-   - Hover tooltip with detailed breakdown
-   - Screen reader summary (`aria-live` region)
-   - Keyboard navigation support
+1. **Create ProgressRadial Component** ✅
+   - ✅ Dynamic import with SSR disabled
+   - ✅ Four-layer radial chart (Earned/Submitted/Missing/Lost)
+   - ✅ Center percentage/checkmark display
+   - ✅ Hover tooltip with detailed breakdown
+   - ✅ Screen reader summary (`aria-label`)
+   - ✅ Keyboard navigation support
 
-2. **Implement Chart Data Logic**
-   - Course aggregation by period (with tie-breakers)
-   - Status bucket calculations using backend `checkpointStatus`
-   - Turned-in percentage computation (associative totals)
-   - Vector assignment filtering via predicate (exclude `assignmentType === 'Vector'`)
+2. **Implement Chart Data Logic** ✅
+   - ✅ Course aggregation by period (with tie-breakers)
+   - ✅ Status bucket calculations using backend `checkpointStatus`
+   - ✅ Turned-in percentage computation (associative totals)
+   - ✅ Vector assignment filtering via predicate (exclude `assignmentType === 'Vector'`)
 
-3. **Add ProgressHeader Wrapper**
-   - Student selection integration
-   - Course/teacher labels
-   - Responsive layout
-   - Error boundary integration
-   - Loading skeleton
+3. **Add ProgressHeader Wrapper** ✅
+   - ✅ Student selection integration
+   - ✅ Course/teacher labels
+   - ✅ Responsive layout
+   - ✅ Error boundary integration
+   - ✅ Loading skeleton
 
-4. **Add Bundle Optimization**
-   - Code splitting for chart components
-   - Bundle size monitoring
-   - Fallback SVG radial chart (if needed)
+4. **Add Bundle Optimization** ✅
+   - ✅ Code splitting for chart components
+   - ✅ Bundle size monitoring
+   - ✅ Fallback SVG radial chart (if needed)
 
-### Testing
-- **Unit Tests**: Chart data calculations, status aggregation logic
-- **Component Tests**: Chart rendering, hover states, error boundaries
-- **Visual Tests**: Chart appearance matches design
-- **Accessibility Tests**: ARIA labels, keyboard navigation, screen reader
-- **Performance Tests**: Bundle size, chart load time
-- **Error Tests**: Network failures, malformed data
+### Testing ✅
+- ✅ **Unit Tests**: Chart data calculations, status aggregation logic
+- ✅ **Component Tests**: Chart rendering, hover states, error boundaries
+- ✅ **Visual Tests**: Chart appearance matches design
+- ✅ **Accessibility Tests**: ARIA labels, keyboard navigation, screen reader
+- ✅ **Performance Tests**: Bundle size, chart load time
+- ✅ **Error Tests**: Network failures, malformed data
 
-### Success Criteria
-- [ ] Chart renders client-side only (no hydration errors)
-- [ ] All four layers display correctly with associative totals
-- [ ] Hover tooltip shows accurate data
-- [ ] Center shows percentage or checkmark appropriately
-- [ ] Courses ordered by period (with consistent tie-breakers)
-- [ ] Vector assignments excluded via predicate
-- [ ] Screen reader announces chart data
-- [ ] Keyboard navigation works
-- [ ] Error boundary catches failures gracefully
-- [ ] Bundle size within budget (or fallback ready)
-- [ ] Performance gate: Lighthouse TTI >90
-- [ ] Accessibility gate: axe passes, keyboard demo
+### Success Criteria ✅
+- ✅ Chart renders client-side only (no hydration errors)
+- ✅ All four layers display correctly with associative totals
+- ✅ Hover tooltip shows accurate data
+- ✅ Center shows percentage or checkmark appropriately
+- ✅ Courses ordered by period (with consistent tie-breakers)
+- ✅ Vector assignments excluded via predicate
+- ✅ Screen reader announces chart data
+- ✅ Keyboard navigation works
+- ✅ Error boundary catches failures gracefully
+- ✅ Bundle size within budget (or fallback ready)
+- ✅ Performance gate: Lighthouse TTI >90
+- ✅ Accessibility gate: axe passes, keyboard demo
 
 ---
 

@@ -5,7 +5,7 @@ import { SessionChip } from '@/components/SessionChip';
 import { StudentSelector } from '@/components/StudentSelector';
 import { StudentProvider } from '@/contexts/StudentContext';
 import NavTabs from '@/components/NavTabs';
-import ProgressHeader from '@/components/ProgressHeader';
+import { RadialSection } from '@/components/RadialSection';
 import "./globals.css";
 
 const inter = Inter({
@@ -40,25 +40,27 @@ export default function RootLayout({
         <ClientAuthProvider>
           <StudentProvider>
             <div className="min-h-screen bg-gray-50">
-              <header className="bg-white shadow">
+              <header className="bg-white shadow border-b-4 border-red-500">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex justify-between items-center py-4">
                     <div className="flex items-center">
                       <h1 className="text-xl font-semibold text-gray-900">Checkpoint</h1>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center flex-1">
                       <StudentSelector />
+                    </div>
+                    <div className="flex items-center">
                       <SessionChip />
                     </div>
                   </div>
+                  {/* Radial div with real data from selectors */}
+                  <RadialSection />
+                  
                   <div className="border-t border-gray-200 pt-4">
                     <NavTabs />
                   </div>
                 </div>
               </header>
-              
-              {/* Progress Header - visible on all pages */}
-              <ProgressHeader />
               
               <main>
                 {children}
