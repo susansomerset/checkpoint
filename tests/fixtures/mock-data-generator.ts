@@ -208,9 +208,7 @@ export function generateMockStudentData(): StudentData {
           }
         }
       }
-    },
-    lastLoadedAt: new Date().toISOString(),
-    apiVersion: '1'
+    }
   }
 
   return mockData
@@ -229,8 +227,15 @@ export function validateMockDataStructure(): boolean {
     
     console.log('✅ Mock data structure validation passed')
     console.log(`   - Students: ${Object.keys(validatedData.students).length}`)
-    console.log(`   - API Version: ${validatedData.apiVersion}`)
-    console.log(`   - Last Loaded: ${validatedData.lastLoadedAt}`)
+    
+    // Count total assignments across all courses
+    let totalAssignments = 0
+    Object.values(validatedData.students).forEach(student => {
+      Object.values(student.courses).forEach(course => {
+        totalAssignments += Object.keys(course.assignments).length
+      })
+    })
+    console.log(`   - Total Assignments: ${totalAssignments}`)
     
     return true
   } catch (error) {
