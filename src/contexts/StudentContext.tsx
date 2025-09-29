@@ -36,7 +36,8 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       const result = await fetchStudentDataWithRetry()
       
       // Sort students by preferred name
-      const studentsArray = Object.values(result.students || {}).sort((a, b) => {
+      const studentsData = result.students || {};
+      const studentsArray = Object.values(studentsData).sort((a, b) => {
         const nameA = a.meta.preferredName || a.meta.legalName || 'Unknown'
         const nameB = b.meta.preferredName || b.meta.legalName || 'Unknown'
         return nameA.localeCompare(nameB)

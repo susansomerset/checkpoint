@@ -1,16 +1,39 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { useStudent } from '@/contexts/StudentContext';
 import { getRadialVM } from '@/selectors/cache';
 import JsonView from '@uiw/react-json-view';
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
+
 export default function ScratchpadPage() {
   const studentContext = useStudent();
+
+  // Early return if no context data during static generation
+  if (!studentContext) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">CourseRadialCard Data Viewer</h1>
+          <div className="bg-white rounded-lg shadow p-6">
+            <p className="text-gray-600">Loading student context...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Get CourseRadialCard data for the first student and their courses
   const getCourseRadialData = () => {
     if (!studentContext?.data || !studentContext?.selectedStudentId) {
       return { message: "No student selected or no data available" };
+    }
+
+    // Check if students data exists and is not null/undefined
+    if (!studentContext.data.students || typeof studentContext.data.students !== 'object') {
+      return { message: "No students data available" };
     }
 
     const student = studentContext.data.students[studentContext.selectedStudentId!];
@@ -19,14 +42,24 @@ export default function ScratchpadPage() {
     }
 
     const courseData = Object.entries(student.courses).map(([courseId, course]) => {
-      const vm = getRadialVM(studentContext.data!, studentContext.selectedStudentId!, courseId);
-      return {
-        courseId,
-        period: course.meta?.period || 0,
-        shortName: course.meta?.shortName || 'Unknown Course',
-        teacher: course.meta?.teacher || 'Unknown Teacher',
-        radialVM: vm
-      };
+      try {
+        const vm = getRadialVM(studentContext.data!, studentContext.selectedStudentId!, courseId);
+        return {
+          courseId,
+          period: course.meta?.period || 0,
+          shortName: course.meta?.shortName || 'Unknown Course',
+          teacher: course.meta?.teacher || 'Unknown Teacher',
+          radialVM: vm
+        };
+      } catch {
+        return {
+          courseId,
+          period: course.meta?.period || 0,
+          shortName: course.meta?.shortName || 'Unknown Course',
+          teacher: course.meta?.teacher || 'Unknown Teacher',
+          radialVM: { error: 'Failed to generate VM' }
+        };
+      }
     }).sort((a, b) => {
       // Convert periods to numbers for proper sorting
       const periodA = typeof a.period === 'number' ? a.period : 
@@ -57,11 +90,11 @@ export default function ScratchpadPage() {
               <div className="bg-gray-100 p-4 rounded border">
                 <JsonView 
                   value={{
-                    selectedStudentId: studentContext?.selectedStudentId,
+                    selectedStudentId: studentContext?.selectedStudentId || null,
                     studentsCount: studentContext?.students?.length || 0,
                     hasData: !!studentContext?.data,
-                    loading: studentContext?.loading,
-                    error: studentContext?.error
+                    loading: studentContext?.loading || false,
+                    error: studentContext?.error || null
                   }}
                   style={{
                     backgroundColor: 'transparent',
@@ -90,7 +123,7 @@ export default function ScratchpadPage() {
                 <JsonView 
                   value={studentContext?.selectedStudentId ? 
                     (studentContext?.data?.students?.[studentContext.selectedStudentId] || undefined) : 
-                    (studentContext?.data?.students ? 
+                    (studentContext?.data?.students && typeof studentContext.data.students === 'object' ? 
                       Object.values(studentContext.data.students)[0] || undefined :
                       undefined)
                   }

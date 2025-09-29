@@ -1,0 +1,98 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master, phase-* ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  quality-checks:
+    name: Quality Checks (ESLint + TSC + Tests)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start dev server
+        run: npm run dev &
+        env:
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run comprehensive quality checks
+        run: node scripts/pre-push.js
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+
+  auto-push-to-master:
+    name: Auto-push to Master
+    runs-on: ubuntu-latest
+    needs: [quality-checks, build]
+    if: github.ref == 'refs/heads/phase-*' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Push to master
+        run: |
+          git checkout master
+          git merge ${{ github.ref_name }} --no-ff -m "Auto-merge ${{ github.ref_name }} to master after quality checks passed"
+          git push origin master

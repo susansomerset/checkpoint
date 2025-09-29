@@ -16,7 +16,16 @@ export function getRadialVM(
   const hit = cache.get(key);
   if (hit) return hit;
 
+  // Check if students data exists and is not null/undefined
+  if (!data.students || typeof data.students !== 'object') {
+    throw new Error('Students data is not available');
+  }
+
   const raw = data.students[studentId];
+  if (!raw) {
+    throw new Error(`Student ${studentId} not found`);
+  }
+
   const buckets = bucketsForCourse(raw, courseId);
   const vm = radialVMFromBuckets(buckets);
   cache.set(key, vm);
