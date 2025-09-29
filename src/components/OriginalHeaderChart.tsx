@@ -19,7 +19,7 @@ export interface HeaderChartProps {
   centerValue?: string;
   showTooltip?: boolean;
   className?: string;
-  courseId?: number;
+  _courseId?: number;
   onCourseClick?: (courseId: number) => void;
 }
 
