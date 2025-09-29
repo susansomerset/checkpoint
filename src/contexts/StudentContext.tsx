@@ -65,7 +65,8 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, []) // Removed selectedStudentId from dependency array
+  }, []) // Removed selectedStudentId from dependency array to prevent unnecessary data reloads
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // Fetch data only when user is authenticated
   useEffect(() => {
