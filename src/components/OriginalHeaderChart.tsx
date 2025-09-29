@@ -20,7 +20,7 @@ export interface HeaderChartProps {
   showTooltip?: boolean;
   className?: string;
   _courseId?: number;
-  onCourseClick?: (courseId: number) => void;
+  onCourseClick?: (_courseId: number) => void;
 }
 
 const HeaderChart: React.FC<HeaderChartProps> = ({
