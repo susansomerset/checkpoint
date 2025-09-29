@@ -419,33 +419,7 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 - [ ] Student preferred names integration using existing meta data
 
 ### Tasks
-<<<<<<< Updated upstream
-1. **Copy and Adapt ProgressView Component**
-   - Copy `docs/components/ProgressView.tsx` to `src/components/ProgressTable.tsx`
-   - Adapt data structure to use current `StudentData` and `Assignment` types
-   - Replace `ProcessedAssignment` with current `Assignment` type from contracts
-   - Update imports to use current type system (`src/lib/contracts/types.ts`)
 
-2. **Use Existing Data Structure**
-   - Use `course.meta.shortName` for course short names
-   - Use `course.meta.teacher` for teacher names  
-   - Use `course.meta.period` for period numbers
-   - Use `student.meta.preferredName` for student preferred names
-   - All data is already available in the existing JSON structure
-
-3. **Adapt Data Processing Logic**
-   - Map current `Assignment` structure to component expectations
-   - Implement status priority mapping (Missing → Submitted (Late) → Submitted → Graded)
-   - Add Vector assignment filtering (`assignmentType === 'Vector'`)
-   - Calculate points and percentages correctly
-   - Handle due date formatting and display
-
-4. **Integrate with Existing Systems**
-   - Connect to `StudentContext` for student selection
-   - Use existing `buildCanvasAssignmentUrl` for Canvas links
-   - Integrate with current error boundary system
-   - Add loading states and error handling
-=======
 1. **Create Architecture Guardrails**
    - Create `src/lib/filters/isDisplayAssignment.ts` - single source of truth for Vector filtering
    - Create `src/lib/comparators/` with deterministic sorting functions:
@@ -474,7 +448,6 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
    - Trust backend `checkpointStatus` - no UI status logic
    - Implement associative totals with unit test to prevent double counting
    - Use `linkToAssignment(courseId, assignmentId)` factory for all Canvas links
->>>>>>> Stashed changes
 
 5. **Add Interactive Features**
    - Expand/collapse functionality with keyboard navigation
@@ -557,21 +530,6 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 - [ ] **Performance**: Efficient rendering with large datasets
 - [ ] **Memory Management**: Proper cleanup of expanded state
 
-<<<<<<< Updated upstream
-### Success Criteria
-- [ ] All data displays correctly with proper fallbacks
-- [ ] Status groups appear in exact priority order
-- [ ] All Canvas links work and open in new tabs
-- [ ] Expand/collapse functionality works smoothly
-- [ ] Student filtering works correctly
-- [ ] Meta data integration working correctly
-- [ ] Responsive design works on all screen sizes
-- [ ] ALL ESLint issues resolved
-- [ ] ALL TSC issues resolved
-- [ ] ALL Playwright tests pass
-- [ ] Vector assignments completely hidden
-- [ ] Performance acceptable with large datasets
-=======
 ### Success Criteria (Vern's Definition of Done)
 - [ ] **Status groups exact priority order** (unit test)
 - [ ] **Single vector filter predicate used** (unit test)
@@ -701,7 +659,6 @@ export function compareCourse(a: Course, b: Course) {
 - **Row render errors**: `console.warn('row-skip', { courseId, assignmentId })` in dev
 - **Sentry breadcrumbs** in prod (PII scrubbed)
 - **Expand/collapse tracking** in dev log with counts for perf tuning
->>>>>>> Stashed changes
 
 ---
 
