@@ -5,24 +5,23 @@ import { useState } from 'react';
 
 export const dynamic = 'force-dynamic';
 
-function JsonViewer({ data, title }: { data: any; title: string }) {
+function JsonViewer({ data, title }: { data: unknown; title: string }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const toggleExpanded = (key: string) => {
     setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const renderValue = (value: any, key: string = '', depth: number = 0): JSX.Element => {
+  const renderValue = (value: unknown, key: string = '', depth: number = 0): JSX.Element => {
     const indent = '  '.repeat(depth);
     const isExpanded = expanded[key];
-    const hasKey = key !== '';
 
     if (value === null) {
       return <span className="text-gray-500">null</span>;
     }
 
     if (typeof value === 'string') {
-      return <span className="text-green-600">"{value}"</span>;
+      return <span className="text-green-600">&quot;{value}&quot;</span>;
     }
 
     if (typeof value === 'number') {
@@ -79,7 +78,7 @@ function JsonViewer({ data, title }: { data: any; title: string }) {
             <div className="ml-4">
               {keys.map(objKey => (
                 <div key={objKey}>
-                  {indent}  <span className="text-red-600">"{objKey}"</span>: {renderValue(value[objKey], `${key}.${objKey}`, depth + 1)}
+                  {indent}  <span className="text-red-600">&quot;{objKey}&quot;</span>: {renderValue(value[objKey], `${key}.${objKey}`, depth + 1)}
                 </div>
               ))}
             </div>
@@ -112,7 +111,7 @@ export default function ScratchpadPage() {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Zach's Int Math 2 Data</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Zach&apos;s Int Math 2 Data</h1>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-gray-600">Loading...</p>
           </div>
@@ -143,7 +142,7 @@ export default function ScratchpadPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Zach's Int Math 2 Data</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Zach&apos;s Int Math 2 Data</h1>
         
         <div className="space-y-6">
           <JsonViewer 
