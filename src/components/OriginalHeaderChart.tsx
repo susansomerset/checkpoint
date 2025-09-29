@@ -48,7 +48,7 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   const startAngle = 225; // Starting angle (-135 degrees)
  
   let currentAngle = startAngle;
-  const chartConfigs: unknown[] = [];
+  const chartConfigs: Array<{ key: string; options: any }> = [];
 
   normalizedSegments.forEach((segment, _index) => {
     if (segment.percentage > 0) {

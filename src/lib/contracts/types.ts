@@ -109,6 +109,7 @@ export const StudentDataSchema = z.object({
   students: z.record(z.string(), StudentSchema),
   lastLoadedAt: z.string(),
   apiVersion: ApiVersion,
+  version: z.number().optional(),
 })
 export type StudentData = z.infer<typeof StudentDataSchema>
 

@@ -13,13 +13,13 @@ export default function ScratchpadPage() {
       return { message: "No student selected or no data available" };
     }
 
-    const student = studentContext.data.students[studentContext.selectedStudentId];
+    const student = studentContext.data.students[studentContext.selectedStudentId!];
     if (!student?.courses) {
       return { message: "No courses found for selected student" };
     }
 
     const courseData = Object.entries(student.courses).map(([courseId, course]) => {
-      const vm = getRadialVM(studentContext.data, studentContext.selectedStudentId, courseId);
+      const vm = getRadialVM(studentContext.data!, studentContext.selectedStudentId!, courseId);
       return {
         courseId,
         period: course.meta?.period || 0,
@@ -89,10 +89,10 @@ export default function ScratchpadPage() {
               <div className="bg-gray-100 p-4 rounded border max-h-96 overflow-auto">
                 <JsonView 
                   value={studentContext?.selectedStudentId ? 
-                    studentContext?.data?.students?.[studentContext.selectedStudentId] || null : 
-                    studentContext?.data?.students ? 
-                      Object.values(studentContext.data.students)[0] || null :
-                      "No student data available"
+                    (studentContext?.data?.students?.[studentContext.selectedStudentId] || undefined) : 
+                    (studentContext?.data?.students ? 
+                      Object.values(studentContext.data.students)[0] || undefined :
+                      undefined)
                   }
                   style={{
                     backgroundColor: 'transparent',

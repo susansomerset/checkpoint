@@ -12,7 +12,7 @@ export function getRadialVM(
   studentId: string,
   courseId: string
 ): HeaderRadialVM {
-  const key = `${data.version}:${studentId}:${courseId}`;
+  const key = `${data.version || 0}:${studentId}:${courseId}`;
   const hit = cache.get(key);
   if (hit) return hit;
 

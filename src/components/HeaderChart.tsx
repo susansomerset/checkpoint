@@ -145,7 +145,7 @@ export default function HeaderChart({
           dataLabels: { show: false }
         }
       },
-      stroke: { lineCap: "round" },
+      stroke: { lineCap: "round" as const },
       legend: { show: false },
       tooltip: { enabled: false }
     }),

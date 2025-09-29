@@ -26,7 +26,6 @@ export function CourseRadialCard({ studentId, courseId, label, teacher }: Course
 
   return (
     <OriginalHeaderChart
-      sizePx={150}
       centerLabel={label}
       centerSubLabel={teacher}
       segments={vm.segments.map(s => ({

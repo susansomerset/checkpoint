@@ -88,7 +88,7 @@ export default function ProgressRadial({
         }
       },
       stroke: { 
-        lineCap: "round" 
+        lineCap: "round" as const
       },
       fill: {
         type: 'gradient',

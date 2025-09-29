@@ -169,9 +169,9 @@ test.describe('Assignment List Integration with Student Selector', () => {
     
     // Count total assignments across all courses for the first student
     let expectedAssignmentCount = 0;
-    Object.values(firstStudent.courses).forEach(course => {
+    Object.values((firstStudent as any).courses).forEach((course: any) => {
       const courseAssignments = Object.values(course.assignments || {}).filter(
-        assignment => assignment.meta.assignmentType !== 'Vector'
+        (assignment: any) => assignment.meta.assignmentType !== 'Vector'
       );
       expectedAssignmentCount += courseAssignments.length;
     });
