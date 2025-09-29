@@ -60,7 +60,7 @@ function JsonViewer({ data, title }: { data: unknown; title: string }) {
       );
     }
 
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value !== null) {
       const keys = Object.keys(value);
       if (keys.length === 0) {
         return <span className="text-gray-500">{'{}'}</span>;
@@ -78,7 +78,7 @@ function JsonViewer({ data, title }: { data: unknown; title: string }) {
             <div className="ml-4">
               {keys.map(objKey => (
                 <div key={objKey}>
-                  {indent}  <span className="text-red-600">&quot;{objKey}&quot;</span>: {renderValue(value[objKey], `${key}.${objKey}`, depth + 1)}
+                  {indent}  <span className="text-red-600">&quot;{objKey}&quot;</span>: {renderValue((value as Record<string, unknown>)[objKey], `${key}.${objKey}`, depth + 1)}
                 </div>
               ))}
             </div>
@@ -123,20 +123,20 @@ export default function ScratchpadPage() {
   // Find Zach's student ID
   const zachStudentId = studentContext?.data?.students ? 
     Object.keys(studentContext.data.students).find(id => {
-      const student = studentContext.data.students[id];
-      const name = student.meta?.preferredName || student.meta?.legalName || '';
+      const student = studentContext.data?.students?.[id];
+      const name = student?.meta?.preferredName || student?.meta?.legalName || '';
       return name.toLowerCase().includes('zach');
     }) : null;
 
   // Find Int Math 2 course
   const intMath2CourseId = zachStudentId && studentContext?.data?.students?.[zachStudentId]?.courses ?
     Object.keys(studentContext.data.students[zachStudentId].courses).find(id => {
-      const course = studentContext.data.students[zachStudentId].courses[id];
-      const name = course.meta?.shortName || course.canvas?.name || '';
+      const course = studentContext.data?.students?.[zachStudentId]?.courses?.[id];
+      const name = course?.meta?.shortName || course?.canvas?.name || '';
       return name.toLowerCase().includes('int math 2') || name.toLowerCase().includes('integrated math 2');
     }) : null;
 
-  const zachStudent = zachStudentId ? studentContext.data.students[zachStudentId] : null;
+  const zachStudent = zachStudentId && studentContext?.data?.students ? studentContext.data.students[zachStudentId] : null;
   const intMath2Course = intMath2CourseId && zachStudent ? zachStudent.courses[intMath2CourseId] : null;
 
   return (
