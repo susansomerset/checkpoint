@@ -175,4 +175,78 @@ test.describe('Smoke Tests - Core Functionality', () => {
       expect(warnings).toHaveLength(0);
     }
   });
+
+  test('should load all sub-pages without 404 errors', async ({ page }) => {
+    // Set up console error tracking
+    const errors: string[] = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text());
+      }
+    });
+
+    // Mock authentication
+    await page.route('**/api/auth/me', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          sub: 'test-user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+          preferredName: 'Test User'
+        })
+      });
+    });
+
+    // Mock student data
+    await page.route('**/api/student-data', async route => {
+      const mockData = {
+        ok: true,
+        status: 200,
+        data: {
+          students: {
+            'student-001': {
+              studentId: 'student-001',
+              meta: { legalName: 'Test Student', preferredName: 'Test' },
+              courses: {
+                'course-101': {
+                  courseId: 'course-101',
+                  canvas: { name: 'Algebra I' },
+                  meta: { shortName: 'Algebra I', teacher: 'Ms. Johnson', period: 1 },
+                  assignments: {},
+                  orphanSubmissions: {}
+                }
+              }
+            }
+          },
+          lastLoadedAt: new Date().toISOString(),
+          apiVersion: '1'
+        }
+      };
+      
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockData)
+      });
+    });
+
+    // Test all sub-pages
+    const subPages = ['/progress', '/assignments', '/detail', '/settings', '/scratchpad'];
+    
+    for (const subPage of subPages) {
+      // Navigate to sub-page
+      const response = await page.goto(subPage);
+      
+      // Should not be a 404 error
+      expect(response?.status()).toBeLessThan(400);
+      
+      // Wait for page to load
+      await page.waitForLoadState('networkidle');
+      
+      // Should not have console errors
+      expect(errors).toHaveLength(0);
+    }
+  });
 });

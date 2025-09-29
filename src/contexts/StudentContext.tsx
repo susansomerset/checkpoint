@@ -65,7 +65,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, [selectedStudentId])
+  }, []) // Removed selectedStudentId from dependency array
 
   // Fetch data only when user is authenticated
   useEffect(() => {
