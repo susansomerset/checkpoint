@@ -1,0 +1,134 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [active]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - navigation [ref=e7]:
+            - button "previous" [disabled] [ref=e8]:
+              - img "previous" [ref=e9]
+            - generic [ref=e11]:
+              - generic [ref=e12]: 1/
+              - generic [ref=e13]: "1"
+            - button "next" [disabled] [ref=e14]:
+              - img "next" [ref=e15]
+          - img
+        - generic [ref=e17]:
+          - link "Next.js 15.5.3 (stale) Webpack" [ref=e18] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e19] [cursor=pointer]
+            - generic "There is a newer version (15.5.4) available, upgrade recommended!" [ref=e21] [cursor=pointer]: Next.js 15.5.3 (stale)
+            - generic [ref=e22] [cursor=pointer]: Webpack
+          - img
+      - dialog "Runtime ReferenceError" [ref=e24]:
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]:
+              - generic [ref=e31]: Runtime ReferenceError
+              - generic [ref=e32]:
+                - button "Copy Error Info" [ref=e33] [cursor=pointer]:
+                  - img [ref=e34] [cursor=pointer]
+                - button "No related documentation found" [disabled] [ref=e36]:
+                  - img [ref=e37]
+                - link "Learn more about enabling Node.js inspector for server code with Chrome DevTools" [ref=e39] [cursor=pointer]:
+                  - /url: https://nextjs.org/docs/app/building-your-application/configuring/debugging#server-side-code
+                  - img [ref=e40] [cursor=pointer]
+            - paragraph [ref=e49]: onCourseClick is not defined
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - paragraph [ref=e53]:
+                - img [ref=e55]
+                - generic [ref=e58]: src/components/OriginalHeaderChart.tsx (217:49) @ HeaderChart
+                - button "Open in editor" [ref=e59] [cursor=pointer]:
+                  - img [ref=e61] [cursor=pointer]
+              - generic [ref=e64]:
+                - generic [ref=e66]: 215 | return (
+                - generic [ref=e68]: 216 | <div
+                - generic [ref=e70]: "> 217 | className={`relative group ${className} ${onCourseClick ? 'cursor-pointer' : ''}`}"
+                - generic [ref=e72]: "| ^"
+                - generic [ref=e74]: "218 | style={{ width: size, height: size }}"
+                - generic [ref=e76]: "219 | onClick={() => onCourseClick && courseId && onCourseClick(courseId)}"
+                - generic [ref=e78]: 220 | >
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - paragraph [ref=e81]:
+                  - text: Call Stack
+                  - generic [ref=e82]: "55"
+                - button "Show 41 ignore-listed frame(s)" [ref=e83] [cursor=pointer]:
+                  - text: Show 41 ignore-listed frame(s)
+                  - img [ref=e84] [cursor=pointer]
+              - generic [ref=e86]:
+                - generic [ref=e87]:
+                  - text: HeaderChart
+                  - button "Open HeaderChart in editor" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89] [cursor=pointer]
+                - generic [ref=e91]: src/components/OriginalHeaderChart.tsx (217:49)
+              - generic [ref=e92]:
+                - generic [ref=e93]: (app-pages-browser)/./node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js
+                - generic [ref=e94]: .next/static/chunks/main-app.js (1279:1)
+              - generic [ref=e95]:
+                - generic [ref=e96]: (app-pages-browser)/./node_modules/next/dist/compiled/scheduler/index.js
+                - generic [ref=e97]: .next/static/chunks/main-app.js (1290:1)
+              - generic [ref=e98]:
+                - generic [ref=e99]: (app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js
+                - generic [ref=e100]: .next/static/chunks/main-app.js (1137:1)
+              - generic [ref=e101]:
+                - generic [ref=e102]: (app-pages-browser)/./node_modules/next/dist/compiled/react-dom/client.js
+                - generic [ref=e103]: .next/static/chunks/main-app.js (1159:1)
+              - generic [ref=e104]:
+                - generic [ref=e105]: (app-pages-browser)/./node_modules/next/dist/client/app-index.js
+                - generic [ref=e106]: .next/static/chunks/main-app.js (116:1)
+              - generic [ref=e107]:
+                - generic [ref=e108]: (app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js
+                - generic [ref=e109]: .next/static/chunks/main-app.js (138:1)
+              - generic [ref=e110]:
+                - generic [ref=e111]: __webpack_exec__
+                - generic [ref=e112]: .next/static/chunks/main-app.js (1889:67)
+              - generic [ref=e113]:
+                - generic [ref=e114]: <unknown>
+                - generic [ref=e115]: .next/static/chunks/main-app.js (1890:154)
+              - generic [ref=e116]:
+                - generic [ref=e117]: <unknown>
+                - generic [ref=e118]: .next/static/chunks/main-app.js (9:61)
+              - generic [ref=e119]:
+                - generic [ref=e120]:
+                  - text: CourseRadialCard
+                  - button "Open CourseRadialCard in editor" [ref=e121] [cursor=pointer]:
+                    - img [ref=e122] [cursor=pointer]
+                - generic [ref=e124]: src/components/CourseRadialCard.tsx (28:5)
+              - generic [ref=e125]:
+                - generic [ref=e126]:
+                  - text: RadialSection/<.children<.children<
+                  - button "Open RadialSection/<.children<.children< in editor" [ref=e127] [cursor=pointer]:
+                    - img [ref=e128] [cursor=pointer]
+                - generic [ref=e130]: src/components/RadialSection.tsx (60:11)
+              - generic [ref=e131]:
+                - generic [ref=e132]:
+                  - text: RadialSection
+                  - button "Open RadialSection in editor" [ref=e133] [cursor=pointer]:
+                    - img [ref=e134] [cursor=pointer]
+                - generic [ref=e136]: src/components/RadialSection.tsx (59:18)
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - text: RootLayout
+                  - button "Open RootLayout in editor" [ref=e139] [cursor=pointer]:
+                    - img [ref=e140] [cursor=pointer]
+                - generic [ref=e142]: src/app/layout.tsx (57:19)
+        - generic [ref=e143]:
+          - generic [ref=e144]: "1"
+          - generic [ref=e145]: "2"
+    - generic [ref=e150] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e151] [cursor=pointer]:
+        - img [ref=e152] [cursor=pointer]
+      - generic [ref=e156] [cursor=pointer]:
+        - button "Open issues overlay" [ref=e157] [cursor=pointer]:
+          - generic [ref=e158] [cursor=pointer]:
+            - generic [ref=e159] [cursor=pointer]: "0"
+            - generic [ref=e160] [cursor=pointer]: "1"
+          - generic [ref=e161] [cursor=pointer]: Issue
+        - button "Collapse issues badge" [ref=e162] [cursor=pointer]:
+          - img [ref=e163] [cursor=pointer]
+  - 'heading "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)." [level=2] [ref=e167]'
+```

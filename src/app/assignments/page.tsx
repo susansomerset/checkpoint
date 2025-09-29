@@ -11,9 +11,7 @@ interface AssignmentsPageProps {
 function AssignmentListWrapper() {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<div className="text-center py-4"><div className="text-sm text-gray-500">Loading...</div></div>}>
-        <AssignmentList />
-      </Suspense>
+      <AssignmentList />
     </ErrorBoundary>
   )
 }

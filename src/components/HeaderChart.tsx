@@ -93,9 +93,9 @@ export default function HeaderChart({
     return clamped.map(s => ({ ...s, pct: (s.pct / sumPct) * 100 }));
   }, [segments]);
 
-  // Find bucket helpers (case-insensitive)
-  const pctOf = (name: string) =>
-    buckets.find(s => s.label.toLowerCase() === name.toLowerCase())?.pct || 0;
+  // Find bucket helpers (case-insensitive) - moved inside useMemo to avoid dependency issues
+  // const pctOf = (name: string) =>
+  //   buckets.find(s => s.label.toLowerCase() === name.toLowerCase())?.pct || 0;
 
   // const pointsOf = (name: string) =>
   //   segments.find(s => s.label.toLowerCase() === name.toLowerCase())?.points ?? undefined;
@@ -106,10 +106,11 @@ export default function HeaderChart({
       return clamp0to100(Math.round(centerValueOverride));
     }
     const totalPct = buckets.reduce((a, s) => a + s.pct, 0) || 1; // should be 100 after our renorm
+    const pctOf = (name: string) => buckets.find(s => s.label.toLowerCase() === name.toLowerCase())?.pct || 0;
     const missingPct = pctOf("Missing");
     const turnedIn = totalPct - missingPct; // includes Earned + Submitted + Lost
     return clamp0to100(Math.round(turnedIn));
-  }, [buckets, centerValueOverride, pctOf]);
+  }, [buckets, centerValueOverride]);
 
   // Build contiguous angle spans for each normalized segment (sum near 100).
   const spans = useMemo(() => {

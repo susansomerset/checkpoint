@@ -2,6 +2,7 @@
 
 import { useStudent } from '@/contexts/StudentContext';
 import { getRadialVM } from '@/selectors/cache';
+import JsonView from '@uiw/react-json-view';
 
 export default function ScratchpadPage() {
   const studentContext = useStudent();
@@ -54,40 +55,50 @@ export default function ScratchpadPage() {
             <div>
               <h3 className="text-lg font-medium text-gray-700 mb-2">Context State:</h3>
               <div className="bg-gray-100 p-4 rounded border">
-                <pre className="text-sm overflow-auto">
-                  {JSON.stringify({
+                <JsonView 
+                  value={{
                     selectedStudentId: studentContext?.selectedStudentId,
                     studentsCount: studentContext?.students?.length || 0,
                     hasData: !!studentContext?.data,
                     loading: studentContext?.loading,
                     error: studentContext?.error
-                  }, null, 2)}
-                </pre>
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    fontSize: '14px'
+                  }}
+                />
               </div>
             </div>
 
             <div>
               <h3 className="text-lg font-medium text-gray-700 mb-2">CourseRadialCard Data (Sorted by Period):</h3>
               <div className="bg-gray-100 p-4 rounded border max-h-96 overflow-auto">
-                <pre className="text-sm">
-                  {JSON.stringify(courseRadialData, null, 2)}
-                </pre>
+                <JsonView 
+                  value={courseRadialData}
+                  style={{
+                    backgroundColor: 'transparent',
+                    fontSize: '14px'
+                  }}
+                />
               </div>
             </div>
 
             <div>
               <h3 className="text-lg font-medium text-gray-700 mb-2">Raw Student Data (First Student):</h3>
               <div className="bg-gray-100 p-4 rounded border max-h-96 overflow-auto">
-                <pre className="text-sm">
-                  {studentContext?.selectedStudentId ? 
-                    JSON.stringify(
-                      studentContext?.data?.students?.[studentContext.selectedStudentId] || null, 
-                      null, 
-                      2
-                    ) : 
-                    "No student selected"
+                <JsonView 
+                  value={studentContext?.selectedStudentId ? 
+                    studentContext?.data?.students?.[studentContext.selectedStudentId] || null : 
+                    studentContext?.data?.students ? 
+                      Object.values(studentContext.data.students)[0] || null :
+                      "No student data available"
                   }
-                </pre>
+                  style={{
+                    backgroundColor: 'transparent',
+                    fontSize: '14px'
+                  }}
+                />
               </div>
             </div>
           </div>

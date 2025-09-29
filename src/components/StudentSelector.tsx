@@ -4,7 +4,26 @@ import React from 'react'
 import { useStudent } from '@/contexts/StudentContext'
 
 export function StudentSelector() {
-  const { selectedStudentId, setSelectedStudentId, students, loading, error } = useStudent()
+  const { selectedStudentId, setSelectedStudentId, students, loading, error, user, authLoading } = useStudent()
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center space-x-2">
+        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+        <span className="text-sm text-gray-600">Checking authentication...</span>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="text-sm text-gray-600">
+        <a href="/api/auth/login" className="text-indigo-600 hover:text-indigo-800 underline">
+          Sign in to view students
+        </a>
+      </div>
+    )
+  }
 
   if (loading) {
     return (

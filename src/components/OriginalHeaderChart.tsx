@@ -30,8 +30,8 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   centerValue,
   showTooltip = true,
   className = '',
-  courseId: _courseId,
-  onCourseClick: _onCourseClick
+  courseId,
+  onCourseClick
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const size = 150; // 60% of 250px (increased by 20%)

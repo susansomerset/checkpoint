@@ -14,6 +14,8 @@ interface StudentContextType {
   loading: boolean
   error: string | null
   refreshData: () => Promise<void>
+  user: any
+  authLoading: boolean
 }
 
 const StudentContext = createContext<StudentContextType | undefined>(undefined)
@@ -69,7 +71,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     if (user && !authLoading) {
       fetchData()
     }
-  }, [user, authLoading, fetchData]) // Fetch when auth state changes
+  }, [user, authLoading]) // Fetch when auth state changes
 
   // Auto-select first student when data loads
   useEffect(() => {
@@ -90,7 +92,9 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       data, 
       loading, 
       error, 
-      refreshData 
+      refreshData,
+      user,
+      authLoading
     }}>
       {children}
     </StudentContext.Provider>

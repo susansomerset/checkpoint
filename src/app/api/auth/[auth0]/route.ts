@@ -1,9 +1,8 @@
-import { handleAuth, handleLogin } from '@auth0/nextjs-auth0';
+// app/api/auth/[auth0]/route.ts
+import { handleAuth } from '@auth0/nextjs-auth0';
 
-// App Router needs a named handler. This covers all /api/auth/*.
-export const GET = handleAuth({
-  login: handleLogin({
-    returnTo: '/assignments' // Default to assignments page after login
-  })
-});
-export const POST = GET;
+export const GET = handleAuth();
+
+// Important: force Node runtime & dynamic; Auth0 SDK does not support Edge here.
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';

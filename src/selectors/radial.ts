@@ -44,50 +44,49 @@ export function bucketsForCourse(student: unknown, courseId: string): BucketsPoi
   let submitted = 0;
   let missing = 0;
   let lost = 0;
-
+    
   // Iterate through assignments and sum up points by status
-  Object.values(courseObj.assignments).forEach((assignment: unknown) => {
+  for (const assignment of Object.values(courseObj.assignments)) {
     if (!assignment || typeof assignment !== 'object' || !('meta' in assignment)) {
-      return;
+      continue;
     }
     
     const assignmentObj = assignment as { meta: unknown };
     const meta = assignmentObj.meta;
     
-    if (!meta || typeof meta !== 'object' || !('assignmentType' in meta) || !('checkpointStatus' in meta) || !('points' in meta)) {
-      return;
+    if (!meta || typeof meta !== 'object' || !('assignmentType' in meta) || !('checkpointStatus' in meta)) {
+      continue;
     }
     
-    const metaObj = meta as { assignmentType: string; checkpointStatus: string; points: number };
-
+    const metaObj = meta as { assignmentType: string; checkpointStatus: string; checkpointEarnedPoints?: number; checkpointSubmittedPoints?: number; checkpointMissingPoints?: number; checkpointLostPoints?: number };
+    
     // Skip Vector assignments - they should not be included in radial calculations
-    if (metaObj.assignmentType === 'Vector') return;
-
+    if (metaObj.assignmentType === 'Vector') continue;
+        
     // Use the checkpointStatus from the backend
     switch (metaObj.checkpointStatus) {
       case 'Graded':
-        earned += (meta as { checkpointEarnedPoints?: number }).checkpointEarnedPoints || 0;
+        earned += metaObj.checkpointEarnedPoints || 0;
         break;
       case 'Submitted':
-        submitted += (meta as { checkpointSubmittedPoints?: number }).checkpointSubmittedPoints || 0;
+        submitted += metaObj.checkpointSubmittedPoints || 0;
         break;
       case 'Missing':
-        missing += (meta as { checkpointMissingPoints?: number }).checkpointMissingPoints || 0;
+        missing += metaObj.checkpointMissingPoints || 0;
         break;
       case 'Lost':
-        lost += (meta as { checkpointLostPoints?: number }).checkpointLostPoints || 0;
+        lost += metaObj.checkpointLostPoints || 0;
         break;
       default:
         // Handle other statuses as needed
         break;
     }
-  });
-
-  return { 
-    Earned: earned, 
-    Submitted: submitted, 
-    Missing: missing, 
-    Lost: lost 
+  }
+  return {
+    Earned: earned,
+    Submitted: submitted,
+    Missing: missing,
+    Lost: lost
   };
 }
 

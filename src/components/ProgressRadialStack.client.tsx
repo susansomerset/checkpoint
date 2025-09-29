@@ -31,7 +31,7 @@ export default function ProgressRadialStack({
   title = "", 
   subtitle = "",
   className = "",
-  testMode = false 
+  testMode: _testMode = false 
 }: ProgressRadialStackProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showTooltip, setShowTooltip] = useState(false);

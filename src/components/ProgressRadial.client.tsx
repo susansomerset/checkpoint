@@ -27,10 +27,10 @@ export default function ProgressRadial({
   colors,
   title,
   subtitle,
-  showPercentage = true,
+  showPercentage: _showPercentage = true,
   showCheckmark = false,
   className = "",
-  testMode = false
+  testMode: _testMode = false
 }: ProgressRadialProps) {
   
   const chartOptions = useMemo(() => {
@@ -139,7 +139,7 @@ export default function ProgressRadial({
         }
       }]
     };
-  }, [series, labels, colors, showPercentage, showCheckmark]);
+  }, [series, labels, colors, showCheckmark]);
 
   // const centerText = useMemo(() => {
   //   if (showCheckmark && series.every(val => val === 100)) {
