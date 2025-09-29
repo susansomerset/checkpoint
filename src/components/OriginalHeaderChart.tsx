@@ -30,7 +30,7 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   centerValue,
   showTooltip = true,
   className = '',
-  courseId,
+  _courseId,
   onCourseClick
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);

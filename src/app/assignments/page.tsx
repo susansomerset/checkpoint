@@ -1,5 +1,4 @@
 // src/app/assignments/page.tsx
-import { Suspense } from 'react'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AssignmentList } from '@/components/AssignmentList'
 import { Toaster } from 'react-hot-toast'

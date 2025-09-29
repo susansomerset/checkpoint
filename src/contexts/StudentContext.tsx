@@ -14,7 +14,7 @@ interface StudentContextType {
   loading: boolean
   error: string | null
   refreshData: () => Promise<void>
-  user: any
+  user: unknown
   authLoading: boolean
 }
 
@@ -71,7 +71,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     if (user && !authLoading) {
       fetchData()
     }
-  }, [user, authLoading]) // Fetch when auth state changes
+  }, [user, authLoading, fetchData]) // Fetch when auth state changes
 
   // Auto-select first student when data loads
   useEffect(() => {

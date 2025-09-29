@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { useStudent } from '@/contexts/StudentContext'
 
 export function StudentSelector() {
@@ -18,9 +19,9 @@ export function StudentSelector() {
   if (!user) {
     return (
       <div className="text-sm text-gray-600">
-        <a href="/api/auth/login" className="text-indigo-600 hover:text-indigo-800 underline">
+        <Link href="/api/auth/login" className="text-indigo-600 hover:text-indigo-800 underline">
           Sign in to view students
-        </a>
+        </Link>
       </div>
     )
   }
