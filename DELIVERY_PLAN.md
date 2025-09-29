@@ -415,10 +415,11 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 - [ ] Collapsible course sections with expand/collapse functionality
 - [ ] Status subgroup organization with proper priority ordering
 - [ ] Canvas assignment links with proper deep linking
-- [ ] Course preferences integration (short names, teacher names, periods)
-- [ ] Preferred names integration for student display
+- [ ] Meta data integration (course short names, teacher names, periods from existing JSON)
+- [ ] Student preferred names integration using existing meta data
 
 ### Tasks
+<<<<<<< Updated upstream
 1. **Copy and Adapt ProgressView Component**
    - Copy `docs/components/ProgressView.tsx` to `src/components/ProgressTable.tsx`
    - Adapt data structure to use current `StudentData` and `Assignment` types
@@ -444,19 +445,62 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
    - Use existing `buildCanvasAssignmentUrl` for Canvas links
    - Integrate with current error boundary system
    - Add loading states and error handling
+=======
+1. **Create Architecture Guardrails**
+   - Create `src/lib/filters/isDisplayAssignment.ts` - single source of truth for Vector filtering
+   - Create `src/lib/comparators/` with deterministic sorting functions:
+     - `compareCourse(a,b)` - by period → course short name
+     - `compareStatus(a,b)` - by status priority
+     - `compareAssignment(a,b)` - by due date → assignment title
+   - Export `STATUS_PRIORITY` constant: `['Missing','Submitted (Late)','Submitted','Graded']`
+   - Add unit tests for all comparators and filters
+
+2. **Create Memoized Selectors**
+   - Create `src/selectors/progressTable.ts` with `useProgressTableRows(studentId)`
+   - Implement derived calculations in selectors, not components
+   - Add memoization by `[studentId, dataVersion]` to avoid stale UI
+   - Keep render logic lightweight with pre-computed data
+
+3. **Build ProgressTable Component**
+   - Use TanStack Table core (headless) for sorting/filtering/accessibility
+   - Pair with custom Tailwind cells for design flexibility
+   - Server-render table shell, client-render rows to avoid hydration mismatch
+   - Implement expand/collapse state: `Record<CourseId, boolean>` + `Record<CourseId, Record<Status, boolean>>`
+   - Add URL persistence for expanded state: `?course=P-2-ALG&open=Missing,Submitted`
+
+4. **Implement Data Processing**
+   - Use existing meta data: `course.meta.shortName`, `course.meta.teacher`, `course.meta.period`
+   - Use `student.meta.preferredName` with fallback to `student.meta.legalName`
+   - Trust backend `checkpointStatus` - no UI status logic
+   - Implement associative totals with unit test to prevent double counting
+   - Use `linkToAssignment(courseId, assignmentId)` factory for all Canvas links
+>>>>>>> Stashed changes
 
 5. **Add Interactive Features**
-   - Expand/collapse functionality for courses and status groups
+   - Expand/collapse functionality with keyboard navigation
    - Student selection filtering (single student view)
-   - Responsive table layout
+   - Responsive table layout with proper table semantics
    - Navigation to detail view with course filtering
+   - Screen reader support with visually-hidden summaries
 
 ### Testing Strategy
-- **Unit Tests**: Status grouping logic, Vector filtering, percentage calculations
-- **Component Tests**: Expand/collapse behavior, data rendering
-- **Integration Tests**: Student filtering, course preferences loading
-- **Visual Tests**: Table layout, status badges, responsive design
-- **E2E Tests**: Complete user workflow from student selection to assignment details
+- **Unit Tests**: 
+  - Status order comparator (snapshot of rendered order with all four statuses)
+  - Associative totals math test (prove sum(child pcts by points) == parent pct)
+  - Single Vector filter predicate test
+  - Deterministic sorting functions
+- **Component Tests (RTL)**:
+  - Expand/collapse toggles (course + status)
+  - Vector filtering hides rows
+  - Fallbacks: shortName → legalName, preferredName → legalName, due date handling
+- **E2E Tests (Playwright)**:
+  - Smoke: load table, expand one course, click assignment → Canvas opens in new tab
+  - URL state persistence: `?course=...&open=Missing` → verify state honored on load
+  - Visual snapshot: single expanded course for diff stability
+  - Accessibility: axe zero critical violations
+- **Performance Tests**:
+  - Bundle size under budget (CI size-limit)
+  - Memoization effectiveness with data updates
 
 ### Comprehensive Verification Checklist
 
@@ -513,6 +557,7 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 - [ ] **Performance**: Efficient rendering with large datasets
 - [ ] **Memory Management**: Proper cleanup of expanded state
 
+<<<<<<< Updated upstream
 ### Success Criteria
 - [ ] All data displays correctly with proper fallbacks
 - [ ] Status groups appear in exact priority order
@@ -526,6 +571,137 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 - [ ] ALL Playwright tests pass
 - [ ] Vector assignments completely hidden
 - [ ] Performance acceptable with large datasets
+=======
+### Success Criteria (Vern's Definition of Done)
+- [ ] **Status groups exact priority order** (unit test)
+- [ ] **Single vector filter predicate used** (unit test)
+- [ ] **Associative totals** (math test)
+- [ ] **URL persists expanded state** (E2E)
+- [ ] **Canvas links open in new tab with noopener** (E2E)
+- [ ] **axe zero critical violations** (E2E)
+- [ ] **size-limit under budget** (CI)
+- [ ] **TanStack Table integration** working
+- [ ] **Memoized selectors** preventing stale UI
+- [ ] **Deterministic sorting** everywhere
+- [ ] **Screen reader support** with proper ARIA
+- [ ] **Keyboard navigation** working
+- [ ] **URL state persistence** working
+- [ ] **Bundle size** within limits
+
+### Safety Nets & Performance Gates
+- [ ] **Deep-link contract**: `?student=<id>&course=<courseId>&open=<Status,Status>&q=<search>`
+- [ ] **Performance gate**: Selector completes <150ms with 2k assignments
+- [ ] **A11y announcements**: Course summaries with counts ("Algebra 2 (Period 3). 12 assignments: 2 Missing, 1 Submitted (Late), 6 Submitted, 3 Graded.")
+- [ ] **Consistent formatting**: Same rounding as header radials to avoid percentage mismatches
+- [ ] **Empty state snapshots**: No courses, Vector-only courses, missing possiblePoints
+- [ ] **PII security**: No student names/IDs in analytics, logs, or Sentry
+- [ ] **Time zone handling**: DST tests with `--timezone=America/Los_Angeles`
+- [ ] **Type safety**: `tsc` check against MSW fixtures to catch drift
+
+### Final Guardrails (Vern's Last Mile Improvements)
+
+#### Deep-Link Contract & URL Helper
+```typescript
+export function progressTableUrl(p:{studentId:string;courseId?:string;open?:string[];q?:string}) {
+  const u = new URL('/progress', window.location.origin);
+  u.searchParams.set('student', p.studentId);
+  if (p.courseId) u.searchParams.set('course', p.courseId);
+  if (p.open?.length) u.searchParams.set('open', p.open.join(','));
+  if (p.q) u.searchParams.set('q', p.q);
+  return u.toString();
+}
+```
+
+#### Centralized Formatters (Consistency with Charts)
+```typescript
+export const formatPoints = (n:number|null|undefined)=> (n ?? 0).toLocaleString('en-US');
+export const pct = (e:number,p:number)=> p ? Math.round((100*e)/p) : 0;
+export const formatDue = (d?:string|Date)=> d ? new Date(d).toLocaleDateString('en-US',{month:'2-digit',day:'2-digit'}) : '(no due date)';
+```
+
+#### Accessibility Testing (Axe in Playwright)
+```typescript
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test('table a11y', async ({ page }) => {
+  await page.goto('/progress?student=S1');
+  const results = await new AxeBuilder({ page }).analyze();
+  const serious = results.violations.filter(v => ['serious','critical'].includes(v.impact ?? 'minor'));
+  expect(serious, JSON.stringify(serious, null, 2)).toHaveLength(0);
+});
+```
+
+#### Performance Testing (Selector Benchmark)
+```typescript
+test('selector under load', () => {
+  const big = makeFixture(2000);  // generate 2k assignments
+  const t0 = performance.now();
+  const rows = selectProgressTableRows(big); // pure function version
+  const dt = performance.now() - t0;
+  expect(rows.length).toBeGreaterThan(0);
+  expect(dt).toBeLessThan(150);
+});
+```
+
+### Code Helpers (Vern's Paste-Ready Examples)
+
+#### Status Order Comparator
+```typescript
+export const STATUS_PRIORITY = ['Missing','Submitted (Late)','Submitted','Graded'] as const;
+const rank = Object.fromEntries(STATUS_PRIORITY.map((s,i)=>[s,i]));
+
+export function compareStatus(a: string, b: string) {
+  return (rank[a] ?? 999) - (rank[b] ?? 999);
+}
+```
+
+#### Associative Totals Test
+```typescript
+// pseudo types: items: { earned:number, possible:number }[]
+const pct = (e:number,p:number)=> p ? Math.round((100*e)/p) : 0;
+
+test('associative totals', () => {
+  const groups = [ /* build from fixtures */ ];
+  const eSum = groups.reduce((s,g)=>s+g.earned,0);
+  const pSum = groups.reduce((s,g)=>s+g.possible,0);
+  expect(pct(eSum,pSum)).toBe(/* expected from parent row */);
+});
+```
+
+#### Deterministic Course Sorter
+```typescript
+export function compareCourse(a: Course, b: Course) {
+  const pa = a.meta.period ?? 999, pb = b.meta.period ?? 999;
+  if (pa !== pb) return pa - pb;
+  return (a.meta.shortName ?? a.meta.legalName ?? '').localeCompare(
+         b.meta.shortName ?? b.meta.legalName ?? '', 'en');
+}
+```
+
+### Phase 4 DoD Checklist (Copy to PR Description)
+- [ ] **URL contract**: `student`, `course`, `open`, `q` honored
+- [ ] **Vector filter** used in table selectors (unit-tested)
+- [ ] **Associativity test** passes (course ↔ status groups)
+- [ ] **Axe**: 0 serious/critical violations
+- [ ] **Visual snapshot** (one expanded course) matches
+- [ ] **size-limit** passes for the table route
+- [ ] **Selector perf test** <150ms @2k rows
+
+### Required Test Fixture
+- **Course containing all four statuses** with mixed due dates, plus one Vector assignment
+- Used across unit, component, and E2E tests for consistency
+
+### Implementation Strategy (Vern's Recommended Approach)
+1. **Skeleton PR**: Table shell + selectors + filter + comparators + one course expanded + a11y + visual snapshot
+2. **Follow-up PR**: Expand/collapse persistence + Canvas links test
+3. **Keep PRs small** (~200–400 LOC diffs) for fast CI and crisp reviews
+
+### Telemetry & Debugging
+- **Row render errors**: `console.warn('row-skip', { courseId, assignmentId })` in dev
+- **Sentry breadcrumbs** in prod (PII scrubbed)
+- **Expand/collapse tracking** in dev log with counts for perf tuning
+>>>>>>> Stashed changes
 
 ---
 

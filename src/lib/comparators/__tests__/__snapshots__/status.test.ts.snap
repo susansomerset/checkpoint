@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`STATUS_PRIORITY maintains exact order and never changes 1`] = `
+[
+  "Missing",
+  "Submitted (Late)",
+  "Submitted",
+  "Graded",
+]
+`;

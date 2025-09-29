@@ -20,15 +20,22 @@ export async function GET(req: NextRequest) {
         const studentData = await kv.get('studentData:v1');
         console.info(`ZXQ get.storage.raw: ${studentData ? 'FOUND' : 'NOT_FOUND'} - ${studentData ? studentData.length : 0} bytes`);
         if (studentData) {
-          const parsed = JSON.parse(studentData);
-          console.info(`ZXQ get.storage: ${parsed.students ? Object.keys(parsed.students).length : 0} students, ${studentData.length} bytes`);
-          return Response.json({
-            ok: true,
-            status: 200,
-            data: parsed
-          });
+          try {
+            const parsed = JSON.parse(studentData);
+            console.info(`ZXQ get.storage: ${parsed.students ? Object.keys(parsed.students).length : 0} students, ${studentData.length} bytes`);
+            return Response.json({
+              ok: true,
+              status: 200,
+              data: parsed
+            });
+          } catch (parseError) {
+            console.error('ZXQ JSON parse error:', parseError);
+            console.error('ZXQ Raw data preview:', studentData.substring(0, 200));
+            // Fall through to regular data
+          }
         }
-      } catch {
+      } catch (storageError) {
+        console.error('ZXQ Storage error:', storageError);
         console.info('No student data found, falling back to regular data');
       }
   

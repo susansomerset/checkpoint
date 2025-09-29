@@ -109,3 +109,6 @@ export function useStudent() {
   }
   return context
 }
+
+// Alias for compatibility
+export const useStudentContext = useStudent

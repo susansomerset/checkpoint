@@ -15,7 +15,7 @@ function NavTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex space-x-8" aria-label="Tabs">
+    <nav className="flex justify-center space-x-8" aria-label="Tabs">
       {navigation.map((item) => {
         const isActive = pathname === item.href;
         return (

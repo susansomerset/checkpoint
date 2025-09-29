@@ -7,7 +7,12 @@ export async function loadStudentData(): Promise<StudentData | null> {
   try {
     const raw = await kv.get(KEY);
     console.info(`ZXQ kv.loadStudentData: ${raw ? 'FOUND' : 'NOT_FOUND'} - ${raw ? String(raw).length : 0} bytes`);
-    return raw ? (raw as StudentData) : null;
+    if (raw) {
+      // Parse the JSON string to return the actual object
+      const parsed = JSON.parse(String(raw));
+      return parsed as StudentData;
+    }
+    return null;
   } catch (error) {
     console.error('ZXQ kv.loadStudentData error:', error);
     return null;

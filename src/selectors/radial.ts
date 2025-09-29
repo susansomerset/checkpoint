@@ -72,15 +72,13 @@ export function bucketsForCourse(student: unknown, courseId: string): BucketsPoi
     switch (metaObj.checkpointStatus) {
       case 'Graded':
         earned += metaObj.checkpointEarnedPoints || 0;
+        lost += metaObj.checkpointLostPoints || 0;
         break;
       case 'Submitted':
         submitted += metaObj.checkpointSubmittedPoints || 0;
         break;
       case 'Missing':
         missing += metaObj.checkpointMissingPoints || 0;
-        break;
-      case 'Lost':
-        lost += metaObj.checkpointLostPoints || 0;
         break;
       default:
         // Handle other statuses as needed
@@ -97,7 +95,7 @@ export function bucketsForCourse(student: unknown, courseId: string): BucketsPoi
 
 export function radialVMFromBuckets(b: BucketsPoints): HeaderRadialVM {
   const total = Math.max(0, b.Earned + b.Submitted + b.Missing + b.Lost);
-  const center = total > 0 ? Math.round(((total - b.Missing) / total) * 100) : 0;
+  const center = total > 0 ? Math.round(((total - b.Missing - b.Lost) / total) * 100) : 0;
 
   // Normalize to 100 so the stacked ring is contiguous:
   const denom = total > 0 ? total : 1;

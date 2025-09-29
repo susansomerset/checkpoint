@@ -27,6 +27,7 @@ const mockStudentData: StudentDataResponse = {
             'assignment1': {
               assignmentId: 'assignment1',
               courseId: 'course1',
+              studentId: 'student1',
               canvas: {
                 name: 'Homework 1',
                 due_at: '2024-01-15T23:59:59Z',
@@ -64,6 +65,7 @@ const mockStudentData: StudentDataResponse = {
             'assignment2': {
               assignmentId: 'assignment2',
               courseId: 'course1',
+              studentId: 'student1',
               canvas: {
                 name: 'Quiz 1',
                 due_at: '2024-01-20T23:59:59Z',
@@ -100,6 +102,7 @@ const mockStudentData: StudentDataResponse = {
             'assignment3': {
               assignmentId: 'assignment3',
               courseId: 'course2',
+              studentId: 'student1',
               canvas: {
                 name: 'Essay 1',
                 due_at: '2024-01-18T23:59:59Z',

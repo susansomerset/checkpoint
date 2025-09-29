@@ -235,7 +235,7 @@ export function buildStudentData(input: BuilderInput): StudentData {
         courseId: courseId,
         canvas: { ...assignment },
         pointsPossible: assignment.points_possible,
-        link: '', // TODO: Get html_url from Canvas API if needed
+            link: (assignment as { html_url?: string }).html_url || `https://djusd.instructure.com/courses/${courseId}/assignments/${assignmentId}`,
         submissions: {},
         meta: {
           checkpointStatus: 'Due',

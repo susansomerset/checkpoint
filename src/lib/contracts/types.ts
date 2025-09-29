@@ -47,6 +47,9 @@ export const AssignmentMetaSchema = z.object({
   checkpointSubmittedPoints: z.number(),
   checkpointMissingPoints: z.number(),
   assignmentType: AssignmentType,
+  title: z.string().optional(),
+  dueDate: z.string().optional(),
+  pointValue: z.number().optional(),
 })
 export type AssignmentMeta = z.infer<typeof AssignmentMetaSchema>
 
@@ -54,6 +57,7 @@ export type AssignmentMeta = z.infer<typeof AssignmentMetaSchema>
 export const AssignmentSchema = z.object({
   assignmentId: z.string(),
   courseId: z.string(),
+  studentId: z.string(),
   canvas: z.record(z.string(), z.any()),
   pointsPossible: z.number().optional(),
   link: z.string(), // html_url
@@ -74,6 +78,7 @@ export type DerivedAssignment = z.infer<typeof DerivedAssignmentSchema>
 // Course meta schema
 export const CourseMetaSchema = z.object({
   shortName: z.string().optional(),
+  legalName: z.string().optional(),
   teacher: z.string().optional(),
   period: z.number().int().optional(),
 })
