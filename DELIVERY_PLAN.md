@@ -411,45 +411,120 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 *"The devil is in the details."*
 
 ### Deliverables
-- [ ] `ProgressTable` component
-- [ ] Collapsible course sections
-- [ ] Status subgroup organization
-- [ ] Canvas assignment links
+- [ ] `ProgressTable` component (copy/adapt from existing `ProgressView`)
+- [ ] Collapsible course sections with expand/collapse functionality
+- [ ] Status subgroup organization with proper priority ordering
+- [ ] Canvas assignment links with proper deep linking
+- [ ] Course preferences integration (short names, teacher names, periods)
+- [ ] Preferred names integration for student display
 
 ### Tasks
-1. **Create ProgressTable Component**
-   - Course grouping by period
-   - Status subgroups: Missing → Submitted → Submitted (On time) → Graded
-   - Collapsible/expandable sections
-   - Assignment count and percentage displays
+1. **Copy and Adapt ProgressView Component**
+   - Copy `docs/components/ProgressView.tsx` to `src/components/ProgressTable.tsx`
+   - Adapt data structure to use current `StudentData` and `Assignment` types
+   - Replace `ProcessedAssignment` with current `Assignment` type from contracts
+   - Update imports to use current type system (`src/lib/contracts/types.ts`)
 
-2. **Implement Status Logic**
-   - Correct status ordering (trust backend `checkpointStatus`)
-   - Vector assignment filtering (exclude `assignmentType === 'Vector'`)
-   - Due date formatting
-   - Canvas link generation (use existing `buildCanvasAssignmentUrl`)
+2. **Implement Missing Utility Functions**
+   - Create `src/lib/utils/coursePreferences.ts` for course short names, teacher names, periods
+   - Create `src/lib/utils/preferredNames.ts` for student preferred name mapping
+   - Implement course preference storage/retrieval system
+   - Add fallback logic for missing preferences
 
-3. **Add Interactive Features**
-   - Expand/collapse functionality
-   - Student selection filtering
+3. **Adapt Data Processing Logic**
+   - Map current `Assignment` structure to component expectations
+   - Implement status priority mapping (Missing → Submitted (Late) → Submitted → Graded)
+   - Add Vector assignment filtering (`assignmentType === 'Vector'`)
+   - Calculate points and percentages correctly
+   - Handle due date formatting and display
+
+4. **Integrate with Existing Systems**
+   - Connect to `StudentContext` for student selection
+   - Use existing `buildCanvasAssignmentUrl` for Canvas links
+   - Integrate with current error boundary system
+   - Add loading states and error handling
+
+5. **Add Interactive Features**
+   - Expand/collapse functionality for courses and status groups
+   - Student selection filtering (single student view)
    - Responsive table layout
+   - Navigation to detail view with course filtering
 
-### Testing
-- **Unit Tests**: Status grouping logic, Vector filtering
-- **Component Tests**: Expand/collapse behavior
-- **Integration Tests**: Student filtering (use existing StudentContext)
-- **Visual Tests**: Table layout and styling
+### Testing Strategy
+- **Unit Tests**: Status grouping logic, Vector filtering, percentage calculations
+- **Component Tests**: Expand/collapse behavior, data rendering
+- **Integration Tests**: Student filtering, course preferences loading
+- **Visual Tests**: Table layout, status badges, responsive design
+- **E2E Tests**: Complete user workflow from student selection to assignment details
+
+### Comprehensive Verification Checklist
+
+#### Data Population & Display
+- [ ] **Course Short Names**: Display custom short names from preferences, fallback to full class names
+- [ ] **Teacher Names**: Show preferred teacher names from preferences, fallback to API data
+- [ ] **Period Numbers**: Display periods in correct order (P-1, P-2, etc.) with manual override support
+- [ ] **Student Names**: Use preferred names when available, fallback to legal names
+- [ ] **Assignment Titles**: Display full assignment titles with proper truncation
+- [ ] **Due Dates**: Format dates as "MM/DD" with "(no due date)" fallback
+- [ ] **Points**: Show earned/possible points with proper formatting
+- [ ] **Percentages**: Calculate and display percentages correctly (rounded to whole numbers)
+
+#### Status Organization & Visual Design
+- [ ] **Status Priority Order**: Missing → Submitted (Late) → Submitted → Graded (exactly as defined)
+- [ ] **Status Badge Colors**: 
+  - Missing: red background (`bg-red-100 text-red-800`)
+  - Submitted (Late): yellow background (`bg-yellow-100 text-yellow-800`)
+  - Submitted/Graded: green background (`bg-green-100 text-green-800`)
+- [ ] **Table Structure**: Proper indentation levels (course → status group → assignment)
+- [ ] **Expand/Collapse Icons**: ChevronRight (collapsed) / ChevronDown (expanded)
+- [ ] **Hover States**: Proper hover effects on clickable rows
+- [ ] **Responsive Layout**: Table scrolls horizontally on mobile
+
+#### Functionality & Interactions
+- [ ] **Course Expansion**: Click course row to expand/collapse status groups
+- [ ] **Status Group Expansion**: Click status group to show/hide individual assignments
+- [ ] **Canvas Links**: All assignment titles link to Canvas with `target="_blank"` and `rel="noopener noreferrer"`
+- [ ] **Course Navigation**: Course names link to detail view with course filtering
+- [ ] **Student Filtering**: Only show selected student's data
+- [ ] **Vector Filtering**: Vector assignments completely hidden from display
+
+#### Data Calculations & Logic
+- [ ] **Assignment Filtering**: Only show graded, submitted, and past-due missing assignments
+- [ ] **Point Calculations**: 
+  - Total possible points include all assignments (including missing)
+  - Total earned points only include submitted/graded assignments
+  - Missing assignments contribute 0 earned points
+- [ ] **Percentage Calculations**: Correct percentage for each level (assignment, status group, course, student)
+- [ ] **Assignment Counts**: Accurate counts at each level
+- [ ] **Period Sorting**: Courses sorted by period number (manual override takes precedence)
+
+#### Error Handling & Edge Cases
+- [ ] **Loading States**: Show spinner and "Loading progress data..." message
+- [ ] **Empty States**: Show "No progress data available." when no data
+- [ ] **Missing Preferences**: Graceful fallback to API data when preferences unavailable
+- [ ] **Invalid Data**: Handle malformed assignment data without crashing
+- [ ] **Network Errors**: Proper error boundary integration
+
+#### Accessibility & Performance
+- [ ] **Keyboard Navigation**: All interactive elements accessible via keyboard
+- [ ] **Screen Reader Support**: Proper ARIA labels and table structure
+- [ ] **Focus Management**: Logical tab order through expandable sections
+- [ ] **Performance**: Efficient rendering with large datasets
+- [ ] **Memory Management**: Proper cleanup of expanded state
 
 ### Success Criteria
-- [ ] Courses ordered by period
-- [ ] Status subgroups in correct order
-- [ ] All assignments link to Canvas
-- [ ] Expand/collapse works smoothly
+- [ ] All data displays correctly with proper fallbacks
+- [ ] Status groups appear in exact priority order
+- [ ] All Canvas links work and open in new tabs
+- [ ] Expand/collapse functionality works smoothly
 - [ ] Student filtering works correctly
+- [ ] Course preferences system integrated
+- [ ] Responsive design works on all screen sizes
 - [ ] ALL ESLint issues resolved
 - [ ] ALL TSC issues resolved
 - [ ] ALL Playwright tests pass
-- [ ] Vector assignments hidden
+- [ ] Vector assignments completely hidden
+- [ ] Performance acceptable with large datasets
 
 ---
 
