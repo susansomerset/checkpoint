@@ -425,11 +425,12 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
    - Replace `ProcessedAssignment` with current `Assignment` type from contracts
    - Update imports to use current type system (`src/lib/contracts/types.ts`)
 
-2. **Implement Missing Utility Functions**
-   - Create `src/lib/utils/coursePreferences.ts` for course short names, teacher names, periods
-   - Create `src/lib/utils/preferredNames.ts` for student preferred name mapping
-   - Implement course preference storage/retrieval system
-   - Add fallback logic for missing preferences
+2. **Use Existing Data Structure**
+   - Use `course.meta.shortName` for course short names
+   - Use `course.meta.teacher` for teacher names  
+   - Use `course.meta.period` for period numbers
+   - Use `student.meta.preferredName` for student preferred names
+   - All data is already available in the existing JSON structure
 
 3. **Adapt Data Processing Logic**
    - Map current `Assignment` structure to component expectations
@@ -460,10 +461,10 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 ### Comprehensive Verification Checklist
 
 #### Data Population & Display
-- [ ] **Course Short Names**: Display custom short names from preferences, fallback to full class names
-- [ ] **Teacher Names**: Show preferred teacher names from preferences, fallback to API data
-- [ ] **Period Numbers**: Display periods in correct order (P-1, P-2, etc.) with manual override support
-- [ ] **Student Names**: Use preferred names when available, fallback to legal names
+- [ ] **Course Short Names**: Display `course.meta.shortName`, fallback to `course.meta.legalName`
+- [ ] **Teacher Names**: Show `course.meta.teacher` from existing data
+- [ ] **Period Numbers**: Display `course.meta.period` in correct order (P-1, P-2, etc.)
+- [ ] **Student Names**: Use `student.meta.preferredName`, fallback to `student.meta.legalName`
 - [ ] **Assignment Titles**: Display full assignment titles with proper truncation
 - [ ] **Due Dates**: Format dates as "MM/DD" with "(no due date)" fallback
 - [ ] **Points**: Show earned/possible points with proper formatting
@@ -501,7 +502,7 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 #### Error Handling & Edge Cases
 - [ ] **Loading States**: Show spinner and "Loading progress data..." message
 - [ ] **Empty States**: Show "No progress data available." when no data
-- [ ] **Missing Preferences**: Graceful fallback to API data when preferences unavailable
+- [ ] **Missing Meta Data**: Graceful fallback to alternative fields when meta data unavailable
 - [ ] **Invalid Data**: Handle malformed assignment data without crashing
 - [ ] **Network Errors**: Proper error boundary integration
 
@@ -518,7 +519,7 @@ Phase 3 provides a solid foundation with comprehensive testing, CI/CD pipeline, 
 - [ ] All Canvas links work and open in new tabs
 - [ ] Expand/collapse functionality works smoothly
 - [ ] Student filtering works correctly
-- [ ] Course preferences system integrated
+- [ ] Meta data integration working correctly
 - [ ] Responsive design works on all screen sizes
 - [ ] ALL ESLint issues resolved
 - [ ] ALL TSC issues resolved
