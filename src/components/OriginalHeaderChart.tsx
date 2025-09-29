@@ -216,7 +216,7 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
     <div 
       className={`relative group ${className} ${onCourseClick ? 'cursor-pointer' : ''}`} 
       style={{ width: size, height: size }}
-      onClick={() => onCourseClick && courseId && onCourseClick(courseId)}
+      onClick={() => onCourseClick && _courseId && onCourseClick(_courseId)}
     >
       {/* Render all chart segments */}
       {chartConfigs.map((config) => (
