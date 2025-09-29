@@ -45,6 +45,11 @@ export function bucketsForCourse(student: unknown, courseId: string): BucketsPoi
   let missing = 0;
   let lost = 0;
     
+  // Check if assignments exist and is not null/undefined
+  if (!courseObj.assignments || typeof courseObj.assignments !== 'object') {
+    return { Earned: earned, Submitted: submitted, Missing: missing, Lost: lost };
+  }
+    
   // Iterate through assignments and sum up points by status
   for (const assignment of Object.values(courseObj.assignments)) {
     if (!assignment || typeof assignment !== 'object' || !('meta' in assignment)) {
