@@ -22,7 +22,6 @@ interface ProgressRadialStackProps {
   title?: string;
   subtitle?: string;
   className?: string;
-  testMode?: boolean;
 }
 
 export default function ProgressRadialStack({ 
@@ -30,8 +29,7 @@ export default function ProgressRadialStack({
   percent, 
   title = "", 
   subtitle = "",
-  className = "",
-  testMode: _testMode = false 
+  className = ""
 }: ProgressRadialStackProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showTooltip, setShowTooltip] = useState(false);

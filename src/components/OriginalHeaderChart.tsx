@@ -50,7 +50,7 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   let currentAngle = startAngle;
   const chartConfigs: Array<{ key: string; options: unknown }> = [];
 
-  normalizedSegments.forEach((segment, _index) => {
+  normalizedSegments.forEach((segment) => {
     if (segment.percentage > 0) {
     const segmentDegrees = Math.floor((segment.percentage / 100) * totalArcDegrees);
     const segmentStartAngle = currentAngle;
@@ -207,6 +207,7 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
   // Disable ApexCharts dataLabels - we'll handle labels with custom overlays
   if (chartConfigs.length > 0) {
     const lastChart = chartConfigs[chartConfigs.length - 1];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (lastChart.options as any).plotOptions.radialBar.dataLabels = {
       show: false
     };
@@ -222,7 +223,9 @@ const HeaderChart: React.FC<HeaderChartProps> = ({
       {chartConfigs.map((config) => (
         <div key={config.key} className="absolute inset-0">
           <Chart
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             options={config.options as any}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             series={(config.options as any).series}
             type="radialBar"
             height={size}

@@ -15,10 +15,8 @@ export interface ProgressRadialProps {
   colors: string[];
   title: string;
   subtitle?: string;
-  showPercentage?: boolean;
   showCheckmark?: boolean;
   className?: string;
-  testMode?: boolean; // For deterministic testing
 }
 
 export default function ProgressRadial({
@@ -27,10 +25,8 @@ export default function ProgressRadial({
   colors,
   title,
   subtitle,
-  showPercentage: _showPercentage = true,
   showCheckmark = false,
-  className = "",
-  testMode: _testMode = false
+  className = ""
 }: ProgressRadialProps) {
   
   const chartOptions = useMemo(() => {
@@ -116,7 +112,7 @@ export default function ProgressRadial({
           fontSize: '12px',
           fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
         },
-        custom: function({ series, seriesIndex, _dataPointIndex, _w }: { series: number[], seriesIndex: number, _dataPointIndex: number, _w: unknown }) {
+        custom: function({ series, seriesIndex }: { series: number[], seriesIndex: number }) {
           const label = labels[seriesIndex] || '';
           const value = series[seriesIndex] || 0;
           return `

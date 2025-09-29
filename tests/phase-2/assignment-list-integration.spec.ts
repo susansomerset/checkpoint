@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getRealStudentData } from '../fixtures/real-data-cache';
+import { getRealStudentData } from './real-data-cache';
 
 test.describe('Assignment List Integration with Student Selector', () => {
   test.beforeEach(async ({ page }) => {

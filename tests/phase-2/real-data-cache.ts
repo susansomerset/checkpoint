@@ -1,5 +1,5 @@
 // tests/fixtures/real-data-cache.ts
-import { generateMockApiResponse, validateMockDataStructure } from './mock-data-generator'
+import { generateMockApiResponse, validateMockDataStructure } from '../fixtures/mock-data-generator'
 
 let cachedStudentData: any = null
 let cacheTimestamp: number = 0
