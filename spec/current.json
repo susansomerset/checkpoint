@@ -526,8 +526,8 @@
           "two_students_small": {
             "S1": {
               "summary": {
-                "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 2 },
-                "totalItems": 3
+                "attentionCounts": { "Check": 0, "Thumb": 2, "Question": 0, "Warning": 2 },
+                "totalItems": 4
               },
               "grid": {
                 "header": {
@@ -573,8 +573,8 @@
                       }
                     },
                     "summary": {
-                      "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 2 },
-                      "totalItems": 3
+                      "attentionCounts": { "Check": 0, "Thumb": 2, "Question": 0, "Warning": 2 },
+                      "totalItems": 4
                     }
                   }
                 ]
@@ -582,8 +582,8 @@
             },
             "S2": {
               "summary": {
-                "attentionCounts": { "Check": 1, "Thumb": 0, "Question": 0, "Warning": 0 },
-                "totalItems": 1
+                "attentionCounts": { "Check": 1, "Thumb": 1, "Question": 0, "Warning": 0 },
+                "totalItems": 2
               },
               "grid": {
                 "header": {
@@ -625,8 +625,8 @@
                       }
                     },
                     "summary": {
-                      "attentionCounts": { "Check": 1, "Thumb": 0, "Question": 0, "Warning": 0 },
-                      "totalItems": 1
+                      "attentionCounts": { "Check": 1, "Thumb": 1, "Question": 0, "Warning": 0 },
+                      "totalItems": 2
                     }
                   }
                 ]

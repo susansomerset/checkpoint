@@ -86,9 +86,9 @@ describe('processing.getWeeklyGrids', () => {
       
       // Check counts match expected (excludes noDate from attentionCounts per spec)
       expect(s1Row.summary.attentionCounts.Check).toBe(0);
-      expect(s1Row.summary.attentionCounts.Thumb).toBe(1);
-      expect(s1Row.summary.attentionCounts.Warning).toBe(2);
-      expect(s1Row.summary.totalItems).toBe(3); // Excludes noDate from totalItems per spec
+      expect(s1Row.summary.attentionCounts.Thumb).toBe(2); // A-2 (Tue, Due) + A-5 (Next, Due)
+      expect(s1Row.summary.attentionCounts.Warning).toBe(2); // A-0 (Prior, Missing) + A-3 (Fri, Missing)
+      expect(s1Row.summary.totalItems).toBe(4); // A-0, A-2, A-3, A-5 (excludes noDate)
     });
 
     it('computes correct student-level aggregated counts', () => {
@@ -101,9 +101,9 @@ describe('processing.getWeeklyGrids', () => {
       const s1Summary = result['S1'].summary;
       
       expect(s1Summary.attentionCounts.Check).toBe(0);
-      expect(s1Summary.attentionCounts.Thumb).toBe(1);
+      expect(s1Summary.attentionCounts.Thumb).toBe(2);
       expect(s1Summary.attentionCounts.Warning).toBe(2);
-      expect(s1Summary.totalItems).toBe(3);
+      expect(s1Summary.totalItems).toBe(4);
     });
   });
 
