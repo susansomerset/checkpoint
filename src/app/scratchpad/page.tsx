@@ -1,32 +1,14 @@
 "use client";
 
-import { useState } from 'react';
-import { toGridItems } from '@/lib/pure/toGridItems';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-// Import fixtures
-import weekdayBatch from '../../../tests/fixtures/processing.toGridItems/weekday_batch.json';
-import priorBatch from '../../../tests/fixtures/processing.toGridItems/prior_batch.json';
-import nextBatch from '../../../tests/fixtures/processing.toGridItems/next_batch.json';
+import { useState } from 'react';
+import { getWeeklyGrids } from '@/lib/compose/getWeeklyGrids';
+
+// Import fixtures for getWeeklyGrids
+import twoStudentsSmall from '../../../tests/fixtures/processing.getWeeklyGrids/two_students_small.json';
 
 export const dynamic = 'force-dynamic';
-
-// Expected outputs from spec
-const expectations = {
-  weekdayBatch: [
-    { id: "A-100", title: "Weekly Reflection #3 (25)", dueAt: "2025-10-02T23:59:00-07:00", points: 25, url: "https://canvas.example/courses/42/assignments/100", attentionType: "Thumb" },
-    { id: "A-101", title: "Lab 2: Vectors (10)", dueAt: "2025-09-15T12:00:00Z", points: 10, url: "https://canvas.example/courses/42/assignments/101", attentionType: "Check" },
-    { id: "A-102", title: "Project Draft (50)", dueAt: "2025-09-10T09:00:00Z", points: 50, url: "https://canvas.example/courses/42/assignments/102", attentionType: "Check" },
-    { id: "A-103", title: "Quiz 1 (5)", dueAt: "2025-10-03T17:00:00-07:00", points: 5, url: "https://canvas.example/courses/42/assignments/103", attentionType: "Question" },
-    { id: "A-104", title: "Short Response (3)", dueAt: "2025-10-07T17:00:00-07:00", points: 3, url: "https://canvas.example/courses/42/assignments/104", attentionType: "Question" },
-    { id: "A-105", title: "Problem Set (20)", dueAt: "2025-10-01T17:00:00-07:00", points: 20, url: "https://canvas.example/courses/42/assignments/105", attentionType: "Warning" }
-  ],
-  priorBatch: [
-    { id: "A-103", title: "10/3: Quiz 1 (5)", dueAt: "2025-10-03T17:00:00-07:00", points: 5, url: "https://canvas.example/courses/42/assignments/103", attentionType: "Question" }
-  ],
-  nextBatch: [
-    { id: "A-105", title: "Wed: Problem Set (20)", dueAt: "2025-10-01T17:00:00-07:00", points: 20, url: "https://canvas.example/courses/42/assignments/105", attentionType: "Warning" }
-  ]
-};
 
 function JsonViewer({ data, title }: { data: unknown; title: string }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -127,192 +109,105 @@ function JsonViewer({ data, title }: { data: unknown; title: string }) {
   );
 }
 
-interface TestCaseProps {
-  label: string;
-  fixture: any;
-  expected: any;
-}
-
-interface Mismatch {
-  index: number;
-  field: string;
-  expectedValue: any;
-  actualValue: any;
-}
-
-function TestCase({ label, fixture, expected }: TestCaseProps) {
-  let actual;
-  let error;
-  const mismatches: Mismatch[] = [];
-  
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actual = toGridItems(
-      fixture.entries,
-      fixture.formatType,
-      fixture.asOf,
-      fixture.timezone
-    );
-    
-    // Deep comparison to find specific mismatches
-    if (Array.isArray(actual) && Array.isArray(expected)) {
-      if (actual.length !== expected.length) {
-        mismatches.push({
-          index: -1,
-          field: 'length',
-          expectedValue: expected.length,
-          actualValue: actual.length
-        });
-      } else {
-        // Check each element
-        actual.forEach((item, index) => {
-          const exp = expected[index];
-          if (exp) {
-            // Check each field
-            const allKeys = new Set([...Object.keys(item), ...Object.keys(exp)]);
-            allKeys.forEach(key => {
-              const actualVal = (item as any)[key];
-              const expVal = (exp as any)[key];
-              if (JSON.stringify(actualVal) !== JSON.stringify(expVal)) {
-                const itemId = (item as any).id || `item-${index}`;
-                mismatches.push({
-                  index,
-                  field: `${itemId}.${key}`,
-                  expectedValue: expVal,
-                  actualValue: actualVal
-                });
-              }
-            });
-          }
-        });
-      }
-    }
-  } catch (e) {
-    error = e instanceof Error ? e.message : String(e);
-  }
-
-  const matches = !error && mismatches.length === 0;
-
-  return (
-    <div className="border-2 border-gray-300 rounded-lg p-6 mb-6">
-      <h3 className="text-2xl font-bold mb-4 text-gray-900">{label}</h3>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* INPUT */}
-        <div>
-          <h4 className="text-lg font-semibold mb-2 text-blue-700">INPUT</h4>
-          <JsonViewer data={fixture} title="" />
-        </div>
-
-        {/* EXPECTED */}
-        <div>
-          <h4 className="text-lg font-semibold mb-2 text-purple-700">EXPECTED</h4>
-          <JsonViewer data={expected} title="" />
-        </div>
-
-        {/* ACTUAL */}
-        <div>
-          <h4 className="text-lg font-semibold mb-2 text-orange-700">ACTUAL OUTPUT</h4>
-          {error ? (
-            <div className="bg-red-50 p-4 rounded border border-red-300">
-              <p className="text-red-700 font-mono text-sm">ERROR: {error}</p>
-            </div>
-          ) : (
-            <JsonViewer data={actual} title="" />
-          )}
-        </div>
-      </div>
-
-      {/* MATCH/MISMATCH with details */}
-      <div className="mt-4 p-4 rounded text-center font-bold text-lg">
-        {error ? (
-          <div className="bg-red-100 text-red-800 border-2 border-red-400">
-            ❌ ERROR
-          </div>
-        ) : matches ? (
-          <div className="bg-green-100 text-green-800 border-2 border-green-400">
-            ✅ MATCH
-          </div>
-        ) : (
-          <div className="bg-yellow-100 text-yellow-800 border-2 border-yellow-400">
-            <div>⚠️ MISMATCH</div>
-            <div className="mt-2 text-sm font-normal text-left">
-              <div className="font-semibold mb-1">Differences found:</div>
-              {mismatches.map((m, idx) => (
-                <div key={idx} className="mb-2 p-2 bg-white rounded border border-yellow-600">
-                  {m.index === -1 ? (
-                    <div className="font-mono text-xs">
-                      <strong>Array {m.field}:</strong> expected {JSON.stringify(m.expectedValue)}, got {JSON.stringify(m.actualValue)}
-                    </div>
-                  ) : (
-                    <div className="font-mono text-xs">
-                      <div className="font-semibold text-gray-900 mb-1">
-                        ⚠️ Array index [{m.index}] - {m.field}
-                      </div>
-                      <div>
-                        <span className="text-purple-700">Expected:</span> {JSON.stringify(m.expectedValue)}
-                      </div>
-                      <div>
-                        <span className="text-orange-700">Actual:</span> {JSON.stringify(m.actualValue)}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function ScratchpadPage() {
+  // Run getWeeklyGrids
+  const twoStudentsData = twoStudentsSmall as Record<string, unknown>;
+  const weeklyGridsActual = getWeeklyGrids(
+    twoStudentsData.studentData as any,
+    twoStudentsData.asOf as string,
+    twoStudentsData.timezone as string | undefined
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">toGridItems Function Test Results</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">processing.getWeeklyGrids v1.0.2</h1>
         <p className="text-lg text-gray-600 mb-2">
-          Spec: processing.toGridItems v1.1.0 (batched)
+          Weekly grid builder for students (indexed by studentId)
         </p>
         <p className="text-sm text-gray-500 mb-8">
           Source: spec/current.json
         </p>
         
         <div className="space-y-6">
-          <TestCase 
-            label="Weekday batch (6)" 
-            fixture={weekdayBatch} 
-            expected={expectations.weekdayBatch} 
-          />
+          <div className="border-2 border-gray-300 rounded-lg p-6">
+            <h3 className="text-2xl font-bold mb-4 text-gray-900">Two Students Small - Full Output</h3>
+            
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold mb-2 text-blue-700">ACTUAL OUTPUT (indexed object)</h4>
+              <JsonViewer data={weeklyGridsActual} title="" />
+            </div>
 
-          <TestCase 
-            label="Prior (prev Friday)" 
-            fixture={priorBatch} 
-            expected={expectations.priorBatch} 
-          />
-
-          <TestCase 
-            label="Next (EEE prefix)" 
-            fixture={nextBatch} 
-            expected={expectations.nextBatch} 
-          />
+            <div className="bg-white p-4 rounded border">
+              <h5 className="font-semibold text-gray-900 mb-2">Quick Summary:</h5>
+              {Object.entries(weeklyGridsActual).map(([studentId, studentGrid]) => (
+                <div key={studentId} className="mb-3 p-3 bg-gray-50 rounded">
+                  <div className="font-bold text-lg">Student: {studentId}</div>
+                  <div className="text-sm mt-1">
+                    <strong>Summary:</strong> {JSON.stringify(studentGrid.summary)}
+                  </div>
+                  <div className="text-sm mt-1">
+                    <strong>Header:</strong> {studentGrid.grid.header.columns.join(' | ')}
+                  </div>
+                  <div className="text-sm mt-1">
+                    <strong>Courses:</strong> {studentGrid.grid.rows.length}
+                  </div>
+                  {studentGrid.grid.rows.map((row, ridx) => (
+                    <div key={ridx} className="ml-4 mt-2 p-2 bg-white rounded border">
+                      <div className="font-semibold">{row.courseName} ({row.courseId})</div>
+                      <div className="text-xs mt-1 grid grid-cols-2 gap-1">
+                        <div>Prior: {row.cells.prior.length}</div>
+                        <div>Mon: {row.cells.weekday.Mon.length}</div>
+                        <div>Tue: {row.cells.weekday.Tue.length}</div>
+                        <div>Wed: {row.cells.weekday.Wed.length}</div>
+                        <div>Thu: {row.cells.weekday.Thu.length}</div>
+                        <div>Fri: {row.cells.weekday.Fri.length}</div>
+                        <div>Next: {row.cells.next.length}</div>
+                        <div>NoDate: {row.cells.noDate.count}</div>
+                      </div>
+                      <div className="text-xs mt-1">
+                        <strong>Row Summary:</strong> {JSON.stringify(row.summary)}
+                      </div>
+                      <div className="text-xs mt-1 text-gray-600">
+                        <div><strong>Items in buckets:</strong></div>
+                        {row.cells.prior.length > 0 && <div>Prior: {row.cells.prior.map(i => i.id).join(', ')}</div>}
+                        {row.cells.weekday.Mon.length > 0 && <div>Mon: {row.cells.weekday.Mon.map(i => i.id).join(', ')}</div>}
+                        {row.cells.weekday.Tue.length > 0 && <div>Tue: {row.cells.weekday.Tue.map(i => i.id).join(', ')}</div>}
+                        {row.cells.weekday.Wed.length > 0 && <div>Wed: {row.cells.weekday.Wed.map(i => i.id).join(', ')}</div>}
+                        {row.cells.weekday.Thu.length > 0 && <div>Thu: {row.cells.weekday.Thu.map(i => i.id).join(', ')}</div>}
+                        {row.cells.weekday.Fri.length > 0 && <div>Fri: {row.cells.weekday.Fri.map(i => i.id).join(', ')}</div>}
+                        {row.cells.next.length > 0 && <div>Next: {row.cells.next.map(i => i.id).join(', ')}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="mt-8 p-6 bg-blue-50 border-2 border-blue-300 rounded-lg">
           <h2 className="text-2xl font-bold text-blue-900 mb-2">⏸️ AWAITING PO APPROVAL</h2>
-          <p className="text-blue-800">
-            Please review the 3 test cases above. Each test case shows:
+          <p className="text-blue-800 mb-3">
+            <strong>processing.getWeeklyGrids v1.0.2:</strong> Review the output above:
           </p>
-          <ul className="list-disc ml-6 mt-2 text-blue-800">
-            <li><strong>INPUT:</strong> The fixture data (entries + formatType + asOf + timezone)</li>
-            <li><strong>EXPECTED:</strong> The expected output from spec/current.json</li>
-            <li><strong>ACTUAL OUTPUT:</strong> The computed result from toGridItems() function</li>
-            <li><strong>Status:</strong> ✅ MATCH / ⚠️ MISMATCH / ❌ ERROR</li>
+          <ul className="list-disc ml-6 text-blue-800 text-sm">
+            <li>Verify indexed object structure (result[&apos;S1&apos;], result[&apos;S2&apos;])</li>
+            <li>Verify header labels match Monday (10/6) through Friday (10/10)</li>
+            <li>Verify Prior bucket contains ONLY Missing before Monday</li>
+            <li>Verify Weekday buckets (Mon-Fri) use plain format (no day prefix)</li>
+            <li>Verify Next bucket uses EEE prefix format</li>
+            <li>Verify Submitted/Graded before current week are excluded</li>
+            <li>Verify No Date summary shows count and points</li>
+            <li>Verify student-level summary aggregates correctly</li>
           </ul>
-          <p className="text-blue-800 mt-4">
-            <strong>Note:</strong> All tests should show ✅ MATCH. If any show mismatch or error, 
-            implementation needs adjustment before commit.
+          <p className="text-yellow-800 bg-yellow-50 p-3 mt-4 rounded border border-yellow-400">
+            ⚠️ <strong>ATTENTION COUNTS MISMATCH DETECTED:</strong><br/>
+            Vern&apos;s corrected fixture expectations show different counts than my implementation produces.<br/>
+            <strong>Expected:</strong> S1 Thumb: 1, totalItems: 3<br/>
+            <strong>My Output:</strong> S1 Thumb: 2 (A-2 + A-5), totalItems: 4<br/>
+            <br/>
+            This appears to be another fixture data issue. The input data has 2 Due assignments (both produce Thumb) but expectations show Thumb: 1.
           </p>
         </div>
       </div>

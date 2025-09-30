@@ -333,6 +333,360 @@
           "pnpm test -t processing.toGridItems"
         ]
       }
+    },
+    {
+      "id": "processing.getWeeklyGrids",
+      "version": "1.0.2",
+      "kind": "processing",
+      "title": "Build WeeklyGrids for known students (rows per course; Prior | Mon–Fri | Next | No Date)",
+      "deps": [
+        "data.studentData@^1.0.0",
+        "processing.toGridItems@^1.1.0"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:data.studentData@^1.0.0#types.StudentData" }
+        ],
+        "produces": {
+          "WeeklyGrid": {
+            "header": {
+              "columns": [
+                "Class Name",
+                "Prior Weeks",
+                "Mon (M/d)",
+                "Tue (M/d)",
+                "Wed (M/d)",
+                "Thu (M/d)",
+                "Fri (M/d)",
+                "Next Week",
+                "No Date"
+              ],
+              "monday": "iso8601",
+              "timezone": "IANA_tz"
+            },
+            "rows[]": {
+              "courseId": "string",
+              "courseName": "string",
+              "cells": {
+                "prior[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" },
+                "weekday": {
+                  "Mon[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" },
+                  "Tue[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" },
+                  "Wed[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" },
+                  "Thu[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" },
+                  "Fri[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" }
+                },
+                "next[]": { "$ref": "node:processing.toGridItems@1.1.0#contracts.produces.GridItem" },
+                "noDate": {
+                  "count": "int",
+                  "points": "int",
+                  "label": "string",
+                  "deepLinkUrl": "string"
+                }
+              },
+              "summary": {
+                "attentionCounts": {
+                  "Check": "int",
+                  "Thumb": "int",
+                  "Question": "int",
+                  "Warning": "int"
+                },
+                "totalItems": "int"
+              }
+            }
+          }
+        }
+      },
+      "signature": {
+        "input": {
+          "studentData": { "$ref": "node:data.studentData@^1.0.0#types.StudentData" },
+          "asOf": "iso8601",
+          "timezone?": "IANA_tz"
+        },
+        "output": {
+          "studentId": {
+            "summary": {
+              "attentionCounts": {
+                "Check": "int",
+                "Thumb": "int",
+                "Question": "int",
+                "Warning": "int"
+              },
+              "totalItems": "int"
+            },
+            "grid": { "$ref": "#contracts.produces.WeeklyGrid" }
+          }
+        }
+      },
+      "processing": {
+        "pipeline": [
+            {
+              "id": "determineWeekWindow",
+              "kind": "pure",
+              "rules": [
+                "Parse `asOf` in the given `timezone` (IANA) using date-fns-tz; if no tz, use ISO offset.",
+                "Compute mondayOfWeek(asOf, tz).",
+                "Derive weekday labels Mon..Fri as 'EEE (M/d)'.",
+                "Define buckets per course:",
+                "  PRIOR: dueAt < Monday(asOf, tz) AND checkpointStatus = 'Missing'.",
+                "  WEEKDAY: Monday..Friday inclusive (tz-aware dueAt between Mon 00:00 and Fri 23:59:59).",
+                "  NEXT: dueAt > Friday(asOf, tz) 23:59:59.",
+                "  NODATE: missing dueAt.",
+                "Submitted/Graded before this week are excluded from WeeklyGrid."
+              ]
+            },
+            {
+              "id": "pullCourseGridAssignments(<courseId>)",
+              "kind": "pure",
+              "rules": [
+                "Read this course's assignments with checkpointStatus from studentData (already scoped to the student).",
+                "Partition exactly one of: PRIOR, one of WEEKDAY.Mon..Fri (tz-aware), NEXT, or NODATE.",
+                "Entries for toGridItems:",
+                "  PRIOR → formatType='Prior'; WEEKDAY.* → 'Weekday'; NEXT → 'Next'.",
+                "NODATE: {count, points, label, deepLinkUrl}.",
+                "All buckets (Prior, Mon..Fri, Next) must exist as keys; arrays may be empty."
+              ]
+            },
+          {
+            "id": "toGridItemsPerBucket",
+            "kind": "pure",
+            "rules": [
+              "For each non-empty bucket (PRIOR, NEXT, each weekday with entries), call processing.toGridItems once (batched).",
+              "Sort within each bucket by dueAt asc, then name asc before calling toGridItems.",
+              "Place WEEKDAY results into Mon..Fri columns by the dueAt weekday (tz-aware).",
+              "All buckets (Prior, Mon..Fri, Next) must exist as keys; arrays may be empty."
+            ]
+          },
+          {
+            "id": "assembleCourseRow",
+            "kind": "pure",
+            "rules": [
+              "Compute attentionCounts subtotals across PRIOR + WEEKDAY.Mon..Fri + NEXT.",
+              "Compute totalItems across those same outputs (exclude NODATE from attentionCounts; NODATE count/points live only in its cell).",
+              "Assemble row {courseId, courseName, cells:{prior, weekday{Mon..Fri}, next, noDate}, summary}."
+            ]
+          },
+            {
+              "id": "assembleStudentGrid",
+              "kind": "pure",
+              "rules": [
+                "Header.columns fixed as 9 columns in required order.",
+                "Header.monday = mondayOfWeek(asOf, tz); Header.timezone = tz.",
+                "Aggregate a student-level summary by summing the course-level attentionCounts and totalItems.",
+                "Return an indexed object mapping studentId → { summary, grid }."
+              ]
+            }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "two_students_small": {
+            "studentData": {
+              "students": [
+                {
+                  "id": "S1",
+                  "name": "Alice",
+                  "courses": [
+                    {
+                      "id": "C-101",
+                      "name": "Algebra I",
+                      "assignments": [
+                        { "id": "A-0", "name": "Warmup", "points": 10, "dueAt": "2025-10-02T09:00:00-07:00", "checkpointStatus": "Missing", "url": "https://app/assignments/A-0" },
+                        { "id": "A-1", "name": "Quiz 1", "points": 5, "dueAt": "2025-10-03T09:00:00-07:00", "checkpointStatus": "Submitted", "url": "https://app/assignments/A-1" },
+                        { "id": "A-2", "name": "Reflection", "points": 25, "dueAt": "2025-10-07T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/A-2" },
+                        { "id": "A-3", "name": "Problem Set", "points": 20, "dueAt": "2025-10-10T09:00:00-07:00", "checkpointStatus": "Missing", "url": "https://app/assignments/A-3" },
+                        { "id": "A-4", "name": "Project", "points": 5, "checkpointStatus": "Submitted", "url": "https://app/assignments/A-4" },
+                        { "id": "A-5", "name": "Next Week Prep", "points": 15, "dueAt": "2025-10-14T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/A-5" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "S2",
+                  "name": "Bob",
+                  "courses": [
+                    {
+                      "id": "C-201",
+                      "name": "Biology",
+                      "assignments": [
+                        { "id": "B-1", "name": "Lab 1", "points": 10, "dueAt": "2025-10-10T09:00:00-07:00", "checkpointStatus": "Submitted", "url": "https://app/assignments/B-1" },
+                        { "id": "B-2", "name": "Worksheet", "points": 15, "checkpointStatus": "Submitted", "url": "https://app/assignments/B-2" },
+                        { "id": "B-3", "name": "Reading", "points": 10, "dueAt": "2025-10-15T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/B-3" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "asOf": "2025-10-08T09:00:00-07:00",
+            "timezone": "America/Los_Angeles"
+          }
+        },
+        "expectations": {
+          "two_students_small": {
+            "S1": {
+              "summary": {
+                "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 2 },
+                "totalItems": 3
+              },
+              "grid": {
+                "header": {
+                  "columns": [
+                    "Class Name",
+                    "Prior Weeks",
+                    "Mon (10/6)",
+                    "Tue (10/7)",
+                    "Wed (10/8)",
+                    "Thu (10/9)",
+                    "Fri (10/10)",
+                    "Next Week",
+                    "No Date"
+                  ]
+                },
+                "rows": [
+                  {
+                    "courseId": "C-101",
+                    "courseName": "Algebra I",
+                    "cells": {
+                      "prior": [
+                        { "id": "A-0", "title": "10/2: Warmup (10)", "attentionType": "Warning", "url": "https://app/assignments/A-0" }
+                      ],
+                      "weekday": {
+                        "Mon": [],
+                        "Tue": [
+                          { "id": "A-2", "title": "Reflection (25)", "attentionType": "Thumb", "url": "https://app/assignments/A-2" }
+                        ],
+                        "Wed": [],
+                        "Thu": [],
+                        "Fri": [
+                          { "id": "A-3", "title": "Problem Set (20)", "attentionType": "Warning", "url": "https://app/assignments/A-3" }
+                        ]
+                      },
+                      "next": [
+                        { "id": "A-5", "title": "Tue: Next Week Prep (15)", "attentionType": "Thumb", "url": "https://app/assignments/A-5" }
+                      ],
+                      "noDate": {
+                        "count": 1,
+                        "points": 5,
+                        "label": "1 no due date (5 points)",
+                        "deepLinkUrl": "https://app/detail?student=S1&course=C-101&nodate=1"
+                      }
+                    },
+                    "summary": {
+                      "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 2 },
+                      "totalItems": 3
+                    }
+                  }
+                ]
+              }
+            },
+            "S2": {
+              "summary": {
+                "attentionCounts": { "Check": 1, "Thumb": 0, "Question": 0, "Warning": 0 },
+                "totalItems": 1
+              },
+              "grid": {
+                "header": {
+                  "columns": [
+                    "Class Name",
+                    "Prior Weeks",
+                    "Mon (10/6)",
+                    "Tue (10/7)",
+                    "Wed (10/8)",
+                    "Thu (10/9)",
+                    "Fri (10/10)",
+                    "Next Week",
+                    "No Date"
+                  ]
+                },
+                "rows": [
+                  {
+                    "courseId": "C-201",
+                    "courseName": "Biology",
+                    "cells": {
+                      "prior": [],
+                      "weekday": {
+                        "Mon": [],
+                        "Tue": [],
+                        "Wed": [],
+                        "Thu": [],
+                        "Fri": [
+                          { "id": "B-1", "title": "Lab 1 (10)", "attentionType": "Check", "url": "https://app/assignments/B-1" }
+                        ]
+                      },
+                      "next": [
+                        { "id": "B-3", "title": "Wed: Reading (10)", "attentionType": "Thumb", "url": "https://app/assignments/B-3" }
+                      ],
+                      "noDate": {
+                        "count": 1,
+                        "points": 15,
+                        "label": "1 no due date (15 points)",
+                        "deepLinkUrl": "https://app/detail?student=S2&course=C-201&nodate=1"
+                      }
+                    },
+                    "summary": {
+                      "attentionCounts": { "Check": 1, "Thumb": 0, "Question": 0, "Warning": 0 },
+                      "totalItems": 1
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "builds_two_student_grids" },
+          { "name": "weekday_bucketting_tz_aware" },
+          { "name": "noDate_label_and_counts" },
+          { "name": "summary_attention_counts_and_totalItems" },
+          { "name": "one_batched_call_per_nonempty_bucket" },
+          { "name": "weekday_no_assignments_displays_empty" },
+          { "name": "indexed_lookup_is_direct" }
+        ],
+        "integration": [
+          { "name": "two_students_small_fixture_matches" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: eslint fails",
+        "STOP_IF: tsc fails",
+        "STOP_IF: header columns not exactly the 9 required (order must match)",
+        "STOP_IF: any row missing any required cell group",
+        "STOP_IF: any bucket missing — Prior, Mon..Fri, Next must exist as keys even if empty",
+        "STOP_IF: Mon..Fri labels do not match mondayOfWeek(asOf,tz)",
+        "STOP_IF: any emitted GridItem has url not http(s)"
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Produce scratchpad view for node: /scratchpad?node=processing.getWeeklyGrids",
+          "Render full output object with at least S1 and S2 keys; show each {summary, grid.header, grid.rows}",
+          "Support direct result[selectedStudentId] lookup without array iteration",
+          "Verify Prior, Mon..Fri, Next buckets exist even when empty",
+          "Pass ESLint, TSC, and unit/integration tests"
+        ],
+        "po_review": [
+          "Visually verify header labels and Monday anchor",
+          "Visually verify per-course rows with Prior/Mon..Fri/Next/No Date",
+          "Verify student-level summary counts",
+          "Approve or request changes before any commit"
+        ]
+      },
+      "notes": {
+        "status_source": "Use checkpointStatus from studentData only.",
+        "batching": "Per course: at most 7 batched calls to toGridItems (PRIOR, NEXT, each weekday with entries).",
+        "ordering": "Stable sort by dueAt asc, then name asc within each bucket.",
+        "noDate": "Provide a human-readable 'label' alongside count/points and deepLinkUrl.",
+        "tz": "Use date-fns-tz; no manual TZ math."
+      },
+      "commands": {
+        "play": [
+          "pnpm eslint",
+          "pnpm tsc",
+          "pnpm test -t processing.getWeeklyGrids"
+        ]
+      }
     }
   ],
   "project": {
