@@ -1,0 +1,17 @@
+{
+  "entries": [
+    {
+      "assignment": {
+        "id": "A-105",
+        "name": "Problem Set",
+        "due_at": "2025-10-01T17:00:00-07:00",
+        "points_possible": 20,
+        "html_url": "https://canvas.example/courses/42/assignments/105"
+      },
+      "checkpointStatus": "Missing"
+    }
+  ],
+  "formatType": "Next",
+  "asOf": "2025-10-03T09:00:00-07:00",
+  "timezone": "America/Los_Angeles"
+}

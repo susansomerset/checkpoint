@@ -758,47 +758,326 @@ Phase 4 successfully delivered a comprehensive progress table system with full f
 
 *"Time is of the essence."*
 
-### Deliverables
-- [ ] `WeeklyGrid` component
-- [ ] Pacific timezone date logic
-- [ ] Rendering rules implementation
-- [ ] Column-specific formatting
+### Implementation Approach: Scratchpad Validation → UI Implementation
 
-### Tasks
-1. **Create WeeklyGrid Component**
-   - Row/column structure
-   - Current day highlighting
-   - Assignment placement logic
-   - Responsive grid layout
+**Vern's Non-Negotiable Guardrails:**
+- ✅ **No feature flags** for this phase (direct implementation)
+- ✅ **No accessibility features** at this time (focus on core functionality)
+- ✅ **No silent deviations** - any change requires check-in first
+- ✅ **No freestyling** - follow spec exactly or propose two options for approval
+- ✅ CI enforced checklist: size-limit, ESLint, TSC, unit tests comprehensive
+- ✅ Single source of truth utilities (must reuse existing utils, no rewrites)
+- ✅ Scratchpad validation required before UI implementation
 
-2. **Implement Date Logic**
-   - Pacific timezone handling (use existing `weekWindow.ts`)
-   - Weekend → Monday mapping
-   - "≤1 weekday late" calculation
-   - Previous weekday logic
+### Grid Specification
 
-3. **Add Rendering Rules**
-   - Emoji bullets by status (use backend `checkpointStatus`)
-   - Color coding (red/yellow/blue/green)
-   - Font sizing by points (use existing `pointsSizing.ts`)
-   - Column-specific label formats (use existing `labels.ts`)
+**Column Structure:**
+- **Prior Weeks** | **Mon** | **Tue** | **Wed** | **Thu** | **Fri** | **Next Week** | **No Due Date**
+- **No weekend columns** (Sat/Sun assignments processed but not displayed in weekend columns)
 
-### Testing
-- **Unit Tests**: Date logic with edge cases
-- **Component Tests**: Rendering rules
-- **Visual Tests**: Grid appearance
-- **Accessibility Tests**: Tab order, ARIA labels
+**Bucket Rules:**
+- **Prior Weeks**: ONLY past-due **Missing** items (no Submitted/Graded/Due)
+- **Current Week (Mon–Fri)**: ALL statuses (Missing, Submitted, Graded, Due)
+- **Next Week (Mon–Fri)**: ALL statuses (Missing, Submitted, Graded, Due)
+- **No Due Date**: Summary link only (count + total points), no individual items
+
+**Accepted Statuses:**
+- `Missing` | `Submitted` | `Graded` | `Due`
+- **NO "Submitted (Late)"** - do not implement or handle
+
+### Step 1: Implement `toGridItem` Function
+
+**Purpose:** Pure formatter/icon decider for a single, already-eligible assignment. No filtering, no bucketing.
+
+**Inputs:**
+```typescript
+toGridItem(assignment, formatType, contextDate)
+// assignment: { courseId, assignmentId, title, canvasUrl, possiblePoints, checkpointStatus, dueAt }
+// formatType: 'Prior' | 'Day' | 'Next'
+// contextDate: Date (Pacific)
+```
+
+**Output:**
+```typescript
+type GridItem = {
+  itemUrl: string;        // from assignment.canvasUrl
+  title: string;          // formatted per rules
+  courseId: string;
+  assignmentId: string;
+  possiblePoints?: number; // default 0 if missing
+  icon: 'check' | 'thumbsUp' | 'question' | 'warning';
+};
+```
+
+**Title Formatting (points always shown):**
+- Let `P = (possiblePoints ?? 0)` as integer, no decimals
+- **formatType: 'Next'** → `Ddd: Title (P)` (e.g., `Mon: Lab Report (25)`)
+- **formatType: 'Day'** → `Title (P)` (e.g., `Lab Report (25)`)
+- **formatType: 'Prior'** → `m/d: Title (P)` (no leading zeros, e.g., `3/7: Lab Report (25)`)
+- Date tokens computed in **Pacific**:
+  - `Ddd` = `Mon|Tue|Wed|Thu|Fri`
+  - `m/d` = numeric month/day (e.g., `3/7`, NOT `03/07`)
+
+**Icon Rules:**
+- **Submitted / Graded**:
+  - If `dueAt` < start of `contextDate` (Pacific) → `check`
+  - Else (today or future) → `thumbsUp`
+- **Due** → always `thumbsUp`
+- **Missing**:
+  - Compute **previous weekday** of `contextDate` (see below)
+  - If assignment `dueAt` (date part in Pacific) == that previous weekday → `question`
+  - Else → `warning`
+
+**Previous Weekday Logic (implement carefully):**
+- If `contextDate` is **Mon** → previous weekday = **Fri (prior week)**
+- If **Tue** → previous = Mon
+- If **Wed** → previous = Tue
+- If **Thu** → previous = Wed
+- If **Fri** → previous = Thu
+- If **Sat/Sun** → treat previous weekday = **Fri**
+
+**Implementation Task:**
+- [ ] Implement `toGridItem` function
+- [ ] **Scratchpad Validation**: Render array of `toGridItem(...)` outputs in JSON viewer with fixtures:
+  - Missing due previous weekday
+  - Missing due earlier previous week day
+  - Due today
+  - Submitted yesterday
+  - Graded tomorrow
+- [ ] **REQUIRES APPROVAL** before proceeding
+
+### Step 2: Implement `getGridItems` Function
+
+**Purpose:** One pass that filters, buckets, sorts, and summarizes for the Weekly Grid; then formats each visible assignment via `toGridItem`.
+
+**Inputs:**
+```typescript
+getGridItems(studentData, selectedStudentId, contextDate)
+```
+
+**Filtering Rules (done in `getGridItems`, NOT in `toGridItem`):**
+- [ ] Exclude **Vector** assignments entirely
+- [ ] Exclude **Locked** assignments
+- [ ] Exclude **Submitted/Graded** whose due date is **before** the week's Monday (they don't belong in Prior Weeks; Prior is Missing-only)
+- [ ] Include all statuses for current & next week
+- [ ] **Only Missing** can appear in Prior Weeks
+
+**Week Window Calculation:**
+- [ ] Compute **`weekStart`** (Monday 00:00 Pacific) and **`weekEnd`** (Friday 23:59:59.999 Pacific) that contains `contextDate`
+- [ ] All date math in **Pacific time**
+
+**Bucketing Logic:**
+- [ ] If `dueAt` is **null** → do not create item; **aggregate** into No Due Date (only Missing count/points)
+- [ ] Else compute **dueDateLocal** (Pacific date part):
+  - **Prior Weeks**: if `dueDateLocal` < `weekStart` AND status = `Missing` → Prior bucket
+  - **Current Week**: if `weekStart` ≤ `dueDateLocal` ≤ `weekEnd` → weekday column (Mon–Fri), all statuses
+  - **Next Week**: if `dueDateLocal` > `weekEnd` and within next Mon–Fri window → Next bucket, all statuses
+  - Otherwise (far future beyond next week) → **exclude** from grid
+
+**Sorting Inside Buckets:**
+- [ ] **Prior Weeks**: by **possiblePoints desc**, then **title asc**
+- [ ] **Each Day (Mon–Fri)**: by **possiblePoints desc**, then **title asc**
+- [ ] **Next Week**: by **dueAt asc**, then **possiblePoints desc**, then **title asc**
+- [ ] Missing `possiblePoints` treated as **0** for sorting and title formatting
+
+**No Due Date Summary:**
+- [ ] Count assignments with `dueAt == null` and `checkpointStatus == 'Missing'`
+- [ ] Sum their `possiblePoints` (treat missing as 0)
+- [ ] Emit course-level summary text: `## due (#,### points)` (e.g., `3 due (1,250 points)`)
+- [ ] Provide **deeplink** to Details page with filters: `courseId`, `missingOnly=true`, `noDueDate=true`
+
+**Output Shape:**
+```typescript
+type CourseGrid = {
+  courseId: string;
+  priorWeeks: GridItem[];
+  days: { Mon: GridItem[]; Tue: GridItem[]; Wed: GridItem[]; Thu: GridItem[]; Fri: GridItem[] };
+  nextWeek: GridItem[];
+  noDueDateSummary?: { label: string; deeplinkUrl: string };
+};
+
+type WeeklyGridData = CourseGrid[];
+```
+
+**Implementation Task:**
+- [ ] Implement `getGridItems` function
+- [ ] **Scratchpad Validation**: Render full `WeeklyGridData` in JSON viewer for larger fixture (multiple courses)
+- [ ] Verify bucket memberships, sort order, and No Due Date labels
+- [ ] **REQUIRES APPROVAL** before UI work
+
+### Step 3: Implement WeeklyGrid Component
+
+**Headers & Highlighting:**
+- [ ] Render columns: **Prior Weeks | Mon | Tue | Wed | Thu | Fri | Next Week | No Due Date**
+- [ ] **Highlight the coming Monday** header if **today is Sat/Sun/Mon** (Pacific)
+- [ ] This is a **header highlight only**—doesn't change bucketing
+
+**Item Visual Rules:**
+- [ ] **Missing (icon = `question`)** → **yellow background highlight** + default text color
+- [ ] **Missing (icon = `warning`)** → **no highlight**, **red text**
+- [ ] **Submitted/Graded** (icon = `check` or `thumbsUp`) → **green text** (no highlight)
+- [ ] **Due** (icon = `thumbsUp`) → **blue text** (no highlight)
+
+**Links:**
+- [ ] Each GridItem renders as link to **`itemUrl`** with `target="_blank"` and `rel="noopener noreferrer"`
+- [ ] "No Due Date" cell: **single** summary link per course row with label and deeplink to Details
+
+**Empty States:**
+- [ ] If bucket has no items, render "—" or keep cell empty (consistent across buckets)
+
+**Implementation Task:**
+- [ ] Wire up WeeklyGrid UI component
+- [ ] Apply visual rules and styling
+- [ ] **REQUIRES APPROVAL** before proceeding to tests
+
+### Step 4: Comprehensive Test Suite
+
+**Unit Tests — `toGridItem`:**
+- [ ] **Format types**:
+  - `'Next'` → `Mon: Title (25)`
+  - `'Day'` → `Title (25)`
+  - `'Prior'` → `3/7: Title (25)` in Pacific
+- [ ] **Submitted/Graded icons**:
+  - Due yesterday → `check`
+  - Due today/tomorrow → `thumbsUp`
+- [ ] **Due status**: Today and future both → `thumbsUp`
+- [ ] **Missing icon (previous weekday)**:
+  - Context **Mon**: Missing due **Fri (prior)** → `question`; Missing due **Thu** → `warning`
+  - Context **Fri**: Missing due **Thu** → `question`; Missing due **Mon** → `warning`
+  - Context **Tue**: Missing due **Mon** → `question`
+  - Context **Sat/Sun**: previous weekday treated as **Fri**
+- [ ] **Points formatting**: Missing points → treated as `0` in title `(0)`
+
+**Unit Tests — `getGridItems`:**
+- [ ] **Filtering**:
+  - Vectors are excluded
+  - Locked are excluded
+  - Submitted/Graded prior to week's Monday are excluded from Prior
+- [ ] **Bucketing**:
+  - Missing before `weekStart` → Prior
+  - Current week Mon–Fri → correct day buckets for all statuses
+  - Next week Mon–Fri → Next bucket for all statuses
+  - Far future (> next week) → excluded
+- [ ] **No Due Date summary**:
+  - Two Missing with `dueAt = null` produce label like `2 due (55 points)` and a deeplink
+  - No GridItems for them
+- [ ] **Sorting**:
+  - Day columns & Prior → points desc, then title asc (ties)
+  - Next Week → due date asc, then points desc, then title asc
+  - Verify that displayed `(P)` matches the numeric used for sort (consistency guarantee)
+- [ ] **Icon sanity via `toGridItem` integration**: Cross a few items through to assert icon selection is preserved
+
+**E2E Tests — WeeklyGrid (Playwright):**
+- [ ] **Renders columns & header highlight**:
+  - Shows Prior, Mon–Fri, Next Week, No Due Date
+  - Coming Monday header highlighted when today is Sat/Sun/Mon
+- [ ] **Title & icon rendering**:
+  - Validate formatting for `'Prior'`, `'Day'`, `'Next'` with representative items
+  - Validate colors: yellow highlight for `question`, red text for `warning`, green for Submitted/Graded, blue for Due
+- [ ] **Sorting within buckets**: Seed three items to verify order in a Day column and in Next Week
+- [ ] **Link behavior**:
+  - Clicking grid item opens new tab with `noopener`
+  - Clicking No Due Date summary opens Details with expected query params
+- [ ] **No weekend columns**: Ensure Sat/Sun never render as columns
+- [ ] **Fixture coverage**:
+  - Friday due date
+  - Saturday/Sunday due dates
+  - Missing vs Due vs Submitted vs Graded
+  - Missing points
+  - Locked assignments (excluded)
+  - Vector assignments (excluded)
+  - No due date assignments
+
+### User Acceptance Testing
+- [ ] **Localhost validation**
+  - User tests table functionality locally
+  - Verify all features working as expected
+  - **REQUIRES APPROVAL** before deployment
+  
+- [ ] **Vercel deployment and validation**
+  - Push approved code to GitHub
+  - Deploy to Vercel
+  - User validates on production environment
+  - **Final sign-off**
+
+### Deliverables (Final Output)
+- [ ] `toGridItem` pure function with comprehensive title formatting and icon logic
+- [ ] `getGridItems` selector function with filtering, bucketing, sorting, and summarizing
+- [ ] `WeeklyGrid` component with visual rules and styling
+- [ ] Pacific timezone date logic (all date math in Pacific)
+- [ ] "No Due Date" summary with deeplink to Details
+- [ ] Comprehensive unit test suite for `toGridItem`
+- [ ] Comprehensive unit test suite for `getGridItems`
+- [ ] E2E Playwright test suite for WeeklyGrid component
+- [ ] Test fixtures with all edge cases (Fri/Sat/Sun due, all statuses, Vector, Locked, missing points)
+
+### Governance & Visibility
+
+**Plan ↔ Code Map Table:**
+| Plan File/Function | Actual Implementation | Notes |
+|-------------------|----------------------|-------|
+| TanStack Table | Custom React component | ADR required (backfill) |
+| `isDisplayAssignment.ts` | `isProgressAssignment.ts` | File naming deviation |
+| - | - | (Update as deviations occur) |
+
+**Drift Log (Approved Deviations):**
+- **TanStack Table → Custom implementation**: Acceptable with ADR backfill documenting a11y + perf notes, maintaining same DoD and axe checks
+- **`selectedStudentId` removed from fetch deps**: Requires guard test to prove no cross-student data bleed + invariant comment at fetch site + SWR/stale-while-revalidate style note
+- **File naming drift**: `isDisplayAssignment` → `isProgressAssignment` - Documented in plan/code map table
+
+**URL Contract (Top-Level for QA Deep-Linking):**
+- `/progress?student=<id>&course=<courseId>&open=<Status,Status>&q=<search>`
+- (Add weekly grid URLs as implemented)
+
+### Quick Wins to Lock Quality
+
+**Mandatory Quality Gates:**
+- [ ] **Immutable STATUS_PRIORITY test**: Explicit comparison (not just snapshot) to ensure order never changes
+- [ ] **Pure selectors exposed**: Export `selectProgressTableRows` and `selectWeeklyGrid` for perf tests (no React)
+- [ ] **Comprehensive test fixture**: Single large fixture with:
+  - All 4 statuses (Missing, Submitted Late, Submitted, Graded)
+  - Vector assignments (should be filtered)
+  - Friday/Saturday/Sunday due dates
+  - Missing possiblePoints edge case
 
 ### Success Criteria
-- [ ] All date logic works in Pacific timezone
-- [ ] Weekend assignments map to Monday
-- [ ] Late logic handles Fri→Mon correctly
-- [ ] All rendering rules implemented exactly
-- [ ] Current day highlighted correctly
+- [ ] **No silent deviations**: Any change checked in with two options for approval
+- [ ] **Scratchpad validations approved**:
+  - `toGridItem` outputs validated in JSON viewer
+  - `getGridItems` full data structure validated in JSON viewer
+- [ ] **Grid Specification met**:
+  - Columns: Prior Weeks | Mon | Tue | Wed | Thu | Fri | Next Week | No Due Date
+  - No weekend columns rendered
+  - Bucket rules correct (Prior = Missing only, Current/Next = all statuses)
+  - NO "Submitted (Late)" status handled
+- [ ] **`toGridItem` function complete**:
+  - Title formatting correct for all formatType values ('Prior', 'Day', 'Next')
+  - Icon logic correct (check, thumbsUp, question, warning)
+  - Previous weekday calculation correct (Mon→Fri prior week, Sat/Sun→Fri)
+  - Points always shown, missing treated as 0
+- [ ] **`getGridItems` function complete**:
+  - Filtering correct (Vector excluded, Locked excluded, Submitted/Graded before week excluded from Prior)
+  - Bucketing correct (Prior/Current/Next week logic)
+  - Sorting correct (points desc + title asc for Day/Prior; due asc + points desc + title asc for Next)
+  - No Due Date summary correct (count, points sum, deeplink with filters)
+- [ ] **WeeklyGrid component complete**:
+  - Header highlight for coming Monday (Sat/Sun/Mon)
+  - Visual rules correct (yellow highlight for question, red text for warning, green for Submitted/Graded, blue for Due)
+  - Links correct (Canvas URLs with noopener, Details deeplink for No Due Date)
+  - Empty states handled consistently
+- [ ] **All date logic in Pacific timezone**
+- [ ] **All tests passing**:
+  - Unit tests for `toGridItem` (all format types, all icon rules, previous weekday edge cases)
+  - Unit tests for `getGridItems` (filtering, bucketing, sorting, No Due Date summary)
+  - E2E tests for WeeklyGrid (columns, highlighting, colors, links, sorting, fixtures)
 - [ ] ALL ESLint issues resolved
 - [ ] ALL TSC issues resolved
-- [ ] ALL Playwright tests pass
-- [ ] All assignments link to Canvas
+- [ ] User accepts localhost functionality
+- [ ] User accepts Vercel deployment
+
+### Final Approval Statement (Vern)
+
+*"Proceed to Phase 5 with the two-PR plan above and the non-negotiables. Any deviation requires an ADR before merge. This will keep Chuckles aligned and you out of 'off the rails' land."*
 
 ---
 

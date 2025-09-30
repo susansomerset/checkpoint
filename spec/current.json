@@ -1,0 +1,463 @@
+{
+  "nodes": [
+    {
+      "id": "processing.toGridItems",
+      "version": "1.1.0",
+      "kind": "processing",
+      "title": "Canvas assignments → GridItem[] (batched; returns url; no status in output)",
+      "deps": [
+        "data.assignmentsRaw@^1.0.0"
+      ],
+      "contracts": {
+        "touch": [
+          {
+            "$ref": "node:data.assignmentsRaw@^1.0.0#types.CanvasAssignmentRaw"
+          }
+        ],
+        "produces": {
+          "GridItem": {
+            "id": "string",
+            "title": "string",
+            "dueAt?": "iso8601",
+            "points?": "int",
+            "url": "string",
+            "attentionType": "enum[Check|Thumb|Question|Warning|Hand]"
+          }
+        }
+      },
+      "signature": {
+        "input": {
+          "entries[]": {
+            "assignment": {
+              "$ref": "node:data.assignmentsRaw@^1.0.0#types.CanvasAssignmentRaw"
+            },
+            "checkpointStatus": "enum[Due|Missing|Submitted|Graded]"
+          },
+          "formatType": "enum[Prior|Weekday|Next]",
+          "asOf": "iso8601",
+          "timezone?": "IANA_tz"
+        },
+        "output[]": {
+          "$ref": "#contracts.produces.GridItem"
+        }
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "toGridItems",
+            "kind": "pure",
+            "rules": [
+              "Precompute once per call (do not recompute per element):",
+              "- Parse `asOf` into the specified `timezone` (IANA) using date-fns-tz; fallback to ISO offset if no tz provided.",
+              "- Derive `asOfWeekday` (0–6, Sun..Sat).",
+              "- Compute `prevFridayInstant(asOf,tz)` and `prevDayInstant(asOf,tz)`.",
+              "- Prepare formatters: `fmtMd` → 'M/d', `fmtEEE` → 'EEE'.",
+              "For each entry in `entries` (preserve input order):",
+              "- Map `id` ← assignment.id (required, non-empty).",
+              "- Map `points` ← clamp(assignment.points_possible, min=0); omit if null/undefined *except* title always shows a number (use 0 when points missing).",
+              "- Map `dueAt` ← assignment.due_at if valid ISO8601 *with timezone*; otherwise omit.",
+              "- Map `url` ← assignment.html_url || assignment.url || compose from known ids; must start with http(s).",
+              "- Build `name` ← trim and collapse internal whitespace from assignment.name.",
+              "- Build `title` (depends on `formatType`; if `dueAt` missing, omit any date prefix):",
+              "  • Prior:   `${fmtMd(dueAt)}: ${name} (${pointsOrZero})`",
+              "  • Weekday: `${name} (${pointsOrZero})`",
+              "  • Next:    `${fmtEEE(dueAt)}: ${name} (${pointsOrZero})`",
+              "- Derive `attentionType` from `(checkpointStatus, dueAt, asOf)`:",
+              "  • If checkpointStatus ∈ {Submitted, Graded} → 'Check'.",
+              "  • Else if checkpointStatus = 'Due' → 'Thumb'.",
+              "  • Else (checkpointStatus = 'Missing'):",
+              "      – If asOf weekday ∈ {Sat,Sun,Mon} AND dueAt == previous Friday (same tz) → 'Question'.",
+              "      – Else if asOf weekday ∈ {Tue,Wed,Thu,Fri} AND dueAt == (asOf - 1 day) (same tz) → 'Question'.",
+              "      – Else → 'Warning'.",
+              "Determinism requirements:",
+              "- `fmtEEE(dueAt)` must match the actual weekday of `dueAt` in the chosen timezone (add test).",
+              "- No global mutable state; memoize helpers inside the call.",
+              "Validation per element (fail fast for that element, continue others):",
+              "- `id` non-empty; `url` begins with http(s); if `dueAt` exists, it must be ISO8601-with-tz."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "weekday_batch": {
+            "entries": [
+              {
+                "assignment": {
+                  "id": "A-100",
+                  "name": " Weekly Reflection  #3 ",
+                  "due_at": "2025-10-02T23:59:00-07:00",
+                  "points_possible": 25,
+                  "html_url": "https://canvas.example/courses/42/assignments/100"
+                },
+                "checkpointStatus": "Due"
+              },
+              {
+                "assignment": {
+                  "id": "A-101",
+                  "name": "Lab 2: Vectors",
+                  "due_at": "2025-09-15T12:00:00Z",
+                  "points_possible": 10,
+                  "html_url": "https://canvas.example/courses/42/assignments/101"
+                },
+                "checkpointStatus": "Submitted"
+              },
+              {
+                "assignment": {
+                  "id": "A-102",
+                  "name": "Project Draft",
+                  "due_at": "2025-09-10T09:00:00Z",
+                  "points_possible": 50,
+                  "html_url": "https://canvas.example/courses/42/assignments/102"
+                },
+                "checkpointStatus": "Graded"
+              },
+              {
+                "assignment": {
+                  "id": "A-103",
+                  "name": "Quiz 1",
+                  "due_at": "2025-10-03T17:00:00-07:00",
+                  "points_possible": 5,
+                  "html_url": "https://canvas.example/courses/42/assignments/103"
+                },
+                "checkpointStatus": "Missing"
+              },
+              {
+                "assignment": {
+                  "id": "A-104",
+                  "name": "Short Response",
+                  "due_at": "2025-10-07T17:00:00-07:00",
+                  "points_possible": 3,
+                  "html_url": "https://canvas.example/courses/42/assignments/104"
+                },
+                "checkpointStatus": "Missing"
+              },
+              {
+                "assignment": {
+                  "id": "A-105",
+                  "name": "Problem Set",
+                  "due_at": "2025-10-01T17:00:00-07:00",
+                  "points_possible": 20,
+                  "html_url": "https://canvas.example/courses/42/assignments/105"
+                },
+                "checkpointStatus": "Missing"
+              }
+            ],
+            "formatType": "Weekday",
+            "asOf": "2025-10-08T09:00:00-07:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "prior_batch": {
+            "entries": [
+              {
+                "assignment": {
+                  "id": "A-103",
+                  "name": "Quiz 1",
+                  "due_at": "2025-10-03T17:00:00-07:00",
+                  "points_possible": 5,
+                  "html_url": "https://canvas.example/courses/42/assignments/103"
+                },
+                "checkpointStatus": "Missing"
+              }
+            ],
+            "formatType": "Prior",
+            "asOf": "2025-10-06T09:00:00-07:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "next_batch": {
+            "entries": [
+              {
+                "assignment": {
+                  "id": "A-105",
+                  "name": "Problem Set",
+                  "due_at": "2025-10-01T17:00:00-07:00",
+                  "points_possible": 20,
+                  "html_url": "https://canvas.example/courses/42/assignments/105"
+                },
+                "checkpointStatus": "Missing"
+              }
+            ],
+            "formatType": "Next",
+            "asOf": "2025-10-03T09:00:00-07:00",
+            "timezone": "America/Los_Angeles"
+          }
+        },
+        "expectations": {
+          "weekday_batch": [
+            {
+              "id": "A-100",
+              "title": "Weekly Reflection #3 (25)",
+              "dueAt": "2025-10-02T23:59:00-07:00",
+              "points": 25,
+              "url": "https://canvas.example/courses/42/assignments/100",
+              "attentionType": "Thumb"
+            },
+            {
+              "id": "A-101",
+              "title": "Lab 2: Vectors (10)",
+              "dueAt": "2025-09-15T12:00:00Z",
+              "points": 10,
+              "url": "https://canvas.example/courses/42/assignments/101",
+              "attentionType": "Check"
+            },
+            {
+              "id": "A-102",
+              "title": "Project Draft (50)",
+              "dueAt": "2025-09-10T09:00:00Z",
+              "points": 50,
+              "url": "https://canvas.example/courses/42/assignments/102",
+              "attentionType": "Check"
+            },
+            {
+              "id": "A-103",
+              "title": "Quiz 1 (5)",
+              "dueAt": "2025-10-03T17:00:00-07:00",
+              "points": 5,
+              "url": "https://canvas.example/courses/42/assignments/103",
+              "attentionType": "Question"
+            },
+            {
+              "id": "A-104",
+              "title": "Short Response (3)",
+              "dueAt": "2025-10-07T17:00:00-07:00",
+              "points": 3,
+              "url": "https://canvas.example/courses/42/assignments/104",
+              "attentionType": "Question"
+            },
+            {
+              "id": "A-105",
+              "title": "Problem Set (20)",
+              "dueAt": "2025-10-01T17:00:00-07:00",
+              "points": 20,
+              "url": "https://canvas.example/courses/42/assignments/105",
+              "attentionType": "Warning"
+            }
+          ],
+          "prior_batch": [
+            {
+              "id": "A-103",
+              "title": "10/3: Quiz 1 (5)",
+              "dueAt": "2025-10-03T17:00:00-07:00",
+              "points": 5,
+              "url": "https://canvas.example/courses/42/assignments/103",
+              "attentionType": "Question"
+            }
+          ],
+          "next_batch": [
+            {
+              "id": "A-105",
+              "title": "Wed: Problem Set (20)",
+              "dueAt": "2025-10-01T17:00:00-07:00",
+              "points": 20,
+              "url": "https://canvas.example/courses/42/assignments/105",
+              "attentionType": "Warning"
+            }
+          ]
+        }
+      },
+      "implementation": {
+        "module": "src/lib/pure/toGridItems.ts",
+        "export": "toGridItems",
+        "pure": true
+      },
+      "ui_bindings": {
+        "scratchpad": {
+          "route": "/scratchpad?node=processing.toGridItems",
+          "render": true,
+          "cases": [
+            {
+              "label": "Weekday batch (6)",
+              "input": "@fixtures.inputs.weekday_batch",
+              "expect": "@fixtures.expectations.weekday_batch"
+            },
+            {
+              "label": "Prior (prev Friday)",
+              "input": "@fixtures.inputs.prior_batch",
+              "expect": "@fixtures.expectations.prior_batch"
+            },
+            {
+              "label": "Next (EEE prefix)",
+              "input": "@fixtures.inputs.next_batch",
+              "expect": "@fixtures.expectations.next_batch"
+            }
+          ]
+        }
+      },
+      "tests": {
+        "unit": [
+          {
+            "name": "maps_array_length_and_order",
+            "jest": "inline",
+            "code": "/* assert output.length equals input.entries.length and order preserved */"
+          },
+          {
+            "name": "mix_of_statuses_attention_types",
+            "jest": "inline",
+            "code": "/* assert Check/Thumb/Question/Warning appear as expected */"
+          },
+          {
+            "name": "title_formats_all_three_modes",
+            "jest": "inline",
+            "code": "/* assert (M/d: ...), (...), and (EEE: ...) respectively */"
+          },
+          {
+            "name": "weekday_matches_dueAt",
+            "jest": "inline",
+            "code": "/* assert fmtEEE(dueAt) equals actual weekday of dueAt in tz */"
+          },
+          {
+            "name": "url_mapping_trivial",
+            "jest": "inline",
+            "code": "/* assert url === assignment.html_url when present */"
+          }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: eslint fails",
+        "STOP_IF: tsc fails",
+        "STOP_IF: any element has empty id",
+        "STOP_IF: any element has url not starting with http(s)",
+        "STOP_IF: any present dueAt is not ISO8601 with timezone",
+        "STOP_IF: fmtEEE(dueAt) mismatches actual weekday (tz-aware)"
+      ],
+      "notes": {
+        "date_lib": "Use date-fns-tz; do not implement tz math manually.",
+        "memoize": "Memoize formatters and prev-day/prev-Friday checks inside call; no global mutable state.",
+        "points_title": "Title always shows a number in parentheses; use 0 when points are missing.",
+        "compat": "Keep single-item toGridItem as a thin wrapper around toGridItems for backwards compatibility."
+      },
+      "commands": {
+        "play": [
+          "pnpm eslint",
+          "pnpm tsc",
+          "pnpm test -t processing.toGridItems"
+        ]
+      }
+    }
+  ],
+  "project": {
+    "id": "checkpoint",
+    "name": "Checkpoint",
+    "version": "2025.10",
+    "description": "Full-stack web app for weekly assignment views and workflows.",
+    "owners": [
+      "po@susansomerset.com"
+    ],
+    "repo": "github.com/susansomerset/checkpoint"
+  },
+  "tech_stack": {
+    "language": "TypeScript",
+    "runtime": "Node 20.x",
+    "frontend": {
+      "framework": "Next.js 14",
+      "styling": "Tailwind",
+      "test": "Vitest + React Testing Library"
+    },
+    "backend": {
+      "framework": "Next API routes",
+      "validation": "zod"
+    },
+    "dates": {
+      "tz_lib": "date-fns-tz"
+    },
+    "build": "pnpm",
+    "formatting": {
+      "lint": "ESLint",
+      "format": "Prettier"
+    }
+  },
+  "dependencies": {
+    "runtime": [
+      "zod@^3",
+      "date-fns@^3",
+      "date-fns-tz@^2"
+    ],
+    "dev": [
+      "typescript@^5",
+      "vitest@^1",
+      "@types/node@^20",
+      "eslint@^9",
+      "prettier@^3"
+    ]
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "eslint": "eslint .",
+    "tsc": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "vitest run",
+    "spec:compile": "node spec/scripts/spec-compile.mjs",
+    "spec:lint": "node spec/scripts/spec-lint.mjs",
+    "spec:diff": "node spec/scripts/spec-diff.mjs",
+    "ci": "pnpm spec:compile && pnpm spec:lint && pnpm eslint && pnpm tsc && pnpm test:unit"
+  },
+  "environments": {
+    "required_env": [
+      "NEXT_PUBLIC_APP_URL",
+      "CANVAS_API_BASE",
+      "CANVAS_API_TOKEN"
+    ],
+    "fail_closed": true
+  },
+  "directories": {
+    "spec_root": "spec/",
+    "spec_current": "spec/current.json",
+    "spec_versions": "spec/versions/",
+    "fixtures": "tests/fixtures/",
+    "pure_impl": "src/lib/pure/",
+    "tests_unit": "src/lib/pure/__tests__/",
+    "scratchpad_route": "src/app/scratchpad/page.tsx"
+  },
+  "conventions": {
+    "naming": {
+      "variables": "camelCase",
+      "types": "PascalCase",
+      "files": "kebab-case.ts"
+    },
+    "comments": "Prefer 'why' over 'what'; reference spec node id when non-obvious.",
+    "data_flow": {
+      "prefer_pass_data": true,
+      "no_duplicate_calls": true,
+      "immutability_pure": true,
+      "max_params_per_fn": 4
+    },
+    "coding_rules": {
+      "no_any": true,
+      "strict_null_checks": true
+    },
+    "security": {
+      "no_secrets_in_code": true,
+      "allowed_url_schemes": [
+        "http",
+        "https"
+      ]
+    }
+  },
+  "ci": {
+    "gates": [
+      "spec:compile must produce spec/current.json + spec/lock.json matching versions/*",
+      "spec:lint passes (urls http(s), tz weekday checks, fixtures exist)",
+      "eslint passes",
+      "tsc (typecheck) passes",
+      "unit tests pass"
+    ]
+  },
+  "policy": {
+    "narration": {
+      "required": true,
+      "format": "console one-liners",
+      "steps": [
+        "spec_saved/spec_appended",
+        "fixtures_written",
+        "impl_stub_created",
+        "tests_added",
+        "eslint_passed",
+        "typecheck_passed",
+        "tests_green",
+        "scratchpad_ready_for_PO"
+      ]
+    }
+  },
+  "_generated_at": "2025-09-30T18:56:56.750440Z"
+}
