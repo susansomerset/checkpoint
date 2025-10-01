@@ -82,7 +82,9 @@ function runPhaseTests(phase) {
   const hasPlaywrightTests = runCommand(`find tests/${phase} -name "*.spec.ts" | wc -l`, `Check for Playwright tests in ${phase}`, true);
   if (hasPlaywrightTests && hasPlaywrightTests.trim() !== '0') {
     console.log(`  Running Playwright E2E tests for ${phase}...`);
-    if (!runCommand(`npx playwright test tests/${phase}/`, `${phase} Playwright tests`)) {
+    // Use 4 workers for phases with multiple specs to speed up execution
+    const workers = phase === 'phase-2' ? '--workers=4' : '';
+    if (!runCommand(`npx playwright test tests/${phase}/ ${workers}`, `${phase} Playwright tests`)) {
       return false;
     }
   }
@@ -120,7 +122,9 @@ function runAllPreviousPhases(targetPhase) {
     const hasPlaywrightTests = runCommand(`find tests/${phase} -name "*.spec.ts" | wc -l`, `Check for Playwright tests in ${phase}`, true);
     if (hasPlaywrightTests && hasPlaywrightTests.trim() !== '0') {
       console.log(`  Running Playwright E2E tests for ${phase}...`);
-      if (!runCommand(`npx playwright test tests/${phase}/`, `${phase} Playwright tests`)) {
+      // Use 4 workers for phases with multiple specs to speed up execution
+      const workers = phase === 'phase-2' ? '--workers=4' : '';
+      if (!runCommand(`npx playwright test tests/${phase}/ ${workers}`, `${phase} Playwright tests`)) {
         return false;
       }
     }
@@ -145,6 +149,13 @@ function runAllPhases() {
 
 function runCodeQualityChecks() {
   console.log('\n🔍 STEP 4: Running code quality checks...');
+  
+  // Run spec tests (unit, E2E, visual)
+  console.log('\n  Running spec-aligned tests...');
+  if (!runCommand('npm run test:spec:unit', 'Spec unit tests')) {
+    console.log('\n💥 Spec unit tests failed - stopping');
+    return false;
+  }
   
   // Run ESLint
   if (!runCommand('npx eslint src --ext .ts,.tsx --max-warnings 0', 'ESLint check')) {
