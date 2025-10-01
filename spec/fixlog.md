@@ -79,7 +79,7 @@ Page was implemented with defensive data recovery logic instead of delegating to
 - Page displays: "Unable to load assignments. Please refresh the page or contact support."
 
 **Commit:**  
-(pending)
+12edde1
 
 **Notes:**  
 Data recovery and transformation is compose layer's responsibility. Page should be dumb: pass data through or show error.
