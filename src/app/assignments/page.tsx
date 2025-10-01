@@ -1,54 +1,88 @@
-// src/app/assignments/page.tsx
-import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { AssignmentList } from '@/components/AssignmentList'
-import { Toaster } from 'react-hot-toast'
+/**
+ * page.Assignments v1.0.1
+ * Spec: spec/current.json
+ * 
+ * Assignments page — route-level container for WeeklyGrid
+ */
 
-interface AssignmentsPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}
+'use client';
 
-function AssignmentListWrapper() {
-  return (
-    <ErrorBoundary>
-      <AssignmentList />
-    </ErrorBoundary>
-  )
-}
+import { useStudent } from '@/contexts/StudentContext';
+import { WeeklyGrid } from '@/components/WeeklyGrid';
+import { getWeeklyGrids } from '@/lib/compose/getWeeklyGrids';
+import { useMemo } from 'react';
 
-export default async function AssignmentsPage({ searchParams }: AssignmentsPageProps) {
-  // Await searchParams in Next.js 15
-  await searchParams
-  return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <div className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Assignments</h1>
-              <p className="mt-2 text-sm text-gray-600">
-                View all assignments with Canvas links and status information
-              </p>
-            </div>
-            <div className="flex gap-4">
-              <a 
-                href="/dashboard" 
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                Dashboard
-              </a>
-              <a 
-                href="/progress" 
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                Progress
-              </a>
-            </div>
-          </div>
+export default function AssignmentsPage() {
+  const { selectedStudentId, data, loading, error } = useStudent();
+  
+  // Generate weekly grids from student data
+  const grids = useMemo(() => {
+    if (!data) return {};
+    
+    // Transform StudentData to format expected by getWeeklyGrids
+    const studentData = {
+      students: Object.values(data.students || {}).map(student => ({
+        id: student.studentId,
+        name: student.meta?.preferredName || student.meta?.legalName || 'Unknown',
+        courses: Object.values(student.courses || {}).map(course => ({
+          id: course.courseId,
+          name: course.meta?.shortName || course.canvas?.name || 'Unknown Course',
+          assignments: Object.values(course.assignments || {}).map(assignment => ({
+            id: assignment.assignmentId,
+            name: assignment.meta?.title || assignment.canvas?.name || 'Untitled',
+            points: assignment.pointsPossible,
+            dueAt: assignment.meta?.dueDate,
+            checkpointStatus: (assignment.meta?.checkpointStatus || 'Due') as 'Due' | 'Missing' | 'Submitted' | 'Graded',
+            url: assignment.canvas?.html_url || `https://canvas.instructure.com/courses/${course.courseId}/assignments/${assignment.assignmentId}`
+          }))
+        }))
+      }))
+    };
+    
+    // Get current time in Pacific timezone
+    const now = new Date().toISOString();
+    
+    return getWeeklyGrids(studentData, now, 'America/Los_Angeles');
+  }, [data]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-gray-600">Loading assignments...</p>
         </div>
-        
-        <AssignmentListWrapper />
       </div>
-      <Toaster position="top-right" />
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-red-600">Error loading data: {error}</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!selectedStudentId) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-gray-600">Please select a student from the header.</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        <WeeklyGrid 
+          grids={grids}
+          selectedStudentId={selectedStudentId}
+        />
+      </div>
     </div>
-  )
+  );
 }

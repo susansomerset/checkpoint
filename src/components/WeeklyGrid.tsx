@@ -60,6 +60,7 @@ interface CourseRow {
 }
 
 interface WeeklyGridHeader {
+  studentHeader: string;
   columns: string[];
   monday: string;
   timezone: string;
@@ -111,6 +112,13 @@ export function WeeklyGrid({ grids, selectedStudentId }: WeeklyGridProps) {
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100 sticky top-0">
+          {/* Student header row */}
+          <tr className="bg-gray-50 border-b-2 border-gray-400">
+            <th colSpan={header.columns.length} className="px-4 py-3 text-left font-bold text-lg">
+              {header.studentHeader}
+            </th>
+          </tr>
+          {/* Column headers row */}
           <tr>
             {header.columns.map((col, idx) => {
               // Split day columns like "Mon (10/6)" into two lines
@@ -138,13 +146,6 @@ export function WeeklyGrid({ grids, selectedStudentId }: WeeklyGridProps) {
             
             return (
               <React.Fragment key={studentId}>
-                {/* Student header row */}
-                <tr className="bg-gray-50 border-t-2 border-gray-400">
-                  <td colSpan={9} className="border border-gray-300 px-4 py-3 font-bold">
-                    Student: {studentId} — {formatAttentionSummary(studentGrid.summary.attentionCounts)}
-                  </td>
-                </tr>
-                
                 {/* Course rows */}
                 {studentGrid.grid.rows.map(row => (
                   <tr key={row.courseId} className="hover:bg-gray-50">
@@ -204,19 +205,11 @@ export function WeeklyGrid({ grids, selectedStudentId }: WeeklyGridProps) {
 }
 
 /**
- * Format attention counts summary for student header
- * Format: '⚠️:W / ❓:Q / 👍:T / ✅:C'
- */
-function formatAttentionSummary(counts: AttentionCounts): string {
-  return `⚠️:${counts.Warning} / ❓:${counts.Question} / 👍:${counts.Thumb} / ✅:${counts.Check}`;
-}
-
-/**
  * Render array of GridItems with icons as bullets and proper text wrapping
  */
 function renderGridItems(items: GridItem[]): React.ReactNode {
   if (items.length === 0) {
-    return <span className="text-gray-400">—</span>;
+    return null;
   }
   
   return (
@@ -247,7 +240,7 @@ function renderGridItems(items: GridItem[]): React.ReactNode {
  */
 function renderNoDate(noDate: NoDateCell): React.ReactNode {
   if (noDate.count === 0) {
-    return <span className="text-gray-400">—</span>;
+    return null;
   }
   
   if (noDate.deepLinkUrl) {

@@ -76,6 +76,7 @@ interface CourseRow {
 }
 
 interface WeeklyGridHeader {
+  studentHeader: string;
   columns: string[];
   monday: string;
   timezone: string;
@@ -113,7 +114,7 @@ export function getWeeklyGrids(
   const monday = startOfWeek(asOfInTz, { weekStartsOn: 1 }); // 1 = Monday
   const mondayISO = monday.toISOString();
   
-  // Derive weekday labels
+  // Derive weekday labels (shared by all students)
   const weekdayLabels = {
     Mon: `Mon (${format(monday, 'M/d')})`,
     Tue: `Tue (${format(addDays(monday, 1), 'M/d')})`,
@@ -122,22 +123,18 @@ export function getWeeklyGrids(
     Fri: `Fri (${format(addDays(monday, 4), 'M/d')})`
   };
   
-  // Build header (fixed columns)
-  const header: WeeklyGridHeader = {
-    columns: [
-      'Class Name',
-      'Prior Weeks',
-      weekdayLabels.Mon,
-      weekdayLabels.Tue,
-      weekdayLabels.Wed,
-      weekdayLabels.Thu,
-      weekdayLabels.Fri,
-      'Next Week',
-      'No Date'
-    ],
-    monday: mondayISO,
-    timezone: timezone || 'UTC'
-  };
+  // Column headers (shared by all students)
+  const columns = [
+    'Class Name',
+    'Prior Weeks',
+    weekdayLabels.Mon,
+    weekdayLabels.Tue,
+    weekdayLabels.Wed,
+    weekdayLabels.Thu,
+    weekdayLabels.Fri,
+    'Next Week',
+    'No Date'
+  ];
   
   // Process each student and build indexed object
   const result: WeeklyGridsResult = {};
@@ -162,13 +159,23 @@ export function getWeeklyGrids(
       studentTotalItems += courseRow.summary.totalItems;
     });
     
+    // Format student header string
+    const displayName = student.name || student.id;
+    const attentionSummary = `⚠️:${studentAttentionCounts.Warning} / ❓:${studentAttentionCounts.Question} / 👍:${studentAttentionCounts.Thumb} / ✅:${studentAttentionCounts.Check}`;
+    const studentHeader = `${displayName} — ${attentionSummary}`;
+    
     result[student.id] = {
       summary: {
         attentionCounts: studentAttentionCounts,
         totalItems: studentTotalItems
       },
       grid: {
-        header,
+        header: {
+          studentHeader,
+          columns,
+          monday: mondayISO,
+          timezone: timezone || 'UTC'
+        },
         rows
       }
     };

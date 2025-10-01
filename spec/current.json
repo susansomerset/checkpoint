@@ -336,7 +336,7 @@
     },
     "processing.getWeeklyGrids": {
       "id": "processing.getWeeklyGrids",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "kind": "processing",
       "title": "Build WeeklyGrids for known students (rows per course; Prior | Mon–Fri | Next | No Date)",
       "deps": [
@@ -350,6 +350,7 @@
         "produces": {
           "WeeklyGrid": {
             "header": {
+              "studentHeader": "string",
               "columns": [
                 "Class Name",
                 "Prior Weeks",
@@ -470,6 +471,10 @@
               "id": "assembleStudentGrid",
               "kind": "pure",
               "rules": [
+                "Header.studentHeader = format student display name and attention summary:",
+                "  - displayName = student.preferredName || student.legalName || student.name || studentId",
+                "  - attentionSummary = '⚠️:{W} / ❓:{Q} / 👍:{T} / ✅:{C}' where {W}=Warning count, {Q}=Question count, {T}=Thumb count, {C}=Check count",
+                "  - studentHeader = `${displayName} — ${attentionSummary}`",
                 "Header.columns fixed as 9 columns in required order.",
                 "Header.monday = mondayOfWeek(asOf, tz); Header.timezone = tz.",
                 "Aggregate a student-level summary by summing the course-level attentionCounts and totalItems.",
@@ -531,6 +536,7 @@
               },
               "grid": {
                 "header": {
+                  "studentHeader": "Alice — ⚠️:2 / ❓:0 / 👍:2 / ✅:0",
                   "columns": [
                     "Class Name",
                     "Prior Weeks",
@@ -587,6 +593,7 @@
               },
               "grid": {
                 "header": {
+                  "studentHeader": "Bob — ⚠️:0 / ❓:0 / 👍:1 / ✅:1",
                   "columns": [
                     "Class Name",
                     "Prior Weeks",
@@ -690,11 +697,11 @@
     },
     "ui.WeeklyGrid": {
       "id": "ui.WeeklyGrid",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "kind": "ui",
       "title": "WeeklyGrid table view (render-only over processing.getWeeklyGrids)",
       "deps": [
-        "processing.getWeeklyGrids@^1.0.2"
+        "processing.getWeeklyGrids@^1.0.3"
       ],
       "contracts": {
         "touch": [
@@ -706,7 +713,7 @@
       },
       "signature": {
         "input": {
-          "grids": "Record<studentId, { summary: { attentionCounts: { Check:int, Thumb:int, Question:int, Warning:int }, totalItems:int }, grid: { header:{ columns:string[], monday:iso8601, timezone:IANA_tz }, rows: any[] } }>",
+          "grids": "Record<studentId, { summary: { attentionCounts: { Check:int, Thumb:int, Question:int, Warning:int }, totalItems:int }, grid: { header:{ studentHeader:string, columns:string[], monday:iso8601, timezone:IANA_tz }, rows: any[] } }>",
           "selectedStudentId?": "string"
         },
         "output": { "react": "JSX.Element" }
@@ -723,7 +730,9 @@
             "id": "renderHeader",
             "kind": "pure",
             "rules": [
-              "Render header.columns (9 fixed) in provided order.",
+              "Render header.studentHeader in a <th colSpan={9}> row ABOVE the column headers row.",
+              "Student header styling: bg-gray-50, border-b-2 border-gray-400, font-bold, text-lg, left-aligned.",
+              "Render header.columns (9 fixed) in provided order below student header.",
               "Display day labels exactly as given; do not compute or reformat.",
               "Highlight the 'today' column by computing 'now' in header.timezone.",
               "If 'now' falls on Sat/Sun, highlight Monday instead."
@@ -742,8 +751,8 @@
             "id": "renderStudentSection",
             "kind": "pure",
             "rules": [
-              "Render a student header row showing totals from grids[studentId].summary.attentionCounts in the format: '⚠️:W / ❓:Q / 👍:T / ✅:C'.",
-              "Under each student header, render their course rows from grid.rows in the order provided (already sorted upstream).",
+              "Student header is pre-formatted in grid.header.studentHeader; render as-is without any formatting logic.",
+              "Render course rows from grid.rows in the order provided (already sorted upstream).",
               "Assume grid.rows[].courseName is the final display name (shortName resolved upstream from course meta). Do not alter or derive names in UI."
             ]
           },
@@ -882,6 +891,101 @@
           "pnpm eslint",
           "pnpm tsc",
           "pnpm test -t ui.WeeklyGrid"
+        ]
+      }
+    },
+    "page.Assignments": {
+      "id": "page.Assignments",
+      "version": "1.0.1",
+      "kind": "page",
+      "title": "Assignments page — route-level container for WeeklyGrid",
+      "deps": [
+        "ui.WeeklyGrid@^1.0.1"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:ui.WeeklyGrid@^1.0.1#contracts.produces.component" }
+        ],
+        "produces": {
+          "route": "/assignments",
+          "component": "NextPage"
+        }
+      },
+      "signature": {
+        "input": {
+          "grids": "Record<studentId, StudentWeeklyGrid>",
+          "selectedStudentId": "string"
+        },
+        "output": { "react": "JSX.Element" }
+      },
+      "implementation": {
+        "module": "src/app/assignments/page.tsx",
+        "export": "default",
+        "layer": "page",
+        "tags": ["assignments","weekly","grid","container"]
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "renderLayout",
+            "kind": "ui",
+            "rules": [
+              "Render ui.WeeklyGrid with props: { grids, selectedStudentId }.",
+              "Do not re-bucket, filter, or sort data; UI depends entirely on provided props.",
+              "Do not render page title or student selector; header/navigation handles that globally."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "student_selected": {
+            "grids": { "...": "see processing.getWeeklyGrids.fixture.expectations.two_students_small" },
+            "selectedStudentId": "S1"
+          }
+        },
+        "expectations": {
+          "student_selected": {
+            "renders": [
+              "WeeklyGrid component is mounted with selectedStudentId=S1.",
+              "Only S1's grid is rendered.",
+              "Changing selectedStudentId at the header level and re-rendering the page updates the grid."
+            ]
+          }
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "passes_props_to_WeeklyGrid" }
+        ],
+        "integration": [
+          { "name": "rerenders_grid_when_selectedStudentId_changes_from_header" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: page re-implements bucketing or summary logic.",
+        "STOP_IF: page attempts to render student dropdown or page title.",
+        "STOP_IF: ui.WeeklyGrid is mounted without a selectedStudentId."
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Mount ui.WeeklyGrid with grids and selectedStudentId from props.",
+          "Pass ESLint, TSC, unit + integration tests."
+        ],
+        "po_review": [
+          "Confirm page renders only the selected student's grid, no extras.",
+          "Confirm grid updates correctly when selectedStudentId is changed by the header."
+        ]
+      },
+      "notes": {
+        "routing": "Page mounted at /assignments. Student selection comes from global header/navigation state, not this page.",
+        "future": "Detail page (/assignments/[studentId]) may be added later."
+      },
+      "commands": {
+        "play": [
+          "pnpm eslint",
+          "pnpm tsc",
+          "pnpm test -t page.Assignments"
         ]
       }
     }
