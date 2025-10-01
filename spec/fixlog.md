@@ -138,7 +138,7 @@ Architecture mismatch. `getWeeklyGrids` was implemented with fixture-based simpl
 - Course names: `text-gray-900` for better readability
 
 **Commit:**  
-(pending)
+6cc794d
 
 **Notes:**  
 This completes the proper layering: Context computes and caches grids when student changes. Page just reads pre-computed data. Compose layer owns data extraction via internal adapter. Grids regenerated fresh (with current "now" timestamp) whenever student selection changes. UI improvements ensure proper text contrast and highlighting behavior.
