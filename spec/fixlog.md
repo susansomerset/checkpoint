@@ -178,7 +178,7 @@ PO reported two issues:
 - Helps diagnose stale data issues in future
 
 **Commit:**  
-(pending)
+796ffbc
 
 **Notes:**  
 Lesson learned: Always check data freshness before debugging logic. The adapter, bucketing, and attention type implementations were all correct. Added scratchpad tools to quickly identify stale data in future. PO lost a year off their life yelling about font colors (all fixed now with solid black headers and proper text contrast).
