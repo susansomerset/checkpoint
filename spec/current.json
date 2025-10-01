@@ -1,6 +1,6 @@
 {
-  "nodes": [
-    {
+  "specs": {
+    "processing.toGridItems": {
       "id": "processing.toGridItems",
       "version": "1.1.0",
       "kind": "processing",
@@ -334,7 +334,7 @@
         ]
       }
     },
-    {
+    "processing.getWeeklyGrids": {
       "id": "processing.getWeeklyGrids",
       "version": "1.0.2",
       "kind": "processing",
@@ -687,8 +687,205 @@
           "pnpm test -t processing.getWeeklyGrids"
         ]
       }
+    },
+    "ui.WeeklyGrid": {
+      "id": "ui.WeeklyGrid",
+      "version": "1.0.1",
+      "kind": "ui",
+      "title": "WeeklyGrid table view (render-only over processing.getWeeklyGrids)",
+      "deps": [
+        "processing.getWeeklyGrids@^1.0.2"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:processing.getWeeklyGrids@^1.0.2#contracts.produces.WeeklyGrid" }
+        ],
+        "produces": {
+          "component": "React.FunctionComponent"
+        }
+      },
+      "signature": {
+        "input": {
+          "grids": "Record<studentId, { summary: { attentionCounts: { Check:int, Thumb:int, Question:int, Warning:int }, totalItems:int }, grid: { header:{ columns:string[], monday:iso8601, timezone:IANA_tz }, rows: any[] } }>",
+          "selectedStudentId?": "string"
+        },
+        "output": { "react": "JSX.Element" }
+      },
+      "implementation": {
+        "module": "src/components/WeeklyGrid.tsx",
+        "export": "WeeklyGrid",
+        "layer": "ui",
+        "tags": ["table","weekly","grid"]
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "renderHeader",
+            "kind": "pure",
+            "rules": [
+              "Render header.columns (9 fixed) in provided order.",
+              "Display day labels exactly as given; do not compute or reformat.",
+              "Highlight the 'today' column by computing 'now' in header.timezone.",
+              "If 'now' falls on Sat/Sun, highlight Monday instead."
+            ]
+          },
+          {
+            "id": "selectStudents",
+            "kind": "pure",
+            "rules": [
+              "If selectedStudentId is provided, render ONLY grids[selectedStudentId].",
+              "Otherwise, render all students in the iteration order of Object.keys(grids).",
+              "Do not refetch or recompute anything; this is purely a render filter."
+            ]
+          },
+          {
+            "id": "renderStudentSection",
+            "kind": "pure",
+            "rules": [
+              "Render a student header row showing totals from grids[studentId].summary.attentionCounts in the format: '⚠️:W / ❓:Q / 👍:T / ✅:C'.",
+              "Under each student header, render their course rows from grid.rows in the order provided (already sorted upstream).",
+              "Assume grid.rows[].courseName is the final display name (shortName resolved upstream from course meta). Do not alter or derive names in UI."
+            ]
+          },
+          {
+            "id": "renderCourseRows",
+            "kind": "pure",
+            "rules": [
+              "Each course row renders exactly 9 cells: Prior, Mon..Fri, Next, No Date.",
+              "All cells must exist even if empty.",
+              "For cells containing GridItem[], render items in the order provided (already sorted upstream).",
+              "Do not compute buckets, titles, dates, or status in UI."
+            ]
+          },
+          {
+            "id": "renderGridItem",
+            "kind": "pure",
+            "rules": [
+              "Render each GridItem as an <a> tag with text=title, href=url, target=_blank, rel=noopener noreferrer.",
+              "Icon/color mapping by attentionType:",
+              "  - Check → prefix '✓' and green text",
+              "  - Thumb → prefix '👍' and blue text",
+              "  - Question → prefix '❓' and red text",
+              "  - Warning → prefix '⚠️' and red text with a yellow text highlight (e.g., background highlight)",
+              "Never modify title or recompute attentionType in the UI."
+            ]
+          },
+          {
+            "id": "renderNoDate",
+            "kind": "pure",
+            "rules": [
+              "Render the provided noDate.label as plain text.",
+              "If noDate.count > 0 and noDate.deepLinkUrl is non-empty, render it as a link (target=_blank, rel=noopener).",
+              "If noDate.count = 0, render an em dash '—'.",
+              "No buttons or callbacks; links only."
+            ]
+          },
+          {
+            "id": "accessibility_and_responsiveness",
+            "kind": "pure",
+            "rules": [
+              "Use semantic <table> with <thead>/<tbody>; header cells are <th scope='col'>.",
+              "Ensure keyboard focus states on all links; visible focus ring.",
+              "Sticky header and horizontal scroll on narrow viewports; wrap long titles."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "tiny_render": {
+            "grids": {
+              "S1": {
+                "summary": { "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 1 }, "totalItems": 2 },
+                "grid": {
+                  "header": {
+                    "columns": ["Class Name","Prior Weeks","Mon (10/6)","Tue (10/7)","Wed (10/8)","Thu (10/9)","Fri (10/10)","Next Week","No Date"],
+                    "monday": "2025-10-06T00:00:00-07:00",
+                    "timezone": "America/Los_Angeles"
+                  },
+                  "rows": [
+                    {
+                      "courseId": "C-101",
+                      "courseName": "Alg I",
+                      "cells": {
+                        "prior": [{ "id": "A-0", "title": "10/2: Warmup (10)", "attentionType": "Warning", "url": "https://app/assignments/A-0" }],
+                        "weekday": { "Mon": [], "Tue": [{ "id": "A-2", "title": "Reflection (25)", "attentionType": "Thumb", "url": "https://app/assignments/A-2" }], "Wed": [], "Thu": [], "Fri": [] },
+                        "next": [],
+                        "noDate": { "count": 0, "points": 0, "label": "", "deepLinkUrl": "" }
+                      },
+                      "summary": { "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 1 }, "totalItems": 2 }
+                    }
+                  ]
+                }
+              }
+            },
+            "selectedStudentId": "S1"
+          }
+        },
+        "expectations": {
+          "tiny_render": {
+            "renders": [
+              "Table with 9 headers exactly as provided.",
+              "Only student S1 section is rendered when selectedStudentId='S1'.",
+              "Student header shows '⚠️:1 / ❓:0 / 👍:1 / ✅:0'.",
+              "Course row 'Alg I' shows Tue cell with 'Reflection (25)' and Prior cell with '10/2: Warmup (10)'.",
+              "No Date cell renders an em dash.",
+              "Links open in a new tab with rel=noopener noreferrer.",
+              "Today column highlight is based on current date in 'America/Los_Angeles'; weekend → highlight Monday."
+            ]
+          }
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "renders_headers_from_compose_header" },
+          { "name": "highlights_today_or_monday_on_weekend" },
+          { "name": "renders_all_cells_even_if_empty" },
+          { "name": "renders_icons_and_colors_by_attentionType" },
+          { "name": "renders_only_selected_student_when_selectedStudentId_present" }
+        ],
+        "integration": [
+          { "name": "renders_links_correctly_and_focusable" },
+          { "name": "renders_rows_in_given_order_without_resorting" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: component imports from src/lib/data or src/lib/pure directly (UI must depend on compose output only).",
+        "STOP_IF: UI recomputes bucketing, titles, day labels, or attention types.",
+        "STOP_IF: header columns count/order diverge from compose header.",
+        "STOP_IF: any GridItem rendered without a valid http(s) url.",
+        "STOP_IF: any of the 9 cells is missing (cells must exist even if empty).",
+        "STOP_IF: No Date cell uses buttons or callbacks (links only when count>0 and deepLinkUrl provided)."
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Render from provided 'grids' without re-bucketing, sorting, or title/status recomputation.",
+          "Use current time in header.timezone to highlight today's column; weekend → highlight Monday.",
+          "Render only the selected student when selectedStudentId is set.",
+          "Respect provided row order and courseName as the final display label.",
+          "Pass ESLint, TSC, unit + integration tests."
+        ],
+        "po_review": [
+          "Visually confirm header/columns and today-highlighting behavior.",
+          "Confirm only selected student renders when filtered.",
+          "Confirm icons/colors: Question=red, Warning=red with yellow text highlight.",
+          "Confirm No Date link behavior and em-dash rendering for empty."
+        ]
+      },
+      "notes": {
+        "compose_contract": "Compose guarantees grid.header and grid.rows are display-ready: rows sorted by course meta.period ascending; courseName already resolved from course meta.shortName (fallback upstream); cells populated and ordered.",
+        "a11y": "Semantic table, focusable links, visible focus outlines.",
+        "perf": "Memoize per-row render; consider virtualization later for very large datasets."
+      },
+      "commands": {
+        "play": [
+          "pnpm eslint",
+          "pnpm tsc",
+          "pnpm test -t ui.WeeklyGrid"
+        ]
+      }
     }
-  ],
+  },
   "project": {
     "id": "checkpoint",
     "name": "Checkpoint",
