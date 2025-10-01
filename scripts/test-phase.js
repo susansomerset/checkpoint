@@ -63,7 +63,7 @@ function runCommand(command, description, captureOutput = false) {
 
 function runSmokeTest() {
   console.log('\n🚨 STEP 1: Running smoke test (MUST PASS)');
-  return runCommand('npx playwright test tests/smoke.spec.ts', 'Smoke test');
+  return runCommand('npx playwright test tests/smoke/core-functionality.spec.ts', 'Smoke test');
 }
 
 function runPhaseTests(phase) {
