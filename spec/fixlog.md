@@ -57,3 +57,29 @@ PO review found that WeeklyGrid student header row displays "Student: S1" (stude
 
 **Notes:**  
 Student header now appears above column headers in table structure. UI automatically spans full width using colSpan.
+
+---
+
+## 2025-10-01 – Remove data recovery/reshaping logic from page layer
+
+**Issue/Context:**  
+Page layer (lines 22-40) attempts to recover from missing/malformed data by extracting, reshaping, and providing fallbacks. This is business logic that doesn't belong in a page component.
+
+**Root Cause:**  
+Page was implemented with defensive data recovery logic instead of delegating to compose layer or failing gracefully with error message.
+
+**Affected Spec Nodes:**  
+- `page.Assignments@1.0.1` → `@1.0.2` (implementation correction)
+
+**Resolution:**  
+**Page layer (`assignments/page.tsx`):**
+- Remove data recovery/reshaping block (lines 22-40)
+- Pass `data` directly to `getWeeklyGrids` without transformation
+- If compose layer can't handle the data, let it fail and show error to user
+- Page displays: "Unable to load assignments. Please refresh the page or contact support."
+
+**Commit:**  
+(pending)
+
+**Notes:**  
+Data recovery and transformation is compose layer's responsibility. Page should be dumb: pass data through or show error.
