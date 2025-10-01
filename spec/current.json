@@ -1122,7 +1122,8 @@
     "data": [
       "Empty arrays or objects must still be represented as keys in the output (never omit expected keys).",
       "Adapter functions are responsible for handling empty data gracefully without introducing errors.",
-      "Failmodes/exception handling must be explicitly documented in each spec node so behavior is predictable when data is missing, malformed, or stale."
+      "Failmodes/exception handling must be explicitly documented in each spec node so behavior is predictable when data is missing, malformed, or stale.",
+      "No live auth in CI; use mocks or cassettes for API tests."
     ],
     "narration": {
       "required": true,
