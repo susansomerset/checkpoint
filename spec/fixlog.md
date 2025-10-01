@@ -142,3 +142,43 @@ Architecture mismatch. `getWeeklyGrids` was implemented with fixture-based simpl
 
 **Notes:**  
 This completes the proper layering: Context computes and caches grids when student changes. Page just reads pre-computed data. Compose layer owns data extraction via internal adapter. Grids regenerated fresh (with current "now" timestamp) whenever student selection changes. UI improvements ensure proper text contrast and highlighting behavior.
+
+---
+
+## 2025-10-01 – Assignment bucketing issues + icon visibility (stale data + UI polish)
+
+**Issue/Context:**  
+PO reported two issues:
+1. Assignment #832587 appearing in wrong column (Monday 9/29 instead of Next Week)
+2. Assignment #886535 showing Warning instead of expected attention type
+3. Check icons (✓) appearing as light gray and nearly invisible
+
+**Root Cause:**  
+**Issues 1 & 2:** Stale cached StudentData. Canvas had updated assignment due dates after data was cached. Investigation consumed significant time before discovering data was last updated 9/30 at 12:15pm.
+
+**Issue 3:** UI used '✓' (light gray checkmark character) instead of '✅' (green checkbox emoji).
+
+**Affected Spec Nodes:**  
+- `ui.WeeklyGrid@1.0.3` → `@1.0.4` (icon fix + debug improvements)
+- `app.Scratchpad` (implementation only, no spec)
+
+**Resolution:**  
+
+**Data freshness (no code changes):**
+- Reset student data via dashboard to pull fresh Canvas data
+- Assignment #832587 now correctly shows in Next Week column with correct due date
+- All bucketing and attention type logic verified correct
+
+**UI layer (`WeeklyGrid.tsx`):**
+- Changed Check icon from '✓' to '✅' for visibility
+
+**Scratchpad improvements:**
+- Added "Most Recent Assignment Update" display (scans all assignments for MAX updated_at)
+- Added working "Reset Student Data" button (calls /api/student-data/reset)
+- Helps diagnose stale data issues in future
+
+**Commit:**  
+(pending)
+
+**Notes:**  
+Lesson learned: Always check data freshness before debugging logic. The adapter, bucketing, and attention type implementations were all correct. Added scratchpad tools to quickly identify stale data in future. PO lost a year off their life yelling about font colors (all fixed now with solid black headers and proper text contrast).

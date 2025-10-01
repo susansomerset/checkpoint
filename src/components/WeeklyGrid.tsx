@@ -267,7 +267,7 @@ function renderNoDate(noDate: NoDateCell): React.ReactNode {
  */
 function getAttentionTypeIcon(type: string): string {
   switch (type) {
-    case 'Check': return '✓';
+    case 'Check': return '✅';
     case 'Thumb': return '👍';
     case 'Question': return '❓';
     case 'Warning': return '⚠️';
