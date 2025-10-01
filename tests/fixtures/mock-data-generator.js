@@ -219,7 +219,7 @@ function generateMockStudentData() {
  * Validates that the mock data has the expected structure
  * This is a basic validation - the real validation happens in TypeScript
  */
-function validateMockDataStructure() {
+function validateMockDataStructure(callerContext) {
   try {
     const mockData = generateMockStudentData()
     
@@ -241,7 +241,8 @@ function validateMockDataStructure() {
       throw new Error('No students found in mock data')
     }
     
-    console.log('✅ Mock data structure validation passed')
+    const context = callerContext ? ` for ${callerContext}` : ''
+    console.log(`✅ Mock data structure validation passed${context}`)
     console.log(`   - Students: ${studentCount}`)
     console.log(`   - API Version: ${mockData.apiVersion}`)
     console.log(`   - Last Loaded: ${mockData.lastLoadedAt}`)

@@ -220,14 +220,15 @@ export function generateMockStudentData(): StudentData {
  * Validates that the mock data matches the backend schema exactly
  * This ensures our tests are using data that would pass backend validation
  */
-export function validateMockDataStructure(): boolean {
+export function validateMockDataStructure(callerContext?: string): boolean {
   try {
     const mockData = generateMockStudentData()
     
     // Validate against the exact schema used by the backend
     const validatedData = StudentDataSchema.parse(mockData)
     
-    console.log('✅ Mock data structure validation passed')
+    const context = callerContext ? ` for ${callerContext}` : ''
+    console.log(`✅ Mock data structure validation passed${context}`)
     console.log(`   - Students: ${Object.keys(validatedData.students).length}`)
     console.log(`   - API Version: ${validatedData.apiVersion}`)
     console.log(`   - Last Loaded: ${validatedData.lastLoadedAt}`)

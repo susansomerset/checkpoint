@@ -21,7 +21,7 @@ export async function getRealStudentData(): Promise<any> {
   // Generate fresh data (suppressed logs during test runs)
   
   // Validate schema structure first
-  if (!validateMockDataStructure()) {
+  if (!validateMockDataStructure('real-data-cache.ts')) {
     throw new Error('Mock data structure validation failed - check schema compatibility')
   }
   
