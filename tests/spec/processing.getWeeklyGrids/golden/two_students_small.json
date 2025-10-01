@@ -1,0 +1,162 @@
+{
+  "S1": {
+    "summary": {
+      "attentionCounts": {
+        "Check": 0,
+        "Thumb": 2,
+        "Question": 0,
+        "Warning": 2
+      },
+      "totalItems": 4
+    },
+    "grid": {
+      "header": {
+        "studentHeader": "Alice — ⚠️:2 / ❓:0 / 👍:2 / ✅:0",
+        "columns": [
+          "Class Name",
+          "Prior Weeks",
+          "Mon (10/6)",
+          "Tue (10/7)",
+          "Wed (10/8)",
+          "Thu (10/9)",
+          "Fri (10/10)",
+          "Next Week",
+          "No Date"
+        ]
+      },
+      "rows": [
+        {
+          "courseId": "C-101",
+          "courseName": "Algebra I",
+          "cells": {
+            "prior": [
+              {
+                "id": "A-0",
+                "title": "10/2: Warmup (10)",
+                "attentionType": "Warning",
+                "url": "https://app/assignments/A-0"
+              }
+            ],
+            "weekday": {
+              "Mon": [],
+              "Tue": [
+                {
+                  "id": "A-2",
+                  "title": "Reflection (25)",
+                  "attentionType": "Thumb",
+                  "url": "https://app/assignments/A-2"
+                }
+              ],
+              "Wed": [],
+              "Thu": [],
+              "Fri": [
+                {
+                  "id": "A-3",
+                  "title": "Problem Set (20)",
+                  "attentionType": "Warning",
+                  "url": "https://app/assignments/A-3"
+                }
+              ]
+            },
+            "next": [
+              {
+                "id": "A-5",
+                "title": "Tue: Next Week Prep (15)",
+                "attentionType": "Thumb",
+                "url": "https://app/assignments/A-5"
+              }
+            ],
+            "noDate": {
+              "count": 1,
+              "points": 5,
+              "label": "1 no due date (5 points)",
+              "deepLinkUrl": "https://app/detail?student=S1&course=C-101&nodate=1"
+            }
+          },
+          "summary": {
+            "attentionCounts": {
+              "Check": 0,
+              "Thumb": 2,
+              "Question": 0,
+              "Warning": 2
+            },
+            "totalItems": 4
+          }
+        }
+      ]
+    }
+  },
+  "S2": {
+    "summary": {
+      "attentionCounts": {
+        "Check": 1,
+        "Thumb": 1,
+        "Question": 0,
+        "Warning": 0
+      },
+      "totalItems": 2
+    },
+    "grid": {
+      "header": {
+        "studentHeader": "Bob — ⚠️:0 / ❓:0 / 👍:1 / ✅:1",
+        "columns": [
+          "Class Name",
+          "Prior Weeks",
+          "Mon (10/6)",
+          "Tue (10/7)",
+          "Wed (10/8)",
+          "Thu (10/9)",
+          "Fri (10/10)",
+          "Next Week",
+          "No Date"
+        ]
+      },
+      "rows": [
+        {
+          "courseId": "C-201",
+          "courseName": "Biology",
+          "cells": {
+            "prior": [],
+            "weekday": {
+              "Mon": [],
+              "Tue": [],
+              "Wed": [],
+              "Thu": [],
+              "Fri": [
+                {
+                  "id": "B-1",
+                  "title": "Lab 1 (10)",
+                  "attentionType": "Check",
+                  "url": "https://app/assignments/B-1"
+                }
+              ]
+            },
+            "next": [
+              {
+                "id": "B-3",
+                "title": "Wed: Reading (10)",
+                "attentionType": "Thumb",
+                "url": "https://app/assignments/B-3"
+              }
+            ],
+            "noDate": {
+              "count": 1,
+              "points": 15,
+              "label": "1 no due date (15 points)",
+              "deepLinkUrl": "https://app/detail?student=S2&course=C-201&nodate=1"
+            }
+          },
+          "summary": {
+            "attentionCounts": {
+              "Check": 1,
+              "Thumb": 1,
+              "Question": 0,
+              "Warning": 0
+            },
+            "totalItems": 2
+          }
+        }
+      ]
+    }
+  }
+}

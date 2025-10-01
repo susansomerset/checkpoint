@@ -1,0 +1,41 @@
+{
+  "studentData": {
+    "students": [
+      {
+        "id": "S1",
+        "name": "Alice",
+        "courses": [
+          {
+            "id": "C-101",
+            "name": "Algebra I",
+            "assignments": [
+              { "id": "A-0", "name": "Warmup", "points": 10, "dueAt": "2025-10-02T09:00:00-07:00", "checkpointStatus": "Missing", "url": "https://app/assignments/A-0" },
+              { "id": "A-1", "name": "Quiz 1", "points": 5, "dueAt": "2025-10-03T09:00:00-07:00", "checkpointStatus": "Submitted", "url": "https://app/assignments/A-1" },
+              { "id": "A-2", "name": "Reflection", "points": 25, "dueAt": "2025-10-07T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/A-2" },
+              { "id": "A-3", "name": "Problem Set", "points": 20, "dueAt": "2025-10-10T09:00:00-07:00", "checkpointStatus": "Missing", "url": "https://app/assignments/A-3" },
+              { "id": "A-4", "name": "Project", "points": 5, "checkpointStatus": "Submitted", "url": "https://app/assignments/A-4" },
+              { "id": "A-5", "name": "Next Week Prep", "points": 15, "dueAt": "2025-10-14T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/A-5" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "name": "Bob",
+        "courses": [
+          {
+            "id": "C-201",
+            "name": "Biology",
+            "assignments": [
+              { "id": "B-1", "name": "Lab 1", "points": 10, "dueAt": "2025-10-10T09:00:00-07:00", "checkpointStatus": "Submitted", "url": "https://app/assignments/B-1" },
+              { "id": "B-2", "name": "Worksheet", "points": 15, "checkpointStatus": "Submitted", "url": "https://app/assignments/B-2" },
+              { "id": "B-3", "name": "Reading", "points": 10, "dueAt": "2025-10-15T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/B-3" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "asOf": "2025-10-08T09:00:00-07:00",
+  "timezone": "America/Los_Angeles"
+}

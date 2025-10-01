@@ -1,0 +1,59 @@
+{
+  "grids": {
+    "S1": {
+      "summary": {
+        "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 1 },
+        "totalItems": 2
+      },
+      "grid": {
+        "header": {
+          "columns": ["Class Name", "Prior Weeks", "Mon (10/6)", "Tue (10/7)", "Wed (10/8)", "Thu (10/9)", "Fri (10/10)", "Next Week", "No Date"],
+          "monday": "2025-10-06T00:00:00-07:00",
+          "timezone": "America/Los_Angeles"
+        },
+        "rows": [
+          {
+            "courseId": "C-101",
+            "courseName": "Alg I",
+            "cells": {
+              "prior": [
+                {
+                  "id": "A-0",
+                  "title": "10/2: Warmup (10)",
+                  "attentionType": "Warning",
+                  "url": "https://app/assignments/A-0"
+                }
+              ],
+              "weekday": {
+                "Mon": [],
+                "Tue": [
+                  {
+                    "id": "A-2",
+                    "title": "Reflection (25)",
+                    "attentionType": "Thumb",
+                    "url": "https://app/assignments/A-2"
+                  }
+                ],
+                "Wed": [],
+                "Thu": [],
+                "Fri": []
+              },
+              "next": [],
+              "noDate": {
+                "count": 0,
+                "points": 0,
+                "label": "",
+                "deepLinkUrl": ""
+              }
+            },
+            "summary": {
+              "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 1 },
+              "totalItems": 2
+            }
+          }
+        ]
+      }
+    }
+  },
+  "selectedStudentId": "S1"
+}

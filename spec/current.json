@@ -214,7 +214,7 @@
               "dueAt": "2025-10-03T17:00:00-07:00",
               "points": 5,
               "url": "https://canvas.example/courses/42/assignments/103",
-              "attentionType": "Question"
+              "attentionType": "Warning"
             },
             {
               "id": "A-104",

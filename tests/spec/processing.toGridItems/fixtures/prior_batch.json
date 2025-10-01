@@ -1,0 +1,17 @@
+{
+  "entries": [
+    {
+      "assignment": {
+        "id": "A-103",
+        "name": "Quiz 1",
+        "due_at": "2025-10-03T17:00:00-07:00",
+        "points_possible": 5,
+        "html_url": "https://canvas.example/courses/42/assignments/103"
+      },
+      "checkpointStatus": "Missing"
+    }
+  ],
+  "formatType": "Prior",
+  "asOf": "2025-10-06T09:00:00-07:00",
+  "timezone": "America/Los_Angeles"
+}
