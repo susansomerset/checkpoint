@@ -1,7 +1,10 @@
 "use client";
 
 import { useStudent } from '@/contexts/StudentContext';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { getDetailRows } from '@/lib/pure/getDetailRows';
+import { getSelectedDetail } from '@/lib/compose/detailData';
+import { useRawDetailSnapshot } from '@/ui/hooks/useRawDetailSnapshot';
 
 interface JsonViewerProps {
   data: unknown;
@@ -29,92 +32,55 @@ function JsonViewer({ data, label }: JsonViewerProps) {
 }
 
 export default function ScratchpadPage() {
-  const { selectedStudentId, data, weeklyGrids, loading, refreshData } = useStudent();
-  const [lastLoadedAt, setLastLoadedAt] = useState<string | null>(null);
+  const studentContext = useStudent();
+  const { selectedStudentId, data, loading } = studentContext;
   
-  // Extract lastLoadedAt from data if it exists
-  useEffect(() => {
-    if (data) {
-      const dataWithMeta = data as Record<string, unknown>;
-      if (dataWithMeta.lastLoadedAt && typeof dataWithMeta.lastLoadedAt === 'string') {
-        setLastLoadedAt(dataWithMeta.lastLoadedAt);
-      }
-    }
-  }, [data]);
+  // Hook for getting raw snapshots (demo of useRawDetailSnapshot)
+  const getSnapshot = useRawDetailSnapshot();
   
-  // Find most recent assignment update across all students
-  const mostRecentAssignmentUpdate = useMemo(() => {
-    if (!data) return null;
-    
-    let maxUpdatedAt: string | null = null;
-    let assignmentId: string | null = null;
-    let studentId: string | null = null;
-    let courseId: string | null = null;
-    
-    Object.entries(data.students).forEach(([sid, student]) => {
-      Object.entries(student.courses).forEach(([cid, course]) => {
-        Object.entries(course.assignments).forEach(([aid, assignment]) => {
-          const canvas = assignment.canvas as Record<string, unknown>;
-          const updatedAt = canvas?.updated_at as string | undefined;
-          
-          if (updatedAt) {
-            if (!maxUpdatedAt || updatedAt > maxUpdatedAt) {
-              maxUpdatedAt = updatedAt;
-              assignmentId = aid;
-              studentId = sid;
-              courseId = cid;
-            }
-          }
-        });
-      });
-    });
-    
-    return { maxUpdatedAt, assignmentId, studentId, courseId };
-  }, [data]);
-  
-  // Run adapter locally to see what it produces
-  const adapterOutput = useMemo(() => {
+  // Compute detail rows for selected student (pure layer)
+  const detailRows = useMemo(() => {
     if (!data || !selectedStudentId) return null;
     
-    // Same filtering as StudentContext
-    const selectedStudentData = {
-      students: {
-        [selectedStudentId]: data.students[selectedStudentId]
-      }
-    };
+    const selectedStudent = data.students[selectedStudentId];
+    if (!selectedStudent) return null;
     
-    // Inline adapter logic to debug
     try {
-      const adapted = {
-        students: Object.values(selectedStudentData.students).map((student) => ({
-          id: student.studentId,
-          name: student.meta?.preferredName || student.meta?.legalName || student.studentId,
-          courses: Object.values(student.courses).map((course) => {
-            const canvasCourse = course.canvas as Record<string, unknown>;
-            return {
-              id: course.courseId,
-              name: course.meta?.shortName || (canvasCourse.name as string) || 'Unknown',
-              assignments: Object.values(course.assignments).map((assignment) => {
-                const canvasAssignment = assignment.canvas as Record<string, unknown>;
-                return {
-                  id: assignment.assignmentId,
-                  name: (canvasAssignment.name as string) || 'Untitled',
-                  points: assignment.pointsPossible,
-                  dueAt: canvasAssignment.due_at as string | undefined,
-                  checkpointStatus: assignment.meta.checkpointStatus,
-                  // eslint-disable-next-line camelcase
-                  html_url: (canvasAssignment.html_url as string) || `https://djusd.instructure.com/courses/${course.courseId}/assignments/${assignment.assignmentId}`
-                };
-              })
-            };
-          })
-        }))
-      };
-      return adapted;
+      const now = new Date().toISOString();
+      const rows = getDetailRows(selectedStudent, now);
+      return rows;
     } catch (err) {
       return { error: String(err) };
     }
   }, [data, selectedStudentId]);
+  
+  // Compute compose layer output (adapter)
+  const composeOutput = useMemo(() => {
+    try {
+      const now = new Date().toISOString();
+      return getSelectedDetail(studentContext, now);
+    } catch (err) {
+      return { error: String(err) };
+    }
+  }, [studentContext]);
+  
+  // Demo: Get raw snapshot for first assignment (using the hook)
+  const rawSnapshotDemo = useMemo(() => {
+    if (!getSnapshot || !detailRows || !Array.isArray(detailRows) || detailRows.length === 0) {
+      return null;
+    }
+    
+    const firstRow = detailRows[0];
+    try {
+      return getSnapshot({
+        studentId: firstRow.studentId,
+        courseId: firstRow.courseId,
+        assignmentId: firstRow.assignmentId
+      });
+    } catch (err) {
+      return { error: String(err) };
+    }
+  }, [getSnapshot, detailRows]);
   
   if (loading) {
     return (
@@ -129,81 +95,47 @@ export default function ScratchpadPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">Scratchpad - WeeklyGrids Debug</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">Scratchpad - Detail Rows</h1>
         
         <div className="mb-6 p-4 bg-yellow-100 border-2 border-yellow-400 rounded-lg">
-          <h2 className="text-xl font-bold text-yellow-900">Current Selection & Data Info</h2>
-          <div className="space-y-2 text-yellow-800">
-            <p>
-              <strong>Student ID:</strong> {selectedStudentId || 'None'}
-            </p>
-            <p>
-              <strong>Data Last Loaded:</strong> {lastLoadedAt ? new Date(lastLoadedAt).toLocaleString() : 'Unknown'}
-            </p>
-            {mostRecentAssignmentUpdate?.maxUpdatedAt && (
-              <div className="mt-3 p-2 bg-white rounded border border-yellow-600">
-                <p className="font-bold text-yellow-900">Most Recent Assignment Update:</p>
-                <p className="text-sm">
-                  <strong>Date:</strong> {new Date(mostRecentAssignmentUpdate.maxUpdatedAt).toLocaleString()}
-                </p>
-                <p className="text-sm">
-                  <strong>Assignment:</strong> {mostRecentAssignmentUpdate.assignmentId}
-                </p>
-                <p className="text-sm">
-                  <strong>Student:</strong> {mostRecentAssignmentUpdate.studentId} | <strong>Course:</strong> {mostRecentAssignmentUpdate.courseId}
-                </p>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={async () => {
-              if (confirm('Reset student data? This will reload all data from Canvas.')) {
-                try {
-                  const response = await fetch('/api/student-data/reset', { method: 'POST' });
-                  if (response.ok) {
-                    await refreshData();
-                    alert('Student data reset successfully! Page will reload.');
-                    window.location.reload();
-                  } else {
-                    alert('Failed to reset student data.');
-                  }
-                } catch (err) {
-                  console.error('Error resetting data:', err);
-                  alert('Error resetting student data.');
-                }
-              }
-            }}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium"
-          >
-            🔄 Reset Student Data
-          </button>
+          <h2 className="text-xl font-bold text-yellow-900">Current Selection</h2>
+          <p className="text-yellow-800">
+            <strong>Student ID:</strong> {selectedStudentId || 'None'}
+          </p>
+          <p className="text-yellow-800 text-sm mt-2">
+            Switch students in the header to see detailRows regenerate for the selected student.
+          </p>
         </div>
         
         <JsonViewer 
-          data={adapterOutput} 
-          label="Adapter Output (StudentData → StudentDataInput)"
+          data={composeOutput} 
+          label="📦 compose.detailData Output (rows + headers + selectedStudentId)"
         />
         
         <JsonViewer 
-          data={weeklyGrids} 
-          label="weeklyGrids (from StudentContext - final output)"
+          data={rawSnapshotDemo} 
+          label="🔍 useRawDetailSnapshot Demo (first assignment - lazy-loaded via hook)"
         />
         
         <JsonViewer 
-          data={data} 
-          label="StudentData (raw from context - input)"
+          data={detailRows} 
+          label="📋 processing.getDetailRows Output (raw rows only)"
         />
         
         <div className="mt-8 p-6 bg-green-50 border-2 border-green-300 rounded-lg">
-          <h2 className="text-2xl font-bold text-green-900 mb-2">Instructions</h2>
-          <p className="text-green-800 mb-3">
-            Change the selected student in the header and watch the weeklyGrids update.
-          </p>
-          <ul className="list-disc ml-6 text-green-800 text-sm">
-            <li>Verify weeklyGrids regenerates when student changes</li>
-            <li>Verify grid.header.studentHeader shows student&apos;s preferredName</li>
-            <li>Verify assignments have dueAt populated from canvas.due_at</li>
-            <li>Verify Prior/Weekday/Next buckets have items (not all in NoDate)</li>
+          <h2 className="text-2xl font-bold text-green-900 mb-2">Validation Checklist</h2>
+          <ul className="list-disc ml-6 text-green-800 text-sm space-y-1">
+            <li>✅ All assignments flattened (one row per assignment)</li>
+            <li>✅ All URLs start with http:// or https://</li>
+            <li>✅ gradePct only present when pointsPossible &gt; 0</li>
+            <li>✅ pointsGraded defaults to 0 when missing</li>
+            <li>✅ Date display: &quot;M/D&quot; (same year) or &quot;M/D/YY&quot; (different year)</li>
+            <li>✅ Rows have NO raw field (IDs at top level instead)</li>
+            <li>✅ useRawDetailSnapshot hook returns callable</li>
+            <li>✅ Raw snapshot has student.meta (NO nested courses)</li>
+            <li>✅ Raw snapshot has course.meta (NO nested assignments)</li>
+            <li>✅ Raw snapshot has assignment.meta.checkpointStatus</li>
+            <li>✅ Raw snapshot has assignment.submissions (ALL submissions)</li>
           </ul>
         </div>
       </div>

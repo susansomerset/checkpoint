@@ -1,5 +1,408 @@
 {
   "specs": {
+    "processing.getDetailRows": {
+      "id": "processing.getDetailRows",
+      "version": "1.0.0",
+      "kind": "processing",
+      "title": "Flatten selected student's courses/assignments into DetailRow[] (pure)",
+      "deps": [
+        "data.studentData@^1.0.0"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:data.studentData@^1.0.0#types.Student" }
+        ],
+        "produces": {
+          "DetailRow": {
+            "studentId": "string",
+            "studentPreferredName": "string",
+            "courseId": "string",
+            "courseShortName": "string",
+            "teacherName": "string",
+            "assignmentId": "string",
+            "assignmentName": "string",
+            "assignmentUrl": "string",
+            "checkpointStatus": "string",
+            "pointsPossible?": "int",
+            "pointsGraded": "int",
+            "gradePct?": "int",
+            "dueAtISO?": "iso8601",
+            "submittedAtISO?": "iso8601",
+            "gradedAtISO?": "iso8601",
+            "dueAtDisplay?": "string",
+            "submittedAtDisplay?": "string",
+            "gradedAtDisplay?": "string",
+            "raw": {
+              "student": "object",
+              "course": "object",
+              "assignment": "object",
+              "submission?": "object"
+            }
+          }
+        }
+      },
+      "signature": {
+        "input": {
+          "student": { "$ref": "node:data.studentData@^1.0.0#types.Student" },
+          "nowISO?": "iso8601"
+        },
+        "output[]": { "$ref": "#contracts.produces.DetailRow" }
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "flatten-selected-student",
+            "kind": "pure",
+            "rules": [
+              "Require a single selected Student node; do not access context/globals.",
+              "For each course in student.courses[*], and each assignment in course.assignments[*], emit one DetailRow.",
+              "studentPreferredName ← student.preferredName || student.legalName || student.name || student.id.",
+              "courseShortName ← course.meta?.shortName || course.canvas?.name || course.id.",
+              "teacherName ← course.meta?.teacher || course.meta?.instructor || ''.",
+              "assignmentUrl ← prefer assignment.canvas?.html_url; else assignment.link IF it exists AND starts with http(s).",
+              "checkpointStatus ← assignment.meta?.checkpointStatus || assignment.status || ''. (Open set; do not restrict.)",
+              "pointsPossible ← numeric if present and ≥0; leave undefined if not present.",
+              "pointsGraded ← submissions?.graded_points || submissions?.score || 0.",
+              "gradePct ← if pointsPossible>0 then round((pointsGraded/pointsPossible)*100) to 0 decimals, else undefined.",
+              "dueAtISO/submittedAtISO/gradedAtISO ← valid ISO if present; omit otherwise.",
+              "For each ISO date present, compute display: 'M/D' if same calendar year as now, else 'M/D/YY'.",
+              "Attach raw.student/raw.course/raw.assignment/raw.submission snapshots for JSON modal."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "selected_student_small": {
+            "student": "TBD_see_two_students_small_S1",
+            "nowISO": "2025-10-01T12:00:00-07:00"
+          }
+        },
+        "expectations": {
+          "rows_count_gte": 5,
+          "all_rows_studentId_eq_input": true,
+          "no_non_http_links": true,
+          "no_gradePct_when_pointsPossible_missing_or_zero": true,
+          "pointsGraded_default_zero_when_missing": true,
+          "display_dates_match_year_rule": true,
+          "raw_objects_present": true
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "flattens_only_selected_student_subtree" },
+          { "name": "prefers_canvas_html_url_then_optional_link_http_only" },
+          { "name": "pointsGraded_defaults_to_zero" },
+          { "name": "gradePct_integer_0decimals_only_when_possible_gt0" },
+          { "name": "date_display_MslashD_same_year_else_MslashDslashYY" },
+          { "name": "passes_through_arbitrary_checkpointStatus_strings" },
+          { "name": "includes_raw_snapshots_for_modal" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: function reads StudentContext or global state.",
+        "STOP_IF: assignmentUrl is non-http(s).",
+        "STOP_IF: gradePct is emitted when pointsPossible <= 0."
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Export a single pure fn: getDetailRows(student, nowISO?).",
+          "No filtering/sorting in this module.",
+          "Add scratchpad case that renders JSON of first 10 rows."
+        ]
+      },
+      "implementation": {
+        "module": "src/lib/pure/getDetailRows.ts",
+        "export": "getDetailRows",
+        "pure": true
+      }
+    },
+    "compose.detailData": {
+      "id": "compose.detailData",
+      "version": "1.0.1",
+      "kind": "compose",
+      "title": "Adapter from StudentContext → DetailRow[] for the selected student (plus static headers)",
+      "deps": [
+        "processing.getDetailRows@^1.0.0"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:processing.getDetailRows@^1.0.0#contracts.produces.DetailRow" }
+        ],
+        "produces": {
+          "SelectedDetailData": {
+            "rows[]": { "$ref": "node:processing.getDetailRows@^1.0.0#contracts.produces.DetailRow" },
+            "selectedStudentId": "string",
+            "headers": [
+              "Student","Course","Teacher","Assignment","Status",
+              "Points","Grade","%","Due","Turned in","Graded on"
+            ]
+          },
+          "RawDetailSnapshot": {
+            "student": {
+              "studentId": "string",
+              "meta": {
+                "preferredName": "string",
+                "legalName": "string"
+              }
+            },
+            "course": {
+              "courseId": "string",
+              "meta": {
+                "shortName": "string",
+                "period": "string"
+              },
+              "canvas?": "object"
+            },
+            "assignment": {
+              "assignmentId": "string",
+              "courseId": "string",
+              "canvas?": "object",
+              "meta": {
+                "checkpointStatus": "string"
+              },
+              "pointsPossible?": "int",
+              "link?": "string",
+              "submissions?": "Record<string,object>"
+            }
+          }
+        }
+      },
+      "signature": {
+        "getSelectedDetail": {
+          "input": {
+            "studentContext": {
+              "selectedStudentId": "string|null",
+              "data?": {
+                "students?": "Record<studentId,StudentNode>"
+              }
+            },
+            "nowISO?": "iso8601"
+          },
+          "output": { "$ref": "#contracts.produces.SelectedDetailData" }
+        },
+        "getRawDetailSnapshot": {
+          "input": {
+            "studentData": {
+              "students": "Record<studentId,StudentNode>"
+            },
+            "studentId": "string",
+            "courseId": "string",
+            "assignmentId": "string"
+          },
+          "output": { "$ref": "#contracts.produces.RawDetailSnapshot|null" }
+        }
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "getSelectedDetail",
+            "kind": "compose",
+            "rules": [
+              "Read { selectedStudentId, data } from studentContext.",
+              "If !selectedStudentId OR !data OR !data.students, return { rows:[], selectedStudentId:'', headers:STATIC_HEADERS }.",
+              "Resolve the Student node: data.students[selectedStudentId].",
+              "If student not found, return { rows:[], selectedStudentId, headers:STATIC_HEADERS }.",
+              "Call processing.getDetailRows(selectedStudent, nowISO).",
+              "Return { rows, selectedStudentId, headers:STATIC_HEADERS }."
+            ]
+          },
+          {
+            "id": "getRawDetailSnapshot",
+            "kind": "compose",
+            "rules": [
+              "Lazy-load function: ONLY called when user opens JSON modal for a row.",
+              "Navigate studentData → students[studentId] → courses[courseId] → assignments[assignmentId].",
+              "If any node missing, return null.",
+              "Build snapshot with:",
+              "  student: { studentId, meta } (NO nested courses)",
+              "  course: { courseId, meta, canvas } (NO nested assignments)",
+              "  assignment: { assignmentId, courseId, canvas, meta, pointsPossible, link, submissions }",
+              "  ← assignment.meta includes checkpointStatus",
+              "  ← assignment.submissions includes ALL submissions (not just first)",
+              "Return snapshot for modal display."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "with_selected_student": {
+            "studentContext": {
+              "selectedStudentId": "S1",
+              "data": {
+                "students": {
+                  "S1": "@processing.getWeeklyGrids.fixtures.inputs.two_students_small.studentData.students.S1"
+                }
+              }
+            },
+            "nowISO": "2025-10-01T12:00:00-07:00"
+          },
+          "no_selected_student": {
+            "studentContext": {
+              "selectedStudentId": null,
+              "data": {
+                "students": {
+                  "S1": "@processing.getWeeklyGrids.fixtures.inputs.two_students_small.studentData.students.S1"
+                }
+              }
+            },
+            "nowISO": "2025-10-01T12:00:00-07:00"
+          },
+          "no_students_key": {
+            "studentContext": {
+              "selectedStudentId": "S1",
+              "data": {}
+            },
+            "nowISO": "2025-10-01T12:00:00-07:00"
+          },
+          "raw_snapshot_request": {
+            "studentData": {
+              "students": {
+                "S1": "@processing.getWeeklyGrids.fixtures.inputs.two_students_small.studentData.students.S1"
+              }
+            },
+            "studentId": "S1",
+            "courseId": "C-101",
+            "assignmentId": "A-0"
+          },
+          "raw_snapshot_missing_assignment": {
+            "studentData": {
+              "students": {
+                "S1": "@processing.getWeeklyGrids.fixtures.inputs.two_students_small.studentData.students.S1"
+              }
+            },
+            "studentId": "S1",
+            "courseId": "C-101",
+            "assignmentId": "A-404"
+          }
+        },
+        "expectations": {
+          "with_selected_student": {
+            "rows": {
+              "length": 6,
+              "first": {
+                "studentId": "S1",
+                "studentPreferredName": "Alice",
+                "courseId": "C-101",
+                "assignmentId": "A-0"
+              }
+            },
+            "selectedStudentId": "S1",
+            "headers": {
+              "length": 11,
+              "first": "Student",
+              "last": "Graded on"
+            }
+          },
+          "no_selected_student": {
+            "rows": [],
+            "selectedStudentId": "",
+            "headers": { "length": 11 }
+          },
+          "no_students_key": {
+            "rows": [],
+            "selectedStudentId": "",
+            "headers": { "length": 11 }
+          },
+          "raw_snapshot_request": {
+            "student": {
+              "studentId": "S1",
+              "meta": {
+                "preferredName": "Alice",
+                "legalName": "Alice Johnson"
+              }
+            },
+            "course": {
+              "courseId": "C-101",
+              "meta": {
+                "shortName": "Algebra I",
+                "period": "1"
+              },
+              "canvas": {
+                "name": "Algebra I"
+              }
+            },
+            "assignment": {
+              "assignmentId": "A-0",
+              "courseId": "C-101",
+              "meta": {
+                "checkpointStatus": "Missing"
+              },
+              "pointsPossible": 10,
+              "submissions": {}
+            }
+          },
+          "raw_snapshot_missing_assignment": null
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "returns_empty_rows_with_headers_when_no_selectedStudentId" },
+          { "name": "returns_empty_rows_with_headers_when_selectedStudent_not_found" },
+          { "name": "delegates_to_getDetailRows_when_student_exists" },
+          { "name": "includes_static_headers_array_11_items" },
+          { "name": "returns_selectedStudentId_in_output" },
+          { "name": "returns_empty_rows_when_studentContext_data_missing_students_key" },
+          { "name": "detail_rows_do_not_include_raw_field" }
+        ],
+        "integration": [
+          { "name": "getRawDetailSnapshot_returns_null_when_ids_invalid" },
+          { "name": "getRawDetailSnapshot_includes_assignment_meta_with_checkpointStatus" },
+          { "name": "getRawDetailSnapshot_includes_all_submissions_not_just_first" },
+          { "name": "getRawDetailSnapshot_excludes_nested_courses_and_assignments" },
+          { "name": "getRawDetailSnapshot_returns_null_when_assignment_missing_but_student_and_course_exist" },
+          { "name": "useRawDetailSnapshot_returns_callable_when_context_ready" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: any filtering/sorting logic is added to getSelectedDetail.",
+        "STOP_IF: module mutates studentContext.",
+        "STOP_IF: getRawDetailSnapshot includes nested courses or assignments Records.",
+        "STOP_IF: headers array length !== 11 or order changes.",
+        "STOP_IF: DetailRow includes a 'raw' object duplicating IDs."
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Export getSelectedDetail(studentContext, nowISO?) → { rows, selectedStudentId, headers }.",
+          "Export getRawDetailSnapshot(studentData, studentId, courseId, assignmentId) → RawDetailSnapshot|null.",
+          "Export useRawDetailSnapshot() hook for UI consumption.",
+          "Rows have no 'raw' property; IDs live at top level.",
+          "Pass ESLint, TSC, unit + integration tests."
+        ],
+        "po_review": [
+          "Verify composeOutput includes headers array with 11 items.",
+          "Verify rows match processing.getDetailRows output.",
+          "Verify rows have NO raw field.",
+          "Verify useRawDetailSnapshot hook returns callable.",
+          "Approve before implementing ui.TableDetail."
+        ]
+      },
+      "implementation": {
+        "module": "src/lib/compose/detailData.ts",
+        "exports": ["getSelectedDetail", "getRawDetailSnapshot"],
+        "pure": false,
+        "react_hook": {
+          "module": "src/ui/hooks/useRawDetailSnapshot.ts",
+          "export": "useRawDetailSnapshot",
+          "description": "React hook wrapper that accesses StudentContext internally, avoiding prop drilling"
+        }
+      },
+      "notes": {
+        "lazy_loading": "getRawDetailSnapshot is only called when modal opens, not during initial row generation. This keeps getDetailRows fast.",
+        "headers_static": "Headers array is static and hardcoded to ensure column order consistency.",
+        "no_raw_field": "DetailRow contains IDs at top level (studentId, courseId, assignmentId). No 'raw' field duplication. Modal uses useRawDetailSnapshot hook to retrieve full data on-demand.",
+        "performance": "Separating raw snapshot retrieval from row generation improves student-switching performance significantly (no blob generation upfront).",
+        "layering": "Pure function (getRawDetailSnapshot) in /lib/compose for testability. React hook wrapper (useRawDetailSnapshot) in /ui/hooks for UI convenience. UI components use the hook; tests use the pure function."
+      },
+      "commands": {
+        "play": [
+          "pnpm eslint src/lib/compose/detailData.ts src/ui/hooks/useRawDetailSnapshot.ts",
+          "pnpm tsc --noEmit",
+          "pnpm test -t compose.detailData"
+        ]
+      }
+    },
     "processing.toGridItems": {
       "id": "processing.toGridItems",
       "version": "1.1.0",
