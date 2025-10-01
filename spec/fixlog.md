@@ -53,7 +53,7 @@ PO review found that WeeklyGrid student header row displays "Student: S1" (stude
 - UI component has zero business logic
 
 **Commit:**  
-(pending)
+4a65b7e
 
 **Notes:**  
 Student header now appears above column headers in table structure. UI automatically spans full width using colSpan.
