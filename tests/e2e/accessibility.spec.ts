@@ -54,7 +54,7 @@ test.describe('Accessibility Tests', () => {
     
     // Check for proper headers
     const headers = page.locator('th[scope="col"]');
-    await expect(headers).toHaveCount(5); // Class Name, Assignment Count, Points Graded, Points Possible, Graded %
+    await expect(headers).toHaveCount(4); // Class Name, Points Graded, Points Possible, Graded %
     
     // Check for expandable rows with proper ARIA
     const expandableRows = page.locator('button[aria-expanded]');
