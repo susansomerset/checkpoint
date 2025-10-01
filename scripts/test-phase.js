@@ -82,7 +82,8 @@ function runPhaseTests(phase) {
   const hasPlaywrightTests = runCommand(`find tests/${phase} -name "*.spec.ts" | wc -l`, `Check for Playwright tests in ${phase}`, true);
   if (hasPlaywrightTests && hasPlaywrightTests.trim() !== '0') {
     console.log(`  Running Playwright E2E tests for ${phase}...`);
-    // Use 4 workers for phases with multiple specs to speed up execution
+    // Use 4 workers for phase-2 to speed up execution
+    // Note: Each worker maintains its own in-memory cache (real-data-cache.ts)
     const workers = phase === 'phase-2' ? '--workers=4' : '';
     if (!runCommand(`npx playwright test tests/${phase}/ ${workers}`, `${phase} Playwright tests`)) {
       return false;
@@ -122,7 +123,8 @@ function runAllPreviousPhases(targetPhase) {
     const hasPlaywrightTests = runCommand(`find tests/${phase} -name "*.spec.ts" | wc -l`, `Check for Playwright tests in ${phase}`, true);
     if (hasPlaywrightTests && hasPlaywrightTests.trim() !== '0') {
       console.log(`  Running Playwright E2E tests for ${phase}...`);
-      // Use 4 workers for phases with multiple specs to speed up execution
+      // Use 4 workers for phase-2 to speed up execution
+      // Note: Each worker maintains its own in-memory cache (real-data-cache.ts)
       const workers = phase === 'phase-2' ? '--workers=4' : '';
       if (!runCommand(`npx playwright test tests/${phase}/ ${workers}`, `${phase} Playwright tests`)) {
         return false;
