@@ -9,18 +9,9 @@
 
 import { useStudent } from '@/contexts/StudentContext';
 import { WeeklyGrid } from '@/components/WeeklyGrid';
-import { useMemo } from 'react';
 
 export default function AssignmentsPage() {
-  const { selectedStudentId, data, loading, error } = useStudent();
-  
-  // Generate weekly grids from student data
-  const grids = useMemo(() => {
-    if (!data) return {};
-    
-    // TODO: Call getWeeklyGrids once it's updated to accept StudentData
-    return {};
-  }, [data]);
+  const { selectedStudentId, weeklyGrids, loading, error } = useStudent();
   
   if (loading) {
     return (
@@ -52,7 +43,7 @@ export default function AssignmentsPage() {
     );
   }
   
-  if (Object.keys(grids).length === 0 && data) {
+  if (!weeklyGrids || Object.keys(weeklyGrids).length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
@@ -66,7 +57,7 @@ export default function AssignmentsPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <WeeklyGrid 
-          grids={grids}
+          grids={weeklyGrids}
           selectedStudentId={selectedStudentId}
         />
       </div>

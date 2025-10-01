@@ -2,15 +2,18 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
-import { StudentData, Student } from '@/lib/contracts/types'
+import { StudentData as StudentDataContract, Student } from '@/lib/contracts/types'
+import { StudentData as StudentDataBuilder } from '@/lib/student/builder'
 import { resetRadialCache } from '@/selectors/cache'
 import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
+import { getWeeklyGrids, WeeklyGridsResult } from '@/lib/compose/getWeeklyGrids'
 
 interface StudentContextType {
   selectedStudentId: string | null
   setSelectedStudentId: (_studentId: string | null) => void
   students: Student[]
-  data: StudentData | null
+  data: StudentDataContract | null
+  weeklyGrids: WeeklyGridsResult | null
   loading: boolean
   error: string | null
   refreshData: () => Promise<void>
@@ -24,7 +27,8 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: authLoading } = useUser()
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
   const [students, setStudents] = useState<Student[]>([])
-  const [data, setData] = useState<StudentData | null>(null)
+  const [data, setData] = useState<StudentDataContract | null>(null)
+  const [weeklyGrids, setWeeklyGrids] = useState<WeeklyGridsResult | null>(null)
   const [loading, setLoading] = useState(false) // Start as false, only true when fetching
   const [error, setError] = useState<string | null>(null)
 
@@ -86,12 +90,36 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     await fetchData()
   }
 
+  // Compute weekly grids when student selection changes
+  useEffect(() => {
+    if (data && selectedStudentId) {
+      try {
+        // Filter to only selected student
+        const selectedStudentData = {
+          students: {
+            [selectedStudentId]: data.students[selectedStudentId]
+          }
+        };
+        
+        const now = new Date().toISOString();
+        const grids = getWeeklyGrids(selectedStudentData as StudentDataBuilder, now, 'America/Los_Angeles');
+        setWeeklyGrids(grids);
+      } catch (err) {
+        console.error('Error generating weekly grids:', err);
+        setWeeklyGrids(null);
+      }
+    } else {
+      setWeeklyGrids(null);
+    }
+  }, [data, selectedStudentId]);
+
   return (
     <StudentContext.Provider value={{ 
       selectedStudentId, 
       setSelectedStudentId, 
       students, 
-      data, 
+      data,
+      weeklyGrids,
       loading, 
       error, 
       refreshData,

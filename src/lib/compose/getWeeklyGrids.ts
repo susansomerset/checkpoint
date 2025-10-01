@@ -8,6 +8,8 @@
 import { parseISO, startOfWeek, addDays, format, getDay, startOfDay, endOfDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import { toGridItems, GridItemEntry, GridItem } from '../pure/toGridItems';
+import { StudentData, StudentNode, CourseNode, AssignmentNode } from '../student/builder';
+import { Assignment as CanvasAssignment } from '../canvas/assignments';
 
 // Input types (matching fixture structure)
 interface Assignment {
@@ -98,14 +100,47 @@ export interface StudentWeeklyGrid {
 export type WeeklyGridsResult = Record<string, StudentWeeklyGrid>;
 
 /**
+ * Internal adapter: Convert StudentData to StudentDataInput
+ * Extracts data from complex nested structure to simple array structure
+ */
+function adaptStudentData(studentData: StudentData): StudentDataInput {
+  return {
+    students: Object.values(studentData.students).map((student: StudentNode) => (({
+      id: student.studentId,
+      name: student.meta?.preferredName || student.meta?.legalName || student.studentId,
+      courses: Object.values(student.courses).map((course: CourseNode) => {
+        const canvasCourse = course.canvas as Record<string, unknown>;
+        return {
+          id: course.courseId,
+          name: course.meta?.shortName || (canvasCourse.name as string) || 'Unknown',
+          assignments: Object.values(course.assignments).map((assignment: AssignmentNode) => {
+            const canvasAssignment = assignment.canvas as unknown as CanvasAssignment;
+            return {
+              id: assignment.assignmentId,
+              name: canvasAssignment.name || 'Untitled',
+              points: assignment.pointsPossible,
+              dueAt: canvasAssignment.due_at,
+              checkpointStatus: assignment.meta.checkpointStatus,
+              url: canvasAssignment.html_url || `https://djusd.instructure.com/courses/${course.courseId}/assignments/${assignment.assignmentId}`
+            };
+          })
+        };
+      })
+    }) as Student))
+  };
+}
+
+/**
  * Build WeeklyGrids for all students in studentData.
  * Returns an object keyed by studentId for easy lookup.
  */
 export function getWeeklyGrids(
-  studentData: StudentDataInput,
+  studentData: StudentData,
   asOf: string,
   timezone?: string
 ): WeeklyGridsResult {
+  // Adapt StudentData to expected input format
+  const input = adaptStudentData(studentData);
   // Parse asOf in timezone
   const asOfDate = parseISO(asOf);
   const asOfInTz = timezone ? toZonedTime(asOfDate, timezone) : asOfDate;
@@ -139,7 +174,7 @@ export function getWeeklyGrids(
   // Process each student and build indexed object
   const result: WeeklyGridsResult = {};
   
-  studentData.students.forEach(student => {
+  input.students.forEach(student => {
     const rows: CourseRow[] = [];
     let studentAttentionCounts: AttentionCounts = { Check: 0, Thumb: 0, Question: 0, Warning: 0 };
     let studentTotalItems = 0;

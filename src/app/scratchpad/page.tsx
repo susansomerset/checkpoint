@@ -1,65 +1,127 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useStudent } from '@/contexts/StudentContext';
+import { useState, useMemo } from 'react';
 
-import { WeeklyGrid } from '@/components/WeeklyGrid';
-import tinyRender from '../../../tests/fixtures/ui.WeeklyGrid/tiny_render.json';
+interface JsonViewerProps {
+  data: unknown;
+  label: string;
+}
 
-export const dynamic = 'force-dynamic';
+function JsonViewer({ data, label }: JsonViewerProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  
+  return (
+    <div className="mb-6 border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full text-left font-bold text-lg text-blue-900 mb-2 hover:text-blue-700"
+      >
+        {isExpanded ? '▼' : '▶'} {label}
+      </button>
+      {isExpanded && (
+        <pre className="bg-white p-4 rounded border border-gray-300 overflow-auto max-h-96 text-xs font-mono" style={{ color: '#000000' }}>
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+}
 
 export default function ScratchpadPage() {
+  const { selectedStudentId, data, weeklyGrids, loading } = useStudent();
+  
+  // Run adapter locally to see what it produces
+  const adapterOutput = useMemo(() => {
+    if (!data || !selectedStudentId) return null;
+    
+    // Same filtering as StudentContext
+    const selectedStudentData = {
+      students: {
+        [selectedStudentId]: data.students[selectedStudentId]
+      }
+    };
+    
+    // Inline adapter logic to debug
+    try {
+      const adapted = {
+        students: Object.values(selectedStudentData.students).map((student) => ({
+          id: student.studentId,
+          name: student.meta?.preferredName || student.meta?.legalName || student.studentId,
+          courses: Object.values(student.courses).map((course) => {
+            const canvasCourse = course.canvas as Record<string, unknown>;
+            return {
+              id: course.courseId,
+              name: course.meta?.shortName || (canvasCourse.name as string) || 'Unknown',
+              assignments: Object.values(course.assignments).map((assignment) => {
+                const canvasAssignment = assignment.canvas as Record<string, unknown>;
+                return {
+                  id: assignment.assignmentId,
+                  name: (canvasAssignment.name as string) || 'Untitled',
+                  points: assignment.pointsPossible,
+                  dueAt: canvasAssignment.due_at as string | undefined,
+                  checkpointStatus: assignment.meta.checkpointStatus,
+                  // eslint-disable-next-line camelcase
+                  html_url: (canvasAssignment.html_url as string) || `https://djusd.instructure.com/courses/${course.courseId}/assignments/${assignment.assignmentId}`
+                };
+              })
+            };
+          })
+        }))
+      };
+      return adapted;
+    } catch (err) {
+      return { error: String(err) };
+    }
+  }, [data, selectedStudentId]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">ui.WeeklyGrid v1.0.1</h1>
-        <p className="text-lg text-gray-600 mb-2">
-          WeeklyGrid table component (render-only)
-        </p>
-        <p className="text-sm text-gray-500 mb-8">
-          Source: spec/current.json
-        </p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">Scratchpad - WeeklyGrids Debug</h1>
         
-        <div className="space-y-6">
-          <div className="border-2 border-gray-300 rounded-lg p-6">
-            <h3 className="text-2xl font-bold mb-4 text-gray-900">Tiny Render - Single Student</h3>
-            
-            <div className="mb-4 p-3 bg-blue-50 rounded border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-2">Test Data:</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li><strong>Student:</strong> S1</li>
-                <li><strong>Course:</strong> Alg I (C-101)</li>
-                <li><strong>Prior:</strong> A-0 (Warning - 10/2: Warmup)</li>
-                <li><strong>Tue:</strong> A-2 (Thumb - Reflection)</li>
-                <li><strong>No Date:</strong> Empty (should show em dash)</li>
-                <li><strong>Summary:</strong> ⚠️:1 / ❓:0 / 👍:1 / ✅:0</li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-4 rounded border">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">Rendered Component:</h4>
-              <WeeklyGrid 
-                grids={tinyRender.grids as any}
-                selectedStudentId={tinyRender.selectedStudentId}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 p-6 bg-blue-50 border-2 border-blue-300 rounded-lg">
-          <h2 className="text-2xl font-bold text-blue-900 mb-2">⏸️ AWAITING PO APPROVAL</h2>
-          <p className="text-blue-800 mb-3">
-            <strong>ui.WeeklyGrid v1.0.1:</strong> Review the rendered table above:
+        <div className="mb-6 p-4 bg-yellow-100 border-2 border-yellow-400 rounded-lg">
+          <h2 className="text-xl font-bold text-yellow-900">Current Selection</h2>
+          <p className="text-yellow-800">
+            <strong>Student ID:</strong> {selectedStudentId || 'None'}
           </p>
-          <ul className="list-disc ml-6 text-blue-800 text-sm">
-            <li>Verify table has exactly 9 column headers in correct order</li>
-            <li>Verify today&apos;s column is highlighted (or Monday if weekend)</li>
-            <li>Verify student header shows &quot;⚠️:1 / ❓:0 / 👍:1 / ✅:0&quot;</li>
-            <li>Verify Prior cell shows &quot;⚠️ 10/2: Warmup (10)&quot; with red text and yellow highlight</li>
-            <li>Verify Tue cell shows &quot;👍 Reflection (25)&quot; with blue text</li>
-            <li>Verify empty cells (Mon, Wed, Thu, Fri, Next, Prior Weeks) show em dash &quot;—&quot;</li>
-            <li>Verify No Date cell shows em dash &quot;—&quot; (count is 0)</li>
-            <li>Verify all assignment links open in new tab with noopener</li>
-            <li>Verify keyboard focus visible on all links</li>
+        </div>
+        
+        <JsonViewer 
+          data={adapterOutput} 
+          label="Adapter Output (StudentData → StudentDataInput)"
+        />
+        
+        <JsonViewer 
+          data={weeklyGrids} 
+          label="weeklyGrids (from StudentContext - final output)"
+        />
+        
+        <JsonViewer 
+          data={data} 
+          label="StudentData (raw from context - input)"
+        />
+        
+        <div className="mt-8 p-6 bg-green-50 border-2 border-green-300 rounded-lg">
+          <h2 className="text-2xl font-bold text-green-900 mb-2">Instructions</h2>
+          <p className="text-green-800 mb-3">
+            Change the selected student in the header and watch the weeklyGrids update.
+          </p>
+          <ul className="list-disc ml-6 text-green-800 text-sm">
+            <li>Verify weeklyGrids regenerates when student changes</li>
+            <li>Verify grid.header.studentHeader shows student&apos;s preferredName</li>
+            <li>Verify assignments have dueAt populated from canvas.due_at</li>
+            <li>Verify Prior/Weekday/Next buckets have items (not all in NoDate)</li>
           </ul>
         </div>
       </div>

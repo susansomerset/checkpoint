@@ -114,7 +114,7 @@ export function WeeklyGrid({ grids, selectedStudentId }: WeeklyGridProps) {
         <thead className="bg-gray-100 sticky top-0">
           {/* Student header row */}
           <tr className="bg-gray-50 border-b-2 border-gray-400">
-            <th colSpan={header.columns.length} className="px-4 py-3 text-left font-bold text-lg">
+            <th colSpan={header.columns.length} className="px-4 py-3 text-left font-bold text-lg" style={{ color: '#000000' }}>
               {header.studentHeader}
             </th>
           </tr>
@@ -133,6 +133,7 @@ export function WeeklyGrid({ grids, selectedStudentId }: WeeklyGridProps) {
                   className={`border border-gray-300 px-4 py-2 text-center font-semibold ${
                     idx === todayColumnIndex ? 'bg-blue-100 border-blue-400' : ''
                   }`}
+                  style={{ color: '#000000' }}
                   dangerouslySetInnerHTML={{ __html: formattedCol }}
                 />
               );
@@ -150,47 +151,47 @@ export function WeeklyGrid({ grids, selectedStudentId }: WeeklyGridProps) {
                 {studentGrid.grid.rows.map(row => (
                   <tr key={row.courseId} className="hover:bg-gray-50">
                     {/* Course Name */}
-                    <td className="border border-gray-300 px-4 py-2 font-medium">
+                    <td className="border border-gray-300 px-4 py-2 font-medium text-gray-900">
                       {row.courseName}
                     </td>
                     
                     {/* Prior Weeks */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 1 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.prior)}
                     </td>
                     
                     {/* Mon */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 2 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.weekday.Mon)}
                     </td>
                     
                     {/* Tue */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 3 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.weekday.Tue)}
                     </td>
                     
                     {/* Wed */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 4 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.weekday.Wed)}
                     </td>
                     
                     {/* Thu */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 5 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.weekday.Thu)}
                     </td>
                     
                     {/* Fri */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 6 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.weekday.Fri)}
                     </td>
                     
                     {/* Next Week */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 7 ? 'bg-yellow-50' : ''}`}>
                       {renderGridItems(row.cells.next)}
                     </td>
                     
                     {/* No Date */}
-                    <td className="border border-gray-300 px-2 py-2">
+                    <td className={`border border-gray-300 px-2 py-2 ${todayColumnIndex === 8 ? 'bg-yellow-50' : ''}`}>
                       {renderNoDate(row.cells.noDate)}
                     </td>
                   </tr>
@@ -225,9 +226,11 @@ function renderGridItems(items: GridItem[]): React.ReactNode {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`text-sm hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded flex-1 ${getAttentionTypeStyles(item.attentionType)}`}
+            className={`text-sm hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex-1 ${getAttentionTypeStyles(item.attentionType)}`}
           >
-            {item.title}
+            <span className={item.attentionType === 'Warning' ? 'bg-yellow-200 px-1 rounded' : ''}>
+              {item.title}
+            </span>
           </a>
         </div>
       ))}
@@ -256,7 +259,7 @@ function renderNoDate(noDate: NoDateCell): React.ReactNode {
     );
   }
   
-  return <span className="text-sm text-gray-700">{noDate.label}</span>;
+  return <span className="text-sm text-gray-900 font-medium">{noDate.label}</span>;
 }
 
 /**
@@ -277,11 +280,11 @@ function getAttentionTypeIcon(type: string): string {
  */
 function getAttentionTypeStyles(type: string): string {
   switch (type) {
-    case 'Check': return 'text-green-600';
-    case 'Thumb': return 'text-blue-600';
-    case 'Question': return 'text-red-600';
-    case 'Warning': return 'text-red-600 bg-yellow-100 px-1 rounded';
-    default: return 'text-gray-600';
+    case 'Check': return 'text-green-700 font-medium';
+    case 'Thumb': return 'text-blue-700 font-medium';
+    case 'Question': return 'text-red-700 font-medium';
+    case 'Warning': return 'text-red-700 font-medium';
+    default: return 'text-gray-900 font-medium';
   }
 }
 
