@@ -1,40 +1,202 @@
 {
   "studentData": {
-    "students": [
-      {
-        "id": "S1",
-        "name": "Alice",
-        "courses": [
-          {
-            "id": "C-101",
-            "name": "Algebra I",
-            "assignments": [
-              { "id": "A-0", "name": "Warmup", "points": 10, "dueAt": "2025-10-02T09:00:00-07:00", "checkpointStatus": "Missing", "url": "https://app/assignments/A-0" },
-              { "id": "A-1", "name": "Quiz 1", "points": 5, "dueAt": "2025-10-03T09:00:00-07:00", "checkpointStatus": "Submitted", "url": "https://app/assignments/A-1" },
-              { "id": "A-2", "name": "Reflection", "points": 25, "dueAt": "2025-10-07T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/A-2" },
-              { "id": "A-3", "name": "Problem Set", "points": 20, "dueAt": "2025-10-10T09:00:00-07:00", "checkpointStatus": "Missing", "url": "https://app/assignments/A-3" },
-              { "id": "A-4", "name": "Project", "points": 5, "checkpointStatus": "Submitted", "url": "https://app/assignments/A-4" },
-              { "id": "A-5", "name": "Next Week Prep", "points": 15, "dueAt": "2025-10-14T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/A-5" }
-            ]
+    "students": {
+      "S1": {
+        "studentId": "S1",
+        "meta": {
+          "preferredName": "Alice",
+          "legalName": "Alice Johnson"
+        },
+        "courses": {
+          "C-101": {
+            "courseId": "C-101",
+            "canvas": {
+              "name": "Algebra I"
+            },
+            "meta": {
+              "shortName": "Algebra I",
+              "period": "1"
+            },
+            "assignments": {
+              "A-0": {
+                "assignmentId": "A-0",
+                "courseId": "C-101",
+                "pointsPossible": 10,
+                "link": "https://app/assignments/A-0",
+                "canvas": {
+                  "id": "A-0",
+                  "name": "Warmup",
+                  "due_at": "2025-10-02T09:00:00-07:00",
+                  "html_url": "https://app/assignments/A-0",
+                  "points_possible": 10
+                },
+                "meta": {
+                  "checkpointStatus": "Missing"
+                },
+                "submissions": {}
+              },
+              "A-1": {
+                "assignmentId": "A-1",
+                "courseId": "C-101",
+                "pointsPossible": 5,
+                "link": "https://app/assignments/A-1",
+                "canvas": {
+                  "id": "A-1",
+                  "name": "Quiz 1",
+                  "due_at": "2025-10-03T09:00:00-07:00",
+                  "html_url": "https://app/assignments/A-1",
+                  "points_possible": 5
+                },
+                "meta": {
+                  "checkpointStatus": "Submitted"
+                },
+                "submissions": {}
+              },
+              "A-2": {
+                "assignmentId": "A-2",
+                "courseId": "C-101",
+                "pointsPossible": 25,
+                "link": "https://app/assignments/A-2",
+                "canvas": {
+                  "id": "A-2",
+                  "name": "Reflection",
+                  "due_at": "2025-10-07T09:00:00-07:00",
+                  "html_url": "https://app/assignments/A-2",
+                  "points_possible": 25
+                },
+                "meta": {
+                  "checkpointStatus": "Due"
+                },
+                "submissions": {}
+              },
+              "A-3": {
+                "assignmentId": "A-3",
+                "courseId": "C-101",
+                "pointsPossible": 20,
+                "link": "https://app/assignments/A-3",
+                "canvas": {
+                  "id": "A-3",
+                  "name": "Problem Set",
+                  "due_at": "2025-10-10T09:00:00-07:00",
+                  "html_url": "https://app/assignments/A-3",
+                  "points_possible": 20
+                },
+                "meta": {
+                  "checkpointStatus": "Missing"
+                },
+                "submissions": {}
+              },
+              "A-4": {
+                "assignmentId": "A-4",
+                "courseId": "C-101",
+                "pointsPossible": 5,
+                "link": "https://app/assignments/A-4",
+                "canvas": {
+                  "id": "A-4",
+                  "name": "Project",
+                  "html_url": "https://app/assignments/A-4",
+                  "points_possible": 5
+                },
+                "meta": {
+                  "checkpointStatus": "Submitted"
+                },
+                "submissions": {}
+              },
+              "A-5": {
+                "assignmentId": "A-5",
+                "courseId": "C-101",
+                "pointsPossible": 15,
+                "link": "https://app/assignments/A-5",
+                "canvas": {
+                  "id": "A-5",
+                  "name": "Next Week Prep",
+                  "due_at": "2025-10-14T09:00:00-07:00",
+                  "html_url": "https://app/assignments/A-5",
+                  "points_possible": 15
+                },
+                "meta": {
+                  "checkpointStatus": "Due"
+                },
+                "submissions": {}
+              }
+            },
+            "orphanSubmissions": {}
           }
-        ]
+        }
       },
-      {
-        "id": "S2",
-        "name": "Bob",
-        "courses": [
-          {
-            "id": "C-201",
-            "name": "Biology",
-            "assignments": [
-              { "id": "B-1", "name": "Lab 1", "points": 10, "dueAt": "2025-10-10T09:00:00-07:00", "checkpointStatus": "Submitted", "url": "https://app/assignments/B-1" },
-              { "id": "B-2", "name": "Worksheet", "points": 15, "checkpointStatus": "Submitted", "url": "https://app/assignments/B-2" },
-              { "id": "B-3", "name": "Reading", "points": 10, "dueAt": "2025-10-15T09:00:00-07:00", "checkpointStatus": "Due", "url": "https://app/assignments/B-3" }
-            ]
+      "S2": {
+        "studentId": "S2",
+        "meta": {
+          "preferredName": "Bob",
+          "legalName": "Bob Smith"
+        },
+        "courses": {
+          "C-201": {
+            "courseId": "C-201",
+            "canvas": {
+              "name": "Biology"
+            },
+            "meta": {
+              "shortName": "Biology",
+              "period": "2"
+            },
+            "assignments": {
+              "B-1": {
+                "assignmentId": "B-1",
+                "courseId": "C-201",
+                "pointsPossible": 10,
+                "link": "https://app/assignments/B-1",
+                "canvas": {
+                  "id": "B-1",
+                  "name": "Lab 1",
+                  "due_at": "2025-10-10T09:00:00-07:00",
+                  "html_url": "https://app/assignments/B-1",
+                  "points_possible": 10
+                },
+                "meta": {
+                  "checkpointStatus": "Submitted"
+                },
+                "submissions": {}
+              },
+              "B-2": {
+                "assignmentId": "B-2",
+                "courseId": "C-201",
+                "pointsPossible": 15,
+                "link": "https://app/assignments/B-2",
+                "canvas": {
+                  "id": "B-2",
+                  "name": "Worksheet",
+                  "html_url": "https://app/assignments/B-2",
+                  "points_possible": 15
+                },
+                "meta": {
+                  "checkpointStatus": "Submitted"
+                },
+                "submissions": {}
+              },
+              "B-3": {
+                "assignmentId": "B-3",
+                "courseId": "C-201",
+                "pointsPossible": 10,
+                "link": "https://app/assignments/B-3",
+                "canvas": {
+                  "id": "B-3",
+                  "name": "Reading",
+                  "due_at": "2025-10-15T09:00:00-07:00",
+                  "html_url": "https://app/assignments/B-3",
+                  "points_possible": 10
+                },
+                "meta": {
+                  "checkpointStatus": "Due"
+                },
+                "submissions": {}
+              }
+            },
+            "orphanSubmissions": {}
           }
-        ]
+        }
       }
-    ]
+    }
   },
   "asOf": "2025-10-08T09:00:00-07:00",
   "timezone": "America/Los_Angeles"

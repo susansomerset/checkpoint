@@ -22,7 +22,9 @@
           "Fri (10/10)",
           "Next Week",
           "No Date"
-        ]
+        ],
+        "monday": "2025-10-06T07:00:00.000Z",
+        "timezone": "America/Los_Angeles"
       },
       "rows": [
         {
@@ -33,8 +35,10 @@
               {
                 "id": "A-0",
                 "title": "10/2: Warmup (10)",
-                "attentionType": "Warning",
-                "url": "https://app/assignments/A-0"
+                "dueAt": "2025-10-02T09:00:00-07:00",
+                "points": 10,
+                "url": "https://app/assignments/A-0",
+                "attentionType": "Warning"
               }
             ],
             "weekday": {
@@ -43,8 +47,10 @@
                 {
                   "id": "A-2",
                   "title": "Reflection (25)",
-                  "attentionType": "Thumb",
-                  "url": "https://app/assignments/A-2"
+                  "dueAt": "2025-10-07T09:00:00-07:00",
+                  "points": 25,
+                  "url": "https://app/assignments/A-2",
+                  "attentionType": "Thumb"
                 }
               ],
               "Wed": [],
@@ -53,8 +59,10 @@
                 {
                   "id": "A-3",
                   "title": "Problem Set (20)",
-                  "attentionType": "Warning",
-                  "url": "https://app/assignments/A-3"
+                  "dueAt": "2025-10-10T09:00:00-07:00",
+                  "points": 20,
+                  "url": "https://app/assignments/A-3",
+                  "attentionType": "Warning"
                 }
               ]
             },
@@ -62,8 +70,10 @@
               {
                 "id": "A-5",
                 "title": "Tue: Next Week Prep (15)",
-                "attentionType": "Thumb",
-                "url": "https://app/assignments/A-5"
+                "dueAt": "2025-10-14T09:00:00-07:00",
+                "points": 15,
+                "url": "https://app/assignments/A-5",
+                "attentionType": "Thumb"
               }
             ],
             "noDate": {
@@ -109,7 +119,9 @@
           "Fri (10/10)",
           "Next Week",
           "No Date"
-        ]
+        ],
+        "monday": "2025-10-06T07:00:00.000Z",
+        "timezone": "America/Los_Angeles"
       },
       "rows": [
         {
@@ -126,8 +138,10 @@
                 {
                   "id": "B-1",
                   "title": "Lab 1 (10)",
-                  "attentionType": "Check",
-                  "url": "https://app/assignments/B-1"
+                  "dueAt": "2025-10-10T09:00:00-07:00",
+                  "points": 10,
+                  "url": "https://app/assignments/B-1",
+                  "attentionType": "Check"
                 }
               ]
             },
@@ -135,8 +149,10 @@
               {
                 "id": "B-3",
                 "title": "Wed: Reading (10)",
-                "attentionType": "Thumb",
-                "url": "https://app/assignments/B-3"
+                "dueAt": "2025-10-15T09:00:00-07:00",
+                "points": 10,
+                "url": "https://app/assignments/B-3",
+                "attentionType": "Thumb"
               }
             ],
             "noDate": {

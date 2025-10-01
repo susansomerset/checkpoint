@@ -10,7 +10,7 @@ import goldenOutput from './golden/two_students_small.json';
 import fixtureInput from './fixtures/two_students_small.json';
 
 describe('processing.getWeeklyGrids - Golden Output', () => {
-  it.skip('matches golden output for two_students_small (TODO: update fixture to real StudentData structure)', () => {
+  it('matches golden output for two_students_small', () => {
     const actual = getWeeklyGrids(
       fixtureInput.studentData as any,
       fixtureInput.asOf,
