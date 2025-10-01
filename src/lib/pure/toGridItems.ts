@@ -70,10 +70,10 @@ export function toGridItems(
       throw new Error(`Assignment ID is required and cannot be empty`);
     }
 
-    // Validation: url must be present and start with http:// or https://
-    const url = assignment.html_url || assignment.url;
+    // Validation: html_url must be present and start with http:// or https://
+    const url = assignment.html_url;
     if (!url) {
-      throw new Error(`Assignment ${assignment.id} URL is required`);
+      throw new Error(`Assignment ${assignment.id} html_url is required`);
     }
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       throw new Error(`Assignment ${assignment.id} URL must start with http:// or https://`);

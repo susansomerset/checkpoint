@@ -12,6 +12,7 @@ export interface Assignment {
   assignment_group_id: number;
   published: boolean;
   grading_type?: string;
+  html_url?: string;
 }
 
 export async function getAssignments(courseId: string): Promise<Assignment[]> {

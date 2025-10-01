@@ -121,7 +121,7 @@ function adaptStudentData(studentData: StudentData): StudentDataInput {
               points: assignment.pointsPossible,
               dueAt: canvasAssignment.due_at,
               checkpointStatus: assignment.meta.checkpointStatus,
-              url: canvasAssignment.html_url || `https://djusd.instructure.com/courses/${course.courseId}/assignments/${assignment.assignmentId}`
+              url: (canvasAssignment.html_url as string | undefined) || `https://djusd.instructure.com/courses/${course.courseId}/assignments/${assignment.assignmentId}`
             };
           })
         };

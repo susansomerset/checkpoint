@@ -36,7 +36,7 @@ export default function ScratchpadPage() {
   useEffect(() => {
     if (data) {
       const dataWithMeta = data as Record<string, unknown>;
-      if (dataWithMeta.lastLoadedAt) {
+      if (dataWithMeta.lastLoadedAt && typeof dataWithMeta.lastLoadedAt === 'string') {
         setLastLoadedAt(dataWithMeta.lastLoadedAt);
       }
     }

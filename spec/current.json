@@ -170,7 +170,7 @@
                 "assignment": {
                   "id": "A-105",
                   "name": "Problem Set",
-                  "due_at": "2025-10-01T17:00:00-07:00",
+                  "due_at": "2025-10-14T17:00:00-07:00",
                   "points_possible": 20,
                   "html_url": "https://canvas.example/courses/42/assignments/105"
                 },
@@ -178,7 +178,7 @@
               }
             ],
             "formatType": "Next",
-            "asOf": "2025-10-03T09:00:00-07:00",
+            "asOf": "2025-10-08T09:00:00-07:00",
             "timezone": "America/Los_Angeles"
           }
         },
@@ -246,8 +246,8 @@
           "next_batch": [
             {
               "id": "A-105",
-              "title": "Wed: Problem Set (20)",
-              "dueAt": "2025-10-01T17:00:00-07:00",
+              "title": "Tue: Problem Set (20)",
+              "dueAt": "2025-10-14T17:00:00-07:00",
               "points": 20,
               "url": "https://canvas.example/courses/42/assignments/105",
               "attentionType": "Warning"
@@ -645,7 +645,7 @@
       "tests": {
         "unit": [
           { "name": "builds_two_student_grids" },
-          { "name": "weekday_bucketting_tz_aware" },
+          { "name": "weekday_bucketing_tz_aware" },
           { "name": "noDate_label_and_counts" },
           { "name": "summary_attention_counts_and_totalItems" },
           { "name": "one_batched_call_per_nonempty_bucket" },
@@ -705,7 +705,7 @@
       ],
       "contracts": {
         "touch": [
-          { "$ref": "node:processing.getWeeklyGrids@^1.0.2#contracts.produces.WeeklyGrid" }
+          { "$ref": "node:processing.getWeeklyGrids@^1.0.3#contracts.produces.WeeklyGrid" }
         ],
         "produces": {
           "component": "React.FunctionComponent"
@@ -772,7 +772,7 @@
             "rules": [
               "Render each GridItem as an <a> tag with text=title, href=url, target=_blank, rel=noopener noreferrer.",
               "Icon/color mapping by attentionType:",
-              "  - Check → prefix '✓' and green text",
+              "  - Check → prefix '✅' and green text",
               "  - Thumb → prefix '👍' and blue text",
               "  - Question → prefix '❓' and red text",
               "  - Warning → prefix '⚠️' and red text with a yellow text highlight (e.g., background highlight)",
@@ -785,7 +785,7 @@
             "rules": [
               "Render the provided noDate.label as plain text.",
               "If noDate.count > 0 and noDate.deepLinkUrl is non-empty, render it as a link (target=_blank, rel=noopener).",
-              "If noDate.count = 0, render an em dash '—'.",
+              "If noDate.count = 0, render nothing (empty cell).",
               "No buttons or callbacks; links only."
             ]
           },
@@ -808,6 +808,7 @@
                 "summary": { "attentionCounts": { "Check": 0, "Thumb": 1, "Question": 0, "Warning": 1 }, "totalItems": 2 },
                 "grid": {
                   "header": {
+                    "studentHeader": "S1 — ⚠️:1 / ❓:0 / 👍:1 / ✅:0",
                     "columns": ["Class Name","Prior Weeks","Mon (10/6)","Tue (10/7)","Wed (10/8)","Thu (10/9)","Fri (10/10)","Next Week","No Date"],
                     "monday": "2025-10-06T00:00:00-07:00",
                     "timezone": "America/Los_Angeles"
@@ -838,7 +839,7 @@
               "Only student S1 section is rendered when selectedStudentId='S1'.",
               "Student header shows '⚠️:1 / ❓:0 / 👍:1 / ✅:0'.",
               "Course row 'Alg I' shows Tue cell with 'Reflection (25)' and Prior cell with '10/2: Warmup (10)'.",
-              "No Date cell renders an em dash.",
+              "No Date cell renders nothing (blank).",
               "Links open in a new tab with rel=noopener noreferrer.",
               "Today column highlight is based on current date in 'America/Los_Angeles'; weekend → highlight Monday."
             ]
@@ -900,11 +901,11 @@
       "kind": "page",
       "title": "Assignments page — route-level container for WeeklyGrid",
       "deps": [
-        "ui.WeeklyGrid@^1.0.1"
+        "ui.WeeklyGrid@^1.0.2"
       ],
       "contracts": {
         "touch": [
-          { "$ref": "node:ui.WeeklyGrid@^1.0.1#contracts.produces.component" }
+          { "$ref": "node:ui.WeeklyGrid@^1.0.2#contracts.produces.component" }
         ],
         "produces": {
           "route": "/assignments",
@@ -1095,10 +1096,34 @@
       "spec:lint passes (urls http(s), tz weekday checks, fixtures exist)",
       "eslint passes",
       "tsc (typecheck) passes",
-      "unit tests pass"
+      "unit tests pass",
+      "PO approval confirmed in Cursor chat before commit",
+      "Affected nodes logged in spec/fixlog.md with commit hash once merged"
     ]
   },
-  "policy": {
+  "policies": {
+    "layering": [
+      "Compose thinks, UI renders. No business logic or data transformation in UI or Page components.",
+      "Page components must remain logic-free: pass context data down, render only.",
+      "Pure functions are not called directly from UI or Page components; they are always called through compose or context layers."
+    ],
+    "approval": [
+      "NOTHING gets committed until PO has approved in Cursor chat. FFS.",
+      "Affected nodes must be logged in spec/fixlog.md with commit hash once merged."
+    ],
+    "testing": [
+      "Each implementation must pass ESLint, TypeScript (tsc), and all jest/unit tests before PO review.",
+      "Playwright/E2E tests must be green before tagging a release."
+    ],
+    "ui": [
+      "Font text is black unless conditionally formatted in the UI spec.",
+      "Conditional formatting rules must be specified explicitly in the spec node."
+    ],
+    "data": [
+      "Empty arrays or objects must still be represented as keys in the output (never omit expected keys).",
+      "Adapter functions are responsible for handling empty data gracefully without introducing errors.",
+      "Failmodes/exception handling must be explicitly documented in each spec node so behavior is predictable when data is missing, malformed, or stale."
+    ],
     "narration": {
       "required": true,
       "format": "console one-liners",

@@ -1,0 +1,106 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - heading "Checkpoint" [level=1] [ref=e7]
+          - generic [ref=e9]:
+            - generic [ref=e10]: "Student:"
+            - generic [ref=e11]:
+              - button "Johnny" [ref=e12] [cursor=pointer]
+              - button "Sarah" [ref=e13] [cursor=pointer]
+          - generic [ref=e15]:
+            - generic [ref=e17]:
+              - text: Signed in as
+              - generic [ref=e18]: Test User
+            - link "Sign out" [ref=e19] [cursor=pointer]:
+              - /url: /api/auth/logout
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - img [ref=e26]
+            - img [ref=e41]
+            - img [ref=e56]
+            - generic:
+              - generic: "90"
+              - generic: "%"
+            - generic:
+              - generic:
+                - generic:
+                  - text: Algebra I
+                  - generic: Ms. Johnson
+          - generic [ref=e70]:
+            - img [ref=e74]
+            - img [ref=e89]
+            - img [ref=e104]
+            - generic:
+              - generic: "90"
+              - generic: "%"
+            - generic:
+              - generic:
+                - generic:
+                  - text: English Lit
+                  - generic: Mr. Davis
+        - navigation "Tabs" [ref=e119]:
+          - link "Progress" [ref=e120] [cursor=pointer]:
+            - /url: /progress
+          - link "Assignments" [ref=e121] [cursor=pointer]:
+            - /url: /assignments
+          - link "Detail" [ref=e122] [cursor=pointer]:
+            - /url: /detail
+          - link "Settings" [ref=e123] [cursor=pointer]:
+            - /url: /settings
+          - link "Scratchpad" [ref=e124] [cursor=pointer]:
+            - /url: /scratchpad
+    - main [ref=e125]:
+      - table [ref=e129]:
+        - rowgroup [ref=e130]:
+          - row "Johnny — ⚠️:0 / ❓:0 / 👍:0 / ✅:0" [ref=e131]:
+            - cell "Johnny — ⚠️:0 / ❓:0 / 👍:0 / ✅:0" [ref=e132]
+          - row "Class Name Prior Weeks Mon (9/29) Tue (9/30) Wed (10/1) Thu (10/2) Fri (10/3) Next Week No Date" [ref=e133]:
+            - columnheader "Class Name" [ref=e134]
+            - columnheader "Prior Weeks" [ref=e135]
+            - columnheader "Mon (9/29)" [ref=e136]:
+              - text: Mon
+              - text: (9/29)
+            - columnheader "Tue (9/30)" [ref=e137]:
+              - text: Tue
+              - text: (9/30)
+            - columnheader "Wed (10/1)" [ref=e138]:
+              - text: Wed
+              - text: (10/1)
+            - columnheader "Thu (10/2)" [ref=e139]:
+              - text: Thu
+              - text: (10/2)
+            - columnheader "Fri (10/3)" [ref=e140]:
+              - text: Fri
+              - text: (10/3)
+            - columnheader "Next Week" [ref=e141]
+            - columnheader "No Date" [ref=e142]
+        - rowgroup [ref=e143]:
+          - row "Algebra I" [ref=e144]:
+            - cell "Algebra I" [ref=e145]
+            - cell [ref=e146]
+            - cell [ref=e147]
+            - cell [ref=e148]
+            - cell [ref=e149]
+            - cell [ref=e150]
+            - cell [ref=e151]
+            - cell [ref=e152]
+            - cell [ref=e153]
+          - row "English Lit" [ref=e154]:
+            - cell "English Lit" [ref=e155]
+            - cell [ref=e156]
+            - cell [ref=e157]
+            - cell [ref=e158]
+            - cell [ref=e159]
+            - cell [ref=e160]
+            - cell [ref=e161]
+            - cell [ref=e162]
+            - cell [ref=e163]
+  - button "Open Next.js Dev Tools" [ref=e169] [cursor=pointer]:
+    - img [ref=e170] [cursor=pointer]
+  - alert [ref=e174]
+```

@@ -10,6 +10,10 @@
  * 4. Stop if ANY test fails
  */
 
+// Suppress NO_COLOR/FORCE_COLOR conflict warning from Node.js
+delete process.env.FORCE_COLOR;
+delete process.env.NO_COLOR;
+
 const { execSync } = require('child_process');
 const path = require('path');
 

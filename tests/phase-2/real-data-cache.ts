@@ -14,11 +14,11 @@ export async function getRealStudentData(): Promise<any> {
   
   // Return cached data if still fresh
   if (cachedStudentData && (now - cacheTimestamp) < CACHE_DURATION) {
-    console.log('Using cached mock student data')
+    // Cached data available, no log needed
     return cachedStudentData
   }
   
-  console.log('Generating fresh mock student data (schema-validated)')
+  // Generate fresh data (suppressed logs during test runs)
   
   // Validate schema structure first
   if (!validateMockDataStructure()) {
@@ -31,8 +31,6 @@ export async function getRealStudentData(): Promise<any> {
   // Cache it
   cachedStudentData = data
   cacheTimestamp = now
-  
-  console.log(`✅ Generated mock data: ${Object.keys(data.data.students).length} students`)
   
   return data
 }
