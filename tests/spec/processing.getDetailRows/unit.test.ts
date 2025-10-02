@@ -121,7 +121,7 @@ describe('processing.getDetailRows', () => {
               meta: {},
               pointsPossible: 10,
               submissions: {
-                'SUB1': { graded_points: 8 }
+                'SUB1': { score: 8 }
               }
             },
             'A2': {
@@ -131,7 +131,7 @@ describe('processing.getDetailRows', () => {
               meta: {},
               pointsPossible: 0,
               submissions: {
-                'SUB2': { graded_points: 5 }
+                'SUB2': { score: 5 }
               }
             },
             'A3': {
@@ -141,7 +141,7 @@ describe('processing.getDetailRows', () => {
               meta: {},
               // No pointsPossible
               submissions: {
-                'SUB3': { graded_points: 10 }
+                'SUB3': { score: 10 }
               }
             }
           }
@@ -174,8 +174,8 @@ describe('processing.getDetailRows', () => {
               meta: {},
               submissions: {
                 'SUB1': {
-                  submitted_at: '2024-09-01T12:00:00Z',
-                  graded_at: '2024-09-02T12:00:00Z'
+                  submittedAt: '2024-09-01T12:00:00Z',
+                  gradedAt: '2024-09-02T12:00:00Z'
                 }
               }
             }
