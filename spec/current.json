@@ -403,6 +403,484 @@
         ]
       }
     },
+    "ui.DetailModal": {
+      "id": "ui.DetailModal",
+      "version": "1.0.1",
+      "kind": "ui",
+      "title": "DetailModal - Display DetailRow snapshot JSON with collapsible tree, search, and copy",
+      "deps": [
+        "compose.detailData@^1.0.1",
+        "react-json-tree@^0.18.0"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:compose.detailData@^1.0.1#contracts.produces.RawDetailSnapshot" }
+        ],
+        "produces": {
+          "component": "React.FunctionComponent"
+        }
+      },
+      "signature": {
+        "input": {
+          "row": {
+            "studentId": "string",
+            "courseId": "string",
+            "assignmentId": "string"
+          },
+          "isOpen": "boolean",
+          "onClose": "() => void",
+          "title?": "string"
+        },
+        "output": { "react": "JSX.Element|null" }
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "fetch_snapshot",
+            "kind": "ui",
+            "rules": [
+              "Use useRawDetailSnapshot() to obtain a getter bound to current StudentContext.",
+              "If !isOpen OR !row, return null (no render, no work).",
+              "When isOpen and row exist, call getSnapshot({ studentId, courseId, assignmentId }) synchronously.",
+              "If snapshot is null, render a lightweight message: 'Data not available for this assignment.'"
+            ]
+          },
+          {
+            "id": "search_filter",
+            "kind": "ui",
+            "rules": [
+              "Local state: searchQuery:string ('').",
+              "Search input at top (placeholder: 'Search keys, values, IDs…').",
+              "Implement case-insensitive matching against keys and stringified values.",
+              "Use shouldExpandNodeInitially(nodePath, data, level) to expand nodes that match searchQuery.",
+              "Optional: highlight matches via labelRenderer/valueRenderer; avoid mutating data."
+            ]
+          },
+          {
+            "id": "render_json_tree",
+            "kind": "ui",
+            "rules": [
+              "Render JSONTree.",
+              "Theme: 'monokai' (or similar high-contrast).",
+              "Initial expansion when no search: expand top-level only (student, course, assignment).",
+              "Container is scrollable; preserve monospace font.",
+              "Do not pre-stringify snapshot for display; let JSONTree render the object."
+            ]
+          },
+          {
+            "id": "render_overlay",
+            "kind": "ui",
+            "rules": [
+              "Full-screen overlay with semi-transparent backdrop.",
+              "Backdrop click → onClose.",
+              "Centered card (max-w-5xl, max-h-[90vh], overflow-auto).",
+              "Header: (title || 'Assignment Detail'), close button (X).",
+              "Search input below header, above JSON tree."
+            ]
+          },
+          {
+            "id": "actions",
+            "kind": "ui",
+            "rules": [
+              "Copy button copies FULL JSON.stringify(snapshot, null, 2).",
+              "Call navigator.clipboard.writeText in try/catch; on failure, fall back to a hidden <textarea> select+execCommand.",
+              "Show 'Copied!' feedback for ~2000ms, then revert."
+            ]
+          },
+          {
+            "id": "keyboard_accessibility",
+            "kind": "ui",
+            "rules": [
+              "Escape key → onClose.",
+              "Focus trap: Tab cycles within modal (header buttons, search input, tree).",
+              "Auto-focus search input when modal opens (after first paint).",
+              "role='dialog' aria-modal='true' and aria-labelledby pointing at header id.",
+              "Visible focus outlines."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "open_with_data": {
+            "row": { "studentId": "S1", "courseId": "C-101", "assignmentId": "A-0" },
+            "isOpen": true,
+            "onClose": "jest.fn()",
+            "title": "Assignment Detail"
+          },
+          "closed": {
+            "row": null,
+            "isOpen": false,
+            "onClose": "jest.fn()"
+          }
+        },
+        "expectations": {
+          "open_with_data": {
+            "renders": "overlay with header, search input, copy/close buttons, JSONTree",
+            "json_content": "student, course, assignment nodes (top-level expanded, nested collapsed)",
+            "search": "expands nodes containing matches (optional highlight via renderers)"
+          },
+          "closed": { "renders": "null" }
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "returns_null_when_not_open" },
+          { "name": "displays_json_tree_when_open_and_data_available" },
+          { "name": "displays_fallback_when_snapshot_null" },
+          { "name": "calls_onClose_when_backdrop_clicked" },
+          { "name": "calls_onClose_when_close_button_clicked" },
+          { "name": "calls_onClose_when_escape_pressed" },
+          { "name": "copy_button_copies_full_json_to_clipboard" },
+          { "name": "search_input_expands_matching_nodes" },
+          { "name": "copy_feedback_shows_copied_for_2_seconds" },
+          { "name": "does_not_mount_tree_when_closed" }
+        ],
+        "integration": [
+          { "name": "uses_useRawDetailSnapshot_hook_to_fetch_data" },
+          { "name": "focus_trap_keeps_tab_within_modal" },
+          { "name": "auto_focuses_search_input_on_open" },
+          { "name": "aria_labels_and_roles_are_present" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: modal renders or mounts JSON tree when isOpen=false.",
+        "STOP_IF: any data fetching/snapshot work occurs when isOpen=false.",
+        "STOP_IF: backdrop/escape do not call onClose.",
+        "STOP_IF: focus can escape modal when open.",
+        "STOP_IF: copy button copies filtered/partial JSON (must copy full snapshot).",
+        "STOP_IF: search mutates snapshot object."
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Install react-json-tree: npm i react-json-tree.",
+          "Return null when !isOpen or !row.",
+          "Use useRawDetailSnapshot hook (no studentData prop).",
+          "Render JSONTree with theme and shouldExpandNodeInitially search expansion.",
+          "Backdrop, close button, escape handlers implemented.",
+          "Copy full JSON with 'Copied!' feedback and clipboard fallback.",
+          "Focus trap, auto-focus search input, role/aria wired.",
+          "Pass ESLint, TSC, unit + integration tests."
+        ],
+        "po_review": [
+          "Open/close behavior is smooth; nothing renders when closed.",
+          "JSON tree shows student.meta, course.meta, assignment.meta.checkpointStatus, assignment.submissions.",
+          "Search expands matches (highlight if implemented).",
+          "Copy copies full JSON and shows feedback.",
+          "Esc/backdrop close; tab key stays within modal; search input focused on open."
+        ]
+      },
+      "implementation": {
+        "module": "src/ui/components/DetailModal.tsx",
+        "export": "DetailModal",
+        "layer": "ui",
+        "tags": ["modal", "json", "collapsible", "search", "detail"],
+        "dependencies": {
+          "react-json-tree": "^0.18.0"
+        }
+      },
+      "notes": {
+        "library": "react-json-tree provides collapsible JSON with themes; use labelRenderer/valueRenderer for optional match highlighting.",
+        "lazy_load": "Only compute snapshot when isOpen=true and row present.",
+        "clipboard": "Include fallback for non-secure contexts or clipboard API failures.",
+        "performance": "Avoid JSON.stringify on every render; stringify only on copy.",
+        "layering": "Lives in src/ui/components/ (not src/components/) to maintain UI layer separation."
+      },
+      "commands": {
+        "play": [
+          "npm i react-json-tree",
+          "pnpm eslint src/ui/components/DetailModal.tsx",
+          "pnpm tsc --noEmit",
+          "pnpm test -t ui.DetailModal"
+        ]
+      }
+    },
+    "ui.TableDetail": {
+      "id": "ui.TableDetail",
+      "version": "1.0.2",
+      "kind": "ui",
+      "title": "Detail table: self-contained filtering, sorting, rendering, and JSON modal",
+      "deps": [
+        "processing.getDetailRows@^1.0.0",
+        "ui.DetailModal@^1.0.1"
+      ],
+      "contracts": {
+        "touch": [
+          { "$ref": "node:processing.getDetailRows@^1.0.0#contracts.produces.DetailRow" },
+          { "$ref": "node:ui.DetailModal@^1.0.1#contracts.produces.component" }
+        ],
+        "produces": {
+          "component": "React.FunctionComponent"
+        }
+      },
+      "signature": {
+        "input": {
+          "baseHeaders": [
+            "Student","Course","Teacher","Assignment","Status",
+            "Points","Grade","%","Due","Turned in","Graded on"
+          ],
+          "rows[]": { "$ref": "node:processing.getDetailRows@^1.0.0#contracts.produces.DetailRow" },
+          "selectedStudentId": "string",
+          "initialSort?": { "by": "string", "dir": "enum[asc|desc]" }
+        },
+        "output": { "react": "JSX.Element" }
+      },
+      "processing": {
+        "pipeline": [
+          {
+            "id": "derive_display_headers",
+            "kind": "ui",
+            "rules": [
+              "Derive headers at render time: const headers = [...baseHeaders, 'Actions'].",
+              "baseHeaders must be exactly 11 items in canonical order (from compose.detailData).",
+              "Actions column is NOT sortable (skip in sort logic)."
+            ]
+          },
+          {
+            "id": "derive_filter_options",
+            "kind": "ui",
+            "rules": [
+              "Course options: unique by courseId → { courseId, label: '${courseShortName} (${teacherName})' }, sorted by label asc.",
+              "Status options: unique set of checkpointStatus strings (open set, no restrictions), sorted alphabetically."
+            ]
+          },
+          {
+            "id": "local_state",
+            "kind": "ui",
+            "rules": [
+              "Local state: selectedCourseIds:string[], selectedStatuses:string[], q:string, sort:{by,dir}, modalRow:{studentId,courseId,assignmentId}|null.",
+              "Default sort: initialSort || {by:'Due', dir:'asc'}.",
+              "When selectedStudentId changes (via useEffect), reset: selectedCourseIds=[], selectedStatuses=[], q='', sort=default, modalRow=null."
+            ]
+          },
+          {
+            "id": "filter_and_sort",
+            "kind": "ui",
+            "rules": [
+              "Start from input rows.",
+              "Course filter: if selectedCourseIds.length>0, keep rows where courseId ∈ selectedCourseIds.",
+              "Status filter: if selectedStatuses.length>0, keep rows where checkpointStatus ∈ selectedStatuses.",
+              "Keyword q: tokenize by whitespace; ALL tokens must match (case-insensitive) at least one of:",
+              "  - Text fields: assignmentName, courseShortName, teacherName, checkpointStatus, studentPreferredName",
+              "  - Date displays: dueAtDisplay, submittedAtDisplay, gradedAtDisplay",
+              "  - Date ISOs: dueAtISO, submittedAtISO, gradedAtISO",
+              "  - IDs: studentId, courseId, assignmentId",
+              "  - Numeric fields: coerce pointsPossible, pointsGraded, gradePct to strings once (not per render).",
+              "Stable sort by column key (baseHeaders only, Actions is non-sortable):",
+              "  'Student'    → studentPreferredName (localeCompare)",
+              "  'Course'     → courseShortName (localeCompare)",
+              "  'Teacher'    → teacherName (localeCompare)",
+              "  'Assignment' → assignmentName (localeCompare)",
+              "  'Status'     → checkpointStatus (localeCompare)",
+              "  'Points'     → pointsPossible (numeric; undefined last on asc, first on desc)",
+              "  'Grade'      → pointsGraded (numeric; undefined last on asc, first on desc)",
+              "  '%'          → gradePct (numeric; undefined last on asc, first on desc)",
+              "  'Due'        → dueAtISO (chronological; undefined last on asc, first on desc)",
+              "  'Turned in'  → submittedAtISO (chronological; undefined last/first)",
+              "  'Graded on'  → gradedAtISO (chronological; undefined last/first)",
+              "Toggle sort direction on repeated header clicks."
+            ]
+          },
+          {
+            "id": "render_filters",
+            "kind": "ui",
+            "rules": [
+              "Filter row above table:",
+              "  Course multi-select dropdown (show selected count when >0: 'Courses (2)').",
+              "  Status multi-select dropdown (show selected count: 'Statuses (1)').",
+              "  Keyword search input (placeholder: 'Search assignments, courses, teachers, IDs…').",
+              "  Clear Filters button (visible only when any filter active).",
+              "Show filtered row count: 'Showing X of Y assignments'."
+            ]
+          },
+          {
+            "id": "render_table",
+            "kind": "ui",
+            "rules": [
+              "Semantic <table> with <caption>, <thead>, <tbody>.",
+              "Caption (sr-only): 'Detail view: {Y} total assignments for {selectedStudentId}'.",
+              "Column headers from derived headers (12 items); clicking baseHeaders toggles sort; Actions is not clickable.",
+              "Apply aria-sort on the active sortable header: 'ascending'|'descending'.",
+              "Show sort indicator (↑/↓) on active sort column.",
+              "Each <tr> uses a stable key: `${studentId}:${courseId}:${assignmentId}`.",
+              "Cells:",
+              "  Student → studentPreferredName",
+              "  Course → courseShortName",
+              "  Teacher → teacherName",
+              "  Assignment → <a href=assignmentUrl target=_blank rel=noopener>{assignmentName}</a> (validate URL with try/catch; render plain text if invalid)",
+              "  Status → checkpointStatus",
+              "  Points → if both present: 'pointsGraded / pointsPossible' (e.g., '8 / 10'); if only pointsGraded: pointsGraded; if only pointsPossible: '- / pointsPossible'; if both undefined: '-'",
+              "  Grade → pointsGraded or '-'",
+              "  % → Math.round(gradePct) + '%' or '-'",
+              "  Due/Turned in/Graded on → display fields or '-'",
+              "  Actions → 🔍 magnifier button (aria-label='View details for {assignmentName}') opens DetailModal",
+              "Empty state (after filters): 'No assignments match your filters.'",
+              "Empty state (no rows): 'No assignments found.'"
+            ]
+          },
+          {
+            "id": "modal_integration",
+            "kind": "ui",
+            "rules": [
+              "Import DetailModal component.",
+              "Local state: modalRow:{studentId,courseId,assignmentId}|null.",
+              "Render <DetailModal row={modalRow} isOpen={!!modalRow} onClose={()=>setModalRow(null)} />.",
+              "Magnifier click → setModalRow({studentId, courseId, assignmentId}) from that row.",
+              "Modal handles its own data fetching via useRawDetailSnapshot hook (no prop drilling)."
+            ]
+          },
+          {
+            "id": "a11y_responsive",
+            "kind": "ui",
+            "rules": [
+              "Sticky header; horizontal overflow on narrow screens; text wraps in long cells.",
+              "Keyboard-accessible: all buttons, links, dropdowns focusable with visible outlines.",
+              "ARIA: role=table (implicit), columnheader scope=col with aria-sort, row/cell structure.",
+              "Magnifier button: role=button, aria-label='View details for {assignmentName}'."
+            ]
+          }
+        ]
+      },
+      "fixtures": {
+        "inputs": {
+          "small_dataset": {
+            "baseHeaders": [
+              "Student","Course","Teacher","Assignment","Status",
+              "Points","Grade","%","Due","Turned in","Graded on"
+            ],
+            "rows": "@compose.detailData.fixtures.expectations.with_selected_student.rows",
+            "selectedStudentId": "S1",
+            "initialSort": { "by": "Due", "dir": "asc" }
+          }
+        },
+        "expectations": {
+          "derives_headers_with_actions": true,
+          "derives_course_options": true,
+          "derives_status_options": true,
+          "filters_AND_logic": true,
+          "keyword_matches_all_text_fields_and_IDs": true,
+          "sorts_correctly_by_11_sortable_columns": true,
+          "actions_column_not_sortable": true,
+          "resets_on_selectedStudentId_change": true,
+          "magnifier_opens_modal": true,
+          "modal_receives_row_IDs_not_full_data": true,
+          "points_cell_formats_all_4_cases": true,
+          "percent_cell_rounded_to_integer": true,
+          "row_keys_are_stable_composite": true,
+          "aria_sort_applied_to_active_header": true
+        }
+      },
+      "tests": {
+        "unit": [
+          { "name": "derives_headers_appending_actions" },
+          { "name": "derives_unique_course_options_with_teacher_labels" },
+          { "name": "derives_unique_status_options_sorted" },
+          { "name": "rejects_baseHeaders_when_length_not_11_or_order_mismatch" },
+          { "name": "actions_column_is_not_sortable" },
+          { "name": "resets_filters_when_selectedStudentId_changes" },
+          { "name": "filters_course_AND_status_AND_keyword" },
+          { "name": "keyword_search_tokenizes_and_matches_all_fields_including_IDs" },
+          { "name": "keyword_search_matches_numeric_fields_as_strings" },
+          { "name": "sorts_text_columns_with_localeCompare" },
+          { "name": "sorts_numeric_columns_with_undefined_handling" },
+          { "name": "sorts_date_columns_chronologically" },
+          { "name": "toggles_sort_direction_on_repeated_header_click" },
+          { "name": "magnifier_click_sets_modalRow_state" },
+          { "name": "renders_DetailModal_with_correct_props" },
+          { "name": "points_cell_formats_all_4_cases" },
+          { "name": "percent_cell_rounds_to_integer_no_decimals" },
+          { "name": "row_key_is_composite_studentId_courseId_assignmentId" },
+          { "name": "aria_sort_ascending_or_descending_on_active_column" },
+          { "name": "assignment_url_validated_renders_plain_text_if_invalid" },
+          { "name": "empty_state_shown_when_no_rows_after_filter" },
+          { "name": "empty_state_shown_when_no_input_rows" }
+        ],
+        "integration": [
+          { "name": "modal_opens_and_displays_snapshot_on_magnifier_click" },
+          { "name": "modal_closes_and_clears_modalRow_on_onClose" },
+          { "name": "filter_dropdowns_update_visible_rows" },
+          { "name": "clear_filters_button_resets_all_filters" },
+          { "name": "sort_persists_through_filtering" }
+        ],
+        "visual": [
+          { "name": "table_with_filters_and_sorted_data_renders" },
+          { "name": "modal_overlay_appears_on_magnifier_click" }
+        ]
+      },
+      "guardrails": [
+        "STOP_IF: component mutates input rows.",
+        "STOP_IF: non-http(s) assignmentUrl is rendered as link.",
+        "STOP_IF: filtering/sorting depend on external globals.",
+        "STOP_IF: modal receives full StudentData as prop (should use useRawDetailSnapshot hook).",
+        "STOP_IF: magnifier icon is not keyboard-accessible.",
+        "STOP_IF: baseHeaders.length !== 11 or order != canonical compose headers.",
+        "STOP_IF: 'Actions' column becomes sortable.",
+        "STOP_IF: Points cell shows 'NaN' or invalid format.",
+        "STOP_IF: aria-sort not applied to active sortable header.",
+        "STOP_IF: row keys are not stable composite (must be studentId:courseId:assignmentId).",
+        "STOP_IF: percent displays decimals (must be integer rounded)."
+      ],
+      "definition_of_done": {
+        "developer_must": [
+          "Derive headers: const headers = [...baseHeaders, 'Actions'].",
+          "Validate baseHeaders.length === 11 at runtime (throw/warn if mismatch).",
+          "Implement as self-contained component with local filter/sort/modal state.",
+          "Derive course/status options from rows.",
+          "Reset filters on selectedStudentId change via useEffect.",
+          "Implement keyword tokenization with numeric field coercion.",
+          "Implement sort for 11 sortable columns (skip Actions).",
+          "Apply aria-sort to active sortable header.",
+          "Use stable row keys: studentId:courseId:assignmentId.",
+          "Round gradePct to integer (Math.round).",
+          "Validate assignmentUrl with new URL() try/catch; render plain text if invalid.",
+          "Render magnifier 🔍 in Actions column, opens DetailModal.",
+          "DetailModal integration: pass {studentId, courseId, assignmentId}, no full data.",
+          "Pass ESLint, TSC, unit + integration + visual tests."
+        ],
+        "po_review": [
+          "12 columns display (11 base + Actions).",
+          "Actions column has magnifier, is not sortable.",
+          "Filters work independently and in combination (AND logic).",
+          "Keyword search finds by name, course, teacher, status, dates, IDs, numbers.",
+          "Sorting works for 11 columns (not Actions); clicking header toggles direction.",
+          "aria-sort attribute changes with active column and direction.",
+          "Percent displays as integer (e.g., '92%' not '92.33%').",
+          "Magnifier icon opens modal with full JSON (student, course, assignment, submissions).",
+          "Modal search/copy/close work correctly.",
+          "Switching students clears filters and resets table.",
+          "Empty states display correctly.",
+          "Invalid URLs render as plain text, not broken links."
+        ]
+      },
+      "implementation": {
+        "module": "src/ui/components/TableDetail.tsx",
+        "export": "TableDetail",
+        "layer": "ui",
+        "tags": ["table", "detail", "filtering", "sorting", "modal"],
+        "dependencies": {
+          "ui.DetailModal": "^1.0.1"
+        }
+      },
+      "notes": {
+        "headers": "Displayed headers = baseHeaders + 'Actions' (derived in component). Sorting applies only to baseHeaders (11 columns). Actions column is visual-only.",
+        "self_contained": "All filtering, sorting, and modal state managed internally. No external dependencies except DetailModal component.",
+        "performance": "Filter/sort computed on every render; acceptable for <1000 rows. Consider useMemo for larger datasets. Numeric field toString() coerced once during filter, not per cell render.",
+        "modal_integration": "DetailModal uses useRawDetailSnapshot hook internally, so TableDetail only passes IDs, not data.",
+        "filter_reset": "Filters reset when selectedStudentId changes (detected via useEffect dependency).",
+        "keyword_search": "Searches ALL text fields, date fields (display and ISO), ID fields, and numeric fields (coerced to strings). Tokenized AND logic.",
+        "url_validation": "assignmentUrl validated with new URL() constructor in try/catch. Invalid URLs render as plain text to prevent broken links.",
+        "layering": "Lives in src/ui/components/ because it's a feature component with complex state (filtering, sorting, modal), not a primitive/presentational component.",
+        "a11y": "aria-sort attribute on sortable headers. Stable composite row keys for React reconciliation. Screen-reader-only caption with row count.",
+        "percent_rounding": "gradePct always displayed as integer using Math.round() to avoid displaying '92.3333%'."
+      },
+      "commands": {
+        "play": [
+          "pnpm eslint src/ui/components/TableDetail.tsx",
+          "pnpm tsc --noEmit",
+          "pnpm test -t ui.TableDetail"
+        ]
+      }
+    },
     "processing.toGridItems": {
       "id": "processing.toGridItems",
       "version": "1.1.0",

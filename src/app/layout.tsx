@@ -68,6 +68,8 @@ export default function RootLayout({
             </div>
           </StudentProvider>
         </ClientAuthProvider>
+        {/* Portal root for modals - positioned at document body level with max z-index */}
+        <div id="portal-root" />
       </body>
     </html>
   );

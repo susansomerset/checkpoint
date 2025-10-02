@@ -13,6 +13,7 @@ export interface DetailRow {
   studentPreferredName: string;
   courseId: string;
   courseShortName: string;
+  coursePeriod: string;
   teacherName: string;
   assignmentId: string;
   assignmentName: string;
@@ -47,6 +48,7 @@ interface Course {
     shortName?: string;
     teacher?: string;
     instructor?: string;
+    period?: string | number;
   };
   assignments: Record<string, Assignment>;
 }
@@ -68,10 +70,9 @@ interface Assignment {
 }
 
 interface Submission {
-  graded_points?: number;
   score?: number;
-  submitted_at?: string | null;
-  graded_at?: string | null;
+  submittedAt?: string | null;
+  gradedAt?: string | null;
 }
 
 /**
@@ -130,6 +131,9 @@ export function getDetailRows(
       course.canvas?.name || 
       course.courseId;
     
+    // Course period (convert to string if numeric)
+    const coursePeriod = course.meta?.period?.toString() || 'zzz'; // sort unknown periods last
+    
     // Teacher name
     const teacherName = 
       course.meta?.teacher || 
@@ -159,10 +163,37 @@ export function getDetailRows(
         ? assignment.pointsPossible
         : undefined;
       
-      // Points graded (default to 0 if missing)
+      // Get most recent submission (prefer graded, then most recent submitted)
       const submissions = Object.values(assignment.submissions || {});
-      const firstSubmission = submissions[0];
-      const pointsGraded = firstSubmission?.graded_points ?? firstSubmission?.score ?? 0;
+      
+      // Find the most relevant submission:
+      // 1. Most recently graded submission (if any)
+      // 2. Otherwise, most recently submitted submission
+      let relevantSubmission: Submission | undefined;
+      
+      if (submissions.length > 0) {
+        const gradedSubmissions = submissions.filter(s => s.gradedAt);
+        if (gradedSubmissions.length > 0) {
+          // Use most recently graded
+          relevantSubmission = gradedSubmissions.sort((a, b) => 
+            (b.gradedAt || '').localeCompare(a.gradedAt || '')
+          )[0];
+        } else {
+          // Use most recently submitted
+          const submittedSubmissions = submissions.filter(s => s.submittedAt);
+          if (submittedSubmissions.length > 0) {
+            relevantSubmission = submittedSubmissions.sort((a, b) => 
+              (b.submittedAt || '').localeCompare(a.submittedAt || '')
+            )[0];
+          } else {
+            // Fallback to first submission
+            relevantSubmission = submissions[0];
+          }
+        }
+      }
+      
+      // Points graded (default to 0 if missing)
+      const pointsGraded = relevantSubmission?.score ?? 0;
       
       // Grade percentage (only if pointsPossible > 0)
       const gradePct = (pointsPossible !== undefined && pointsPossible > 0)
@@ -171,8 +202,8 @@ export function getDetailRows(
       
       // ISO dates
       const dueAtISO = assignment.canvas?.due_at || undefined;
-      const submittedAtISO = firstSubmission?.submitted_at || undefined;
-      const gradedAtISO = firstSubmission?.graded_at || undefined;
+      const submittedAtISO = relevantSubmission?.submittedAt || undefined;
+      const gradedAtISO = relevantSubmission?.gradedAt || undefined;
       
       // Display dates
       const dueAtDisplay = formatDateDisplay(dueAtISO, now);
@@ -185,6 +216,7 @@ export function getDetailRows(
         studentPreferredName,
         courseId: course.courseId,
         courseShortName,
+        coursePeriod,
         teacherName,
         assignmentId: assignment.assignmentId,
         assignmentName: assignment.canvas?.name || 'Untitled',

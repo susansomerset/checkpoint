@@ -139,3 +139,9 @@ body {
 .dot.submitted { background-color: #3b82f6; }
 .dot.missing { background-color: #f59e0b; }
 .dot.lost { background-color: #ef4444; }
+
+/* Portal root for modals - max z-index to win all stacking context wars */
+#portal-root {
+  position: relative;
+  z-index: 2147483647; /* max 32-bit int */
+}
