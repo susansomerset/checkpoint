@@ -22,7 +22,11 @@ function getRedis() {
 
 export async function getRaw(key: string) {
   const result = await getRedis().get(key);
-  return result ? JSON.stringify(result) : null;
+  // Upstash Redis auto-deserializes JSON, so if we stored a JSON string,
+  // it returns the parsed object. We need to re-stringify to maintain string API.
+  if (result === null) return null;
+  if (typeof result === 'string') return result;
+  return JSON.stringify(result);
 }
 export async function setRaw(key: string, val: string) {
   await getRedis().set(key, val);
