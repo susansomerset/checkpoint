@@ -1,0 +1,11 @@
+# Authentication state (contains session cookies)
+auth-state.json
+
+# Local environment variables
+.env.local
+.env
+
+# Logs
+*.log
+scraper-*.log
+

@@ -30,7 +30,11 @@
     "check-bundle-size": "node scripts/check-bundle-size.js",
     "test:sentry": "jest tests/integration/sentry.test.ts",
     "test:timezone": "TZ=America/Los_Angeles jest tests/lib/derive/timezone.test.ts",
-    "size": "size-limit"
+    "size": "size-limit",
+        "migrate:dry": "tsx -r tsconfig-paths/register scripts/backfill-kv-to-upstash.ts",
+        "migrate:write": "tsx -r tsconfig-paths/register scripts/backfill-kv-to-upstash.ts --write",
+        "storage:scan": "tsx -r tsconfig-paths/register scripts/storage-scan.ts",
+        "scrape:canvas": "tsx scraper/canvas-scraper.ts"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.8.0",
@@ -60,7 +64,7 @@
   "devDependencies": {
     "@playwright/test": "^1.55.1",
     "@size-limit/preset-big-lib": "^11.2.0",
-    "@types/node": "^20.14.15",
+    "@types/node": "^20.19.19",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.16",
@@ -70,6 +74,8 @@
     "postcss": "^8.4.39",
     "size-limit": "^11.2.0",
     "tailwindcss": "^3.4.6",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.5.4"
   },
   "size-limit": [
