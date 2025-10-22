@@ -157,7 +157,7 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
     // if points possible is not 0, return Missing.
     if (
       typeof (assignment as unknown as Record<string, unknown>).points_possible === 'number' &&
-      (assignment as unknown as Record<string, unknown>).points_possible > 0
+      (assignment as unknown as Record<string, unknown>).points_possible as number > 0
     ) {
       return 'Missing';
     }

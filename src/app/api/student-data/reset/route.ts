@@ -10,6 +10,7 @@ import { Submission } from '@/lib/canvas/submissions';
 import { buildStudentData, CourseWithStudent } from '@/lib/student/builder';
 import { saveStudentData, kv } from '@/lib/storage';
 import { k } from '@/lib/storage/prefix';
+import { StudentData } from '@/lib/contracts/types';
 
 export async function POST(req: NextRequest) {
   try {
@@ -203,7 +204,7 @@ export async function POST(req: NextRequest) {
       lastLoadedAt: new Date().toISOString(),
       apiVersion: '1.0.0' as const,
       version: Date.now()
-    } as unknown as StudentData; // Type assertion to bypass schema mismatch
+    } as StudentData; // Type assertion to bypass schema mismatch
     
     await saveStudentData(contractsData);
     

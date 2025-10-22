@@ -24,7 +24,7 @@ export async function scrapeExternalToolPage(
       courseId,
       courseName: undefined,
       assignments: [],
-      vectors: [],
+      vectorMetadata: [],
       scrapedAt: new Date().toISOString(),
     };
   }
