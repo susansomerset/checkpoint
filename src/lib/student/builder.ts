@@ -156,8 +156,8 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
   if (dueDate < now) {
     // if points possible is not 0, return Missing.
     if (
-      typeof (assignment as any).points_possible === 'number' &&
-      (assignment as any).points_possible > 0
+      typeof (assignment as Record<string, unknown>).points_possible === 'number' &&
+      (assignment as Record<string, unknown>).points_possible > 0
     ) {
       return 'Missing';
     }

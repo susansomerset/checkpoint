@@ -54,7 +54,7 @@ export async function callScratchpadApi<T = unknown>(
       return {
         success: false,
         error: data && typeof data === 'object' && 'error' in data 
-          ? String((data as any).error)
+          ? String((data as Record<string, unknown>).error)
           : `HTTP ${response.status}: ${response.statusText}`,
         status: response.status,
       };

@@ -8,10 +8,10 @@ import './startup-check'; // Validate storage config on startup
  * KVLike interface for storage abstraction
  */
 export interface KVLike {
-  get: (k: string) => Promise<string | null>;
-  set: (k: string, v: string, opts?: { ex?: number }) => Promise<void>;
-  del: (k: string) => Promise<void>;
-  mget: (...ks: string[]) => Promise<(string | null)[]>;
+  get: (_k: string) => Promise<string | null>;
+  set: (_k: string, _v: string, _opts?: { ex?: number }) => Promise<void>;
+  del: (_k: string) => Promise<void>;
+  mget: (..._ks: string[]) => Promise<(string | null)[]>;
 }
 
 /**
@@ -37,13 +37,14 @@ export const kv: KVLike = {
 };
 
 export async function loadStudentData(): Promise<StudentData | null> {
-  const raw = await getWithFallback(k('studentData:v1'));
+  const { getRaw } = await import('./redis-raw');
+  const raw = await getRaw(k('studentData:v1'));
   if (!raw) return null;
   
   const studentData = JSON.parse(raw) as StudentData;
   
   // Add lastLoadedAt from separate key
-  const lastLoadedAt = await getWithFallback(k('lastLoadedAt'));
+  const lastLoadedAt = await getRaw(k('lastLoadedAt'));
   if (lastLoadedAt) {
     try {
       const timestamp = JSON.parse(lastLoadedAt);
@@ -59,7 +60,8 @@ export async function loadStudentData(): Promise<StudentData | null> {
 }
 
 export async function saveStudentData(doc: StudentData): Promise<void> {
-  await setWithDualWrite(k('studentData:v1'), JSON.stringify(doc));
+  const { setRaw } = await import('./redis-raw');
+  await setRaw(k('studentData:v1'), JSON.stringify(doc));
 }
 
 // Atomic save function

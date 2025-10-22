@@ -556,7 +556,7 @@ export function TableDetail({
                 {filteredAndSortedRows
                   .filter(row => selectedRows.has(`${row.studentId}:${row.courseId}:${row.assignmentId}`))
                   .sort((a, b) => (b.pointsPossible || 0) - (a.pointsPossible || 0))
-                  .map((row, index) => {
+                  .map((row) => {
                     // Check if assignmentUrl is valid
                     let isValidUrl = false;
                     try {

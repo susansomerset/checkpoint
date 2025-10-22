@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
       lastLoadedAt: new Date().toISOString(),
       apiVersion: '1.0.0' as const,
       version: Date.now()
-    } as any; // Type assertion to bypass schema mismatch
+    } as StudentData; // Type assertion to bypass schema mismatch
     
     await saveStudentData(contractsData);
     
