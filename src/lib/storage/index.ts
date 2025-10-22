@@ -22,7 +22,7 @@ export const kv: KVLike = {
     const { getRaw } = await import('./redis-raw');
     return getRaw(key);
   },
-  set: async (key, value, opts) => {
+  set: async (key, value, _opts) => {
     const { setRaw } = await import('./redis-raw');
     return setRaw(key, value);
   },
