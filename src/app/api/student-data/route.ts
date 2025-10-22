@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { requireSession } from '@/lib/auth/auth0';
-import { loadStudentData, saveStudentData } from '@/lib/storage';
-import { StudentDataSchema } from '@/lib/student/schema';
-import * as kv from '@/lib/storage/kv';
+import { loadStudentData, saveStudentData, kv } from '@/lib/storage';
+import { StudentDataSchema } from '@/lib/contracts/types';
+import { k } from '@/lib/storage/prefix';
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   
       // Try to get student data from storage
       try {
-        const studentData = await kv.get('studentData:v1');
+        const studentData = await kv.get(k('studentData:v1'));
         console.info(`ZXQ get.storage.raw: ${studentData ? 'FOUND' : 'NOT_FOUND'} - ${studentData ? studentData.length : 0} bytes`);
         if (studentData) {
           try {

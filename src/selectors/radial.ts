@@ -95,7 +95,7 @@ export function bucketsForCourse(student: unknown, courseId: string): BucketsPoi
 
 export function radialVMFromBuckets(b: BucketsPoints): HeaderRadialVM {
   const total = Math.max(0, b.Earned + b.Submitted + b.Missing + b.Lost);
-  const center = total > 0 ? Math.round(((total - b.Missing - b.Lost) / total) * 100) : 0;
+  const center = total > 0 ? Math.round(((total - b.Missing) / total) * 100) : 0;
 
   // Normalize to 100 so the stacked ring is contiguous:
   const denom = total > 0 ? total : 1;

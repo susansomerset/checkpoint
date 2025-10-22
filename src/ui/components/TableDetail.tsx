@@ -71,8 +71,8 @@ export function TableDetail({
     );
   }
 
-  // Derive display headers (baseHeaders + Actions)
-  const headers = useMemo(() => [...baseHeaders, 'Actions'], [baseHeaders]);
+  // Derive display headers (Select + baseHeaders + Actions)
+  const headers = useMemo(() => ['Select', ...baseHeaders, 'Actions'], [baseHeaders]);
 
   // Local state
   const [selectedCourseId, setSelectedCourseId] = useState<string>(''); // single value, empty = all
@@ -86,6 +86,8 @@ export function TableDetail({
     courseId: string;
     assignmentId: string;
   } | null>(null);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [showCopyModal, setShowCopyModal] = useState(false);
 
   // Reset filters when selectedStudentId changes
   useEffect(() => {
@@ -307,6 +309,18 @@ export function TableDetail({
           />
         </div>
 
+        {/* Copy selected button */}
+        {selectedRows.size > 0 && (
+          <div>
+            <button
+              onClick={() => setShowCopyModal(true)}
+              className="border rounded px-3 py-1 text-sm text-gray-900 hover:bg-gray-100 bg-blue-50"
+            >
+              Copy Selected ({selectedRows.size})
+            </button>
+          </div>
+        )}
+
         {/* Clear filters button */}
         {hasActiveFilters && (
           <div>
@@ -328,14 +342,11 @@ export function TableDetail({
       {/* Table */}
       <div className="overflow-x-auto" style={{ marginTop: '0.25rem' }}>
         <table className="min-w-full border-collapse border">
-          <caption className="sr-only">
-            Detail view: {rows.length} total assignments for {selectedStudentId}
-          </caption>
           <thead className="bg-gray-100 sticky top-0">
             <tr>
               {headers.map((header) => {
                 const isSortable =
-                  header !== 'Actions' && SORTABLE_HEADERS.includes(header);
+                  header !== 'Actions' && header !== 'Select' && SORTABLE_HEADERS.includes(header);
                 const isActive = sort.by === header;
                 const ariaSort = isActive
                   ? sort.dir === 'asc'
@@ -352,7 +363,7 @@ export function TableDetail({
                   'Turned in',
                   'Graded on',
                 ].includes(header);
-                const alignClass = isNumericOrDate ? 'text-center' : 'text-left';
+                const alignClass = isNumericOrDate || header === 'Select' ? 'text-center' : 'text-left';
 
                 return (
                   <th
@@ -364,11 +375,30 @@ export function TableDetail({
                       isSortable ? 'cursor-pointer hover:bg-gray-200' : ''
                     }`}
                   >
-                    {header}
-                    {isActive && (
-                      <span className="ml-1">
-                        {sort.dir === 'asc' ? '↑' : '↓'}
-                      </span>
+                    {header === 'Select' ? (
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.size === filteredAndSortedRows.length && filteredAndSortedRows.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            const allRowKeys = new Set(filteredAndSortedRows.map(row => 
+                              `${row.studentId}:${row.courseId}:${row.assignmentId}`
+                            ));
+                            setSelectedRows(allRowKeys);
+                          } else {
+                            setSelectedRows(new Set());
+                          }
+                        }}
+                      />
+                    ) : (
+                      <>
+                        {header}
+                        {isActive && (
+                          <span className="ml-1">
+                            {sort.dir === 'asc' ? '↑' : '↓'}
+                          </span>
+                        )}
+                      </>
                     )}
                   </th>
                 );
@@ -417,6 +447,21 @@ export function TableDetail({
 
               return (
                 <tr key={rowKey}>
+                  <td className="border px-2 py-1 text-sm text-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.has(rowKey)}
+                      onChange={(e) => {
+                        const newSelected = new Set(selectedRows);
+                        if (e.target.checked) {
+                          newSelected.add(rowKey);
+                        } else {
+                          newSelected.delete(rowKey);
+                        }
+                        setSelectedRows(newSelected);
+                      }}
+                    />
+                  </td>
                   <td className="border px-2 py-1 text-sm text-gray-900">
                     {row.studentPreferredName}
                   </td>
@@ -483,6 +528,116 @@ export function TableDetail({
         isOpen={!!modalRow}
         onClose={() => setModalRow(null)}
       />
+
+      {/* Copy Modal */}
+      {showCopyModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" 
+          style={{ zIndex: 9999 }}
+        >
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Selected Assignments ({selectedRows.size})</h3>
+              <button onClick={() => setShowCopyModal(false)} className="text-gray-500 hover:text-gray-700">
+                ✕
+              </button>
+            </div>
+            <div className="border rounded p-3 h-64 overflow-auto bg-gray-50">
+              {/* Header when single course and status are filtered */}
+              {selectedCourseId && selectedStatus && (
+                <div className="mb-4 pb-2 border-b border-gray-300">
+                  <div className="text-sm font-semibold text-gray-800">
+                    {courseOptions.find(c => c.courseId === selectedCourseId)?.label}: {filteredAndSortedRows.filter(row => selectedRows.has(`${row.studentId}:${row.courseId}:${row.assignmentId}`)).length} Assignments {selectedStatus}
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-sm">
+                {filteredAndSortedRows
+                  .filter(row => selectedRows.has(`${row.studentId}:${row.courseId}:${row.assignmentId}`))
+                  .sort((a, b) => (b.pointsPossible || 0) - (a.pointsPossible || 0))
+                  .map((row, index) => {
+                    // Check if assignmentUrl is valid
+                    let isValidUrl = false;
+                    try {
+                      const url = new URL(row.assignmentUrl);
+                      isValidUrl = url.protocol === 'http:' || url.protocol === 'https:';
+                    } catch {
+                      isValidUrl = false;
+                    }
+
+                    const pointsDisplay = row.pointsPossible !== undefined ? row.pointsPossible.toString() : 'N/A';
+                    
+                    // Format due date: m/d + (year = this year? "" : /yy)
+                    let dueDisplay = 'N/A';
+                    if (row.dueAtDisplay) {
+                      const currentYear = new Date().getFullYear();
+                      const dueDate = new Date(row.dueAtISO || '');
+                      if (!isNaN(dueDate.getTime())) {
+                        const dueYear = dueDate.getFullYear();
+                        const month = dueDate.getMonth() + 1;
+                        const day = dueDate.getDate();
+                        
+                        if (dueYear === currentYear) {
+                          dueDisplay = `${month}/${day}`;
+                        } else {
+                          const shortYear = dueYear.toString().slice(-2);
+                          dueDisplay = `${month}/${day}/${shortYear}`;
+                        }
+                      }
+                    }
+
+                    const isSingleCourseAndStatus = selectedCourseId && selectedStatus;
+
+                    return (
+                      <div key={`${row.studentId}:${row.courseId}:${row.assignmentId}`} className="mb-2">
+                        {isValidUrl ? (
+                          <a 
+                            href={row.assignmentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {row.assignmentName}
+                          </a>
+                        ) : (
+                          <span className="text-gray-900">{row.assignmentName}</span>
+                        )}
+                        <span className="text-gray-900">
+                          {isSingleCourseAndStatus ? (
+                            <>
+                              {' '}Due: <span className="font-medium">{dueDisplay}</span>{' '}
+                              Points: <span className="font-medium">{pointsDisplay}</span>
+                            </>
+                          ) : (
+                            <>
+                              {' '}Status: <span className="font-medium">{row.checkpointStatus}</span>{' '}
+                              Due: <span className="font-medium">{row.dueAtDisplay || 'N/A'}</span>{' '}
+                              Points: <span className="font-medium">{pointsDisplay}</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+            
+            {/* Total points summary */}
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+              <div className="text-sm font-medium text-blue-900">
+                Total Possible Points: {filteredAndSortedRows
+                  .filter(row => selectedRows.has(`${row.studentId}:${row.courseId}:${row.assignmentId}`))
+                  .reduce((total, row) => total + (row.pointsPossible || 0), 0)}
+              </div>
+            </div>
+            
+            <div className="mt-4 text-sm text-gray-600">
+              Select all assignments above and copy (Ctrl+C / Cmd+C) - links will work when pasted into emails!
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

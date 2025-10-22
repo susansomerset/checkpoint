@@ -9,7 +9,7 @@
 import { format, parseISO, getDay, subDays, isSameDay, startOfDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
-export type CheckpointStatus = 'Due' | 'Missing' | 'Submitted' | 'Graded';
+export type CheckpointStatus = 'Due' | 'Missing' | 'Submitted' | 'Graded' | 'Optional';
 export type FormatType = 'Prior' | 'Weekday' | 'Next';
 export type AttentionType = 'Check' | 'Thumb' | 'Question' | 'Warning' | 'Hand';
 
@@ -20,6 +20,7 @@ export interface CanvasAssignmentRaw {
   points_possible?: number | null;
   html_url?: string;
   url?: string;
+  zxq_canvas_missing?: boolean;
 }
 
 export interface GridItemEntry {
@@ -100,6 +101,9 @@ export function toGridItems(
     // Build name (trim and collapse whitespace)
     const name = assignment.name.trim().replace(/\s+/g, ' ');
 
+
+    // get the assignment.submissions[0].canvas.missing flag
+    const missing = assignment.submissions[0]?.canvas?.missing;
     // Build title based on formatType
     let title: string;
     
@@ -107,7 +111,7 @@ export function toGridItems(
       // Format: M/d: Name (pts)
       const dueDateInTz = timezone ? toZonedTime(dueDate, timezone) : dueDate;
       const datePrefix = format(dueDateInTz, 'M/d');
-      title = `${datePrefix}: ${name} (${pointsOrZero})`;
+      title = `${datePrefix}: ${name} (${pointsOrZero}) canvas.missing: ${missing}`;
     } else if (formatType === 'Weekday') {
       // Format: Name (pts)
       title = `${name} (${pointsOrZero})`;

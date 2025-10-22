@@ -21,7 +21,7 @@ export const AssignmentType = z.enum(['Pointed', 'Vector'])
 export type AssignmentType = z.infer<typeof AssignmentType>
 
 export const CheckpointStatus = z.enum([
-  'Locked', 'Closed', 'Due', 'Missing', 'Vector', 'Submitted', 'Graded', 'Cancelled'
+  'Locked', 'Closed', 'Due', 'Missing', 'Vector', 'Submitted', 'Graded', 'Cancelled', 'Optional'
 ])
 export type CheckpointStatus = z.infer<typeof CheckpointStatus>
 

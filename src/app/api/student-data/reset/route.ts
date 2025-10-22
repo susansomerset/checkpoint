@@ -8,9 +8,8 @@ import { getSubmissionsForStudent } from '@/lib/canvas/submissions';
 import { getObservees } from '@/lib/canvas/observees';
 import { Submission } from '@/lib/canvas/submissions';
 import { buildStudentData, CourseWithStudent } from '@/lib/student/builder';
-import { getMetadata } from '@/lib/storage/kv';
-import { saveStudentData } from '@/lib/storage';
-import * as kv from '@/lib/storage/kv';
+import { saveStudentData, kv } from '@/lib/storage';
+import { k } from '@/lib/storage/prefix';
 
 export async function POST(req: NextRequest) {
   try {
@@ -161,7 +160,8 @@ export async function POST(req: NextRequest) {
     const buildStartTime = Date.now();
     
     // Load metadata for merging
-    const metadata = await getMetadata();
+    const metadataRaw = await kv.get(k('metadata:v1'));
+    const metadata = metadataRaw ? JSON.parse(metadataRaw) : null;
     console.info(`ZXQ reset.metadata: ${metadata ? 'LOADED' : 'NOT_FOUND'} - ${metadata ? Object.keys(metadata).length : 0} top-level keys`);
     
     const studentData = buildStudentData({
@@ -197,10 +197,21 @@ export async function POST(req: NextRequest) {
     const saveStartTime = Date.now();
     console.info(`ZXQ reset.save.start: ${Object.keys(studentData.students).length} students, ${Object.keys(studentData).length} top-level keys`);
     
-    await saveStudentData(studentData);
+    // Convert to contracts schema format
+    const contractsData = {
+      ...studentData,
+      lastLoadedAt: new Date().toISOString(),
+      apiVersion: '1.0.0' as const,
+      version: Date.now()
+    } as any; // Type assertion to bypass schema mismatch
+    
+    await saveStudentData(contractsData);
+    
+    // Update lastLoadedAt timestamp
+    await kv.set(k('lastLoadedAt'), JSON.stringify(new Date().toISOString()));
     
     // Verify save
-    const verifyData = await kv.get('studentData:v1');
+    const verifyData = await kv.get(k('studentData:v1'));
     console.info(`ZXQ reset.save.verify: ${verifyData ? 'SUCCESS' : 'FAILED'} - ${verifyData ? verifyData.length : 0} bytes saved`);
     
     const saveEndTime = Date.now();

@@ -52,28 +52,25 @@ export function StudentSelector() {
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <span className="text-sm text-gray-600">Student:</span>
-      <div className="flex space-x-1">
-        {students.map((student) => {
-          const displayName = student.meta.preferredName || student.meta.legalName || 'Unknown'
-          const isSelected = selectedStudentId === student.studentId
-          
-          return (
-            <button
-              key={student.studentId}
-              onClick={() => setSelectedStudentId(student.studentId)}
-              className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
-                isSelected
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {displayName}
-            </button>
-          )
-        })}
-      </div>
+    <div className="flex space-x-1">
+      {students.map((student) => {
+        const displayName = student.meta.preferredName || student.meta.legalName || 'Unknown'
+        const isSelected = selectedStudentId === student.studentId
+        
+        return (
+          <button
+            key={student.studentId}
+            onClick={() => setSelectedStudentId(student.studentId)}
+            className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+              isSelected
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            {displayName}
+          </button>
+        )
+      })}
     </div>
   )
 }

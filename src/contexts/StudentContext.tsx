@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
-import { StudentData as StudentDataContract, Student } from '@/lib/contracts/types'
+import { StudentData, Student } from '@/lib/contracts/types'
 import { StudentData as StudentDataBuilder } from '@/lib/student/builder'
 import { resetRadialCache } from '@/selectors/cache'
 import { fetchStudentDataWithRetry } from '@/lib/api/studentData'
@@ -12,7 +12,7 @@ interface StudentContextType {
   selectedStudentId: string | null
   setSelectedStudentId: (_studentId: string | null) => void
   students: Student[]
-  data: StudentDataContract | null
+  data: StudentData | null
   weeklyGrids: WeeklyGridsResult | null
   loading: boolean
   error: string | null
@@ -27,7 +27,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: authLoading } = useUser()
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
   const [students, setStudents] = useState<Student[]>([])
-  const [data, setData] = useState<StudentDataContract | null>(null)
+  const [data, setData] = useState<StudentData | null>(null)
   const [weeklyGrids, setWeeklyGrids] = useState<WeeklyGridsResult | null>(null)
   const [loading, setLoading] = useState(false) // Start as false, only true when fetching
   const [error, setError] = useState<string | null>(null)

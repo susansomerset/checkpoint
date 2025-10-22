@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { set, get } from '@/lib/storage/kv';
+import { kv } from '@/lib/storage';
+import { k } from '@/lib/storage/prefix';
 
 export async function GET() {
   try {
     console.info('ZXQ metadata GET: Starting...');
-    const data = await get('metadata:v1');
+    const data = await kv.get(k('metadata:v1'));
     console.info('ZXQ metadata GET: Retrieved data type:', typeof data);
     console.info('ZXQ metadata GET: Retrieved data value:', data);
     
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
   try {
     const metadata = await req.json();
     console.info('ZXQ metadata POST: Received metadata keys:', Object.keys(metadata));
-    await set('metadata:v1', JSON.stringify(metadata));
+    await kv.set(k('metadata:v1'), JSON.stringify(metadata));
     console.info('ZXQ metadata POST: Saved to Redis successfully');
     return NextResponse.json({ success: true });
   } catch (error) {

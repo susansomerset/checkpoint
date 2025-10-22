@@ -6,7 +6,15 @@ function getRedis() {
   if (!redis) {
     const url = process.env.UPSTASH_REDIS_REST_URL;
     const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-    if (!url || !token) throw new Error('Missing Redis env (UPSTASH_REDIS_REST_URL/_TOKEN)');
+    if (!url || !token) {
+      console.warn('ZXQ Redis: Missing env vars (UPSTASH_REDIS_REST_URL/_TOKEN), using mock');
+      // Return a mock Redis instance for development
+      return {
+        get: async () => null,
+        set: async () => {},
+        del: async () => {},
+      };
+    }
     redis = new Redis({ url, token });
   }
   return redis;

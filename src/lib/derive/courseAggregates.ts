@@ -35,6 +35,7 @@ export const calculateCourseAggregate = (course: Course): CourseAggregate => {
     'Submitted': 0,
     'Graded': 0,
     'Cancelled': 0,
+    'Optional': 0,
   }
   
   for (const assignment of filteredAssignments) {

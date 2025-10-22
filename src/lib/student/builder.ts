@@ -93,6 +93,11 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
   const hasSubmission = submissions.length > 0;
   const submission = hasSubmission ? submissions[0] : null;
   
+  // Check if the submission missing flag is true, if so, return Missing.
+  if (submission && submission.canvas && typeof submission.canvas === 'object' && 'missing' in submission.canvas && submission.canvas.missing) {
+    return 'Missing';
+  }
+
   // Check if submission has been graded AND score is exactly 40% of possible points
   if (submission && submission.canvas && typeof submission.canvas === 'object' && 'workflow_state' in submission.canvas && 'score' in submission.canvas) {
     const submissionCanvas = submission.canvas as unknown as Submission;
@@ -145,10 +150,19 @@ function getAssignmentStatus(assignmentNode: AssignmentNode): 'Locked' | 'Closed
     return 'Due';
   }
   
+  
   // If due date is in the past, status is "Missing"
   const dueDate = new Date(assignment.due_at);
   if (dueDate < now) {
-    return 'Missing';
+    // if points possible is not 0, return Missing.
+    if (
+      typeof (assignment as any).points_possible === 'number' &&
+      (assignment as any).points_possible > 0
+    ) {
+      return 'Missing';
+    }
+
+    return 'Optional';
   }
   
   // If no submission and due date is today or future, status is "Due"

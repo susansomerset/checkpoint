@@ -43,11 +43,11 @@ export default function RootLayout({
               <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex justify-between items-center py-4">
-                    <div className="flex items-center">
+                    <div className="flex flex-col">
                       <h1 className="text-xl font-semibold text-gray-900">Checkpoint</h1>
-                    </div>
-                    <div className="flex items-center justify-center flex-1">
-                      <StudentSelector />
+                      <div className="mt-2">
+                        <StudentSelector />
+                      </div>
                     </div>
                     <div className="flex items-center">
                       <SessionChip />
