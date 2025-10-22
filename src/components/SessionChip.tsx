@@ -48,6 +48,7 @@ export function SessionChip() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       })
       
       if (!resetResponse.ok) {

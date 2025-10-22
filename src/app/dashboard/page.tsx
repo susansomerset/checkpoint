@@ -96,7 +96,8 @@ export default function DashboardPage() {
     try {
       const res = await fetch('/api/student-data/reset', { 
         method: 'POST',
-        cache: 'no-store' 
+        cache: 'no-store',
+        credentials: 'include'
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
