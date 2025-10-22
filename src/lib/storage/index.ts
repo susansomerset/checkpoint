@@ -24,7 +24,7 @@ export const kv: KVLike = {
   },
   set: async (key, value, opts) => {
     const { setRaw } = await import('./redis-raw');
-    return setRaw(key, value, opts);
+    return setRaw(key, value);
   },
   del: async (key) => {
     const { delRaw } = await import('./redis-raw');

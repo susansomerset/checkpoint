@@ -44,12 +44,12 @@ export async function scrapeExternalToolPage(
   // If no vectors found on main page, try inside the iframe
   if (vectorMetadata.length === 0) {
     console.log('  🔄 No vectors found on main page, trying iframe...');
-    const iframeVectors = await extractVectorMetadata(contentFrame);
+    const iframeVectors = await extractVectorMetadata(contentFrame as any);
     vectorMetadata.push(...iframeVectors);
   }
 
   // Extract assignments from the iframe
-  const assignments = await extractAssignments(contentFrame);
+  const assignments = await extractAssignments(contentFrame as any);
 
   return {
     courseId,
