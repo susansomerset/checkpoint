@@ -9,7 +9,7 @@ import './startup-check'; // Validate storage config on startup
  */
 export interface KVLike {
   get: (_k: string) => Promise<string | null>;
-  set: (_k: string, _v: string, _opts?: { ex?: number }) => Promise<void>;
+  set: (_k: string, _v: string) => Promise<void>;
   del: (_k: string) => Promise<void>;
   mget: (..._ks: string[]) => Promise<(string | null)[]>;
 }
@@ -22,7 +22,7 @@ export const kv: KVLike = {
     const { getRaw } = await import('./redis-raw');
     return getRaw(key);
   },
-  set: async (key, value, _opts) => {
+  set: async (key, value) => {
     const { setRaw } = await import('./redis-raw');
     return setRaw(key, value);
   },
