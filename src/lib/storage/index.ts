@@ -1,6 +1,6 @@
 import { StudentData } from '@/lib/contracts/types';
 // import { getRaw, setRaw } from './redis-raw';
-import { getWithFallback, setWithDualWrite } from './fallback';
+// import { getWithFallback, setWithDualWrite } from './fallback';
 import { k } from './prefix';
 import './startup-check'; // Validate storage config on startup
 
@@ -18,11 +18,17 @@ export interface KVLike {
  * Upstash-backed KV implementation
  */
 export const kv: KVLike = {
-  get: (key) => getWithFallback(key),
-  set: (key, value, opts) => setWithDualWrite(key, value),
+  get: async (key) => {
+    const { getRaw } = await import('./redis-raw');
+    return getRaw(key);
+  },
+  set: async (key, value, opts) => {
+    const { setRaw } = await import('./redis-raw');
+    return setRaw(key, value, opts);
+  },
   del: async (key) => {
-    const { delWithDualWrite } = await import('./fallback');
-    await delWithDualWrite(key);
+    const { delRaw } = await import('./redis-raw');
+    await delRaw(key);
   },
   mget: async (...keys) => {
     const { getRaw } = await import('./redis-raw');

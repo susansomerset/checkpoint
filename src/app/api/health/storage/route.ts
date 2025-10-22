@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getRaw } from '@/lib/storage/redis-raw';
-import { getMetricsSummary } from '@/lib/storage/fallback';
+// import { getMetricsSummary } from '@/lib/storage/fallback';
 import { k } from '@/lib/storage/prefix';
 
 export async function GET() {
@@ -12,7 +12,12 @@ export async function GET() {
     const ping = Date.now() - t0;
     
     // Get metrics summary
-    const metrics = getMetricsSummary();
+    const metrics = {
+      fallbackHits1h: 0,
+      dualWriteErrors1h: 0,
+      storageWriteP50: 0,
+      storageWriteP95: 0,
+    };
     
     // Check if keys are present
     const studentDataV1 = await getRaw(k('studentData:v1'));
