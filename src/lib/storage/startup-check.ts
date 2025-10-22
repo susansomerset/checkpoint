@@ -34,5 +34,9 @@ export function validateStorageConfig() {
   }
 }
 
-// Run validation on import
-validateStorageConfig();
+// Only run validation during runtime (not build time)
+// Check for NEXT_PHASE to detect build vs runtime
+const isBuilding = process.env.NEXT_PHASE === 'phase-production-build';
+if (!isBuilding) {
+  validateStorageConfig();
+}
