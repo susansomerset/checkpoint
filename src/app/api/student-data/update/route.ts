@@ -4,7 +4,10 @@ import { loadStudentData, saveStudentData } from '@/lib/storage';
 
 export async function POST(req: NextRequest) {
   await requireSession(req);
-  const current = (await loadStudentData()) ?? { students: {} };
+  const current = await loadStudentData();
+  if (!current) {
+    return Response.json({ error: 'No student data found' }, { status: 404 });
+  }
   // TODO: Implement Canvas deltas fetching
   await saveStudentData(current);
   return Response.json({ ok: true });

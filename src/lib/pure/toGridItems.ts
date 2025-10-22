@@ -102,8 +102,6 @@ export function toGridItems(
     const name = assignment.name.trim().replace(/\s+/g, ' ');
 
 
-    // get the assignment.submissions[0].canvas.missing flag
-    const missing = assignment.submissions[0]?.canvas?.missing;
     // Build title based on formatType
     let title: string;
     
@@ -111,7 +109,7 @@ export function toGridItems(
       // Format: M/d: Name (pts)
       const dueDateInTz = timezone ? toZonedTime(dueDate, timezone) : dueDate;
       const datePrefix = format(dueDateInTz, 'M/d');
-      title = `${datePrefix}: ${name} (${pointsOrZero}) canvas.missing: ${missing}`;
+      title = `${datePrefix}: ${name} (${pointsOrZero})`;
     } else if (formatType === 'Weekday') {
       // Format: Name (pts)
       title = `${name} (${pointsOrZero})`;
