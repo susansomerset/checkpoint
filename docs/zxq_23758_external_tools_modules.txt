@@ -1,0 +1,68 @@
+{
+  "courseId": "23758",
+  "outcomes": [
+    {
+      "outcomeName": "Collaboration",
+      "outcomeKey": "CB",
+      "outcomeGrade": "90%",
+      "outcomeEarned": "54",
+      "outcomePossible": "60",
+      "outcomeWeight": "10"
+    },
+    {
+      "outcomeName": "Critical Thinking",
+      "outcomeKey": "CT",
+      "outcomeGrade": "92%",
+      "outcomeEarned": "110",
+      "outcomePossible": "120",
+      "outcomeWeight": "10"
+    },
+    {
+      "outcomeName": "Curricular Literacy",
+      "outcomeKey": "CL",
+      "outcomeGrade": "88%",
+      "outcomeEarned": "178",
+      "outcomePossible": "202",
+      "outcomeWeight": "25"
+    },
+    {
+      "outcomeName": "Learning Mindset",
+      "outcomeKey": "LM",
+      "outcomeGrade": "71%",
+      "outcomeEarned": "25",
+      "outcomePossible": "35",
+      "outcomeWeight": "10"
+    },
+    {
+      "outcomeName": "Oral Communication",
+      "outcomeKey": "OC",
+      "outcomeGrade": "100%",
+      "outcomeEarned": "20",
+      "outcomePossible": "20",
+      "outcomeWeight": "10"
+    },
+    {
+      "outcomeName": "Professionalism",
+      "outcomeKey": "Pr",
+      "outcomeGrade": "71%",
+      "outcomeEarned": "131",
+      "outcomePossible": "185",
+      "outcomeWeight": "10"
+    },
+    {
+      "outcomeName": "Written Communication",
+      "outcomeKey": "WC",
+      "outcomeGrade": "80%",
+      "outcomeEarned": "44",
+      "outcomePossible": "55",
+      "outcomeWeight": "25"
+    }
+  ],
+  "modules": [
+    {
+      "name": "All",
+      "assignments": []
+    }
+  ],
+  "assignments": []
+}
