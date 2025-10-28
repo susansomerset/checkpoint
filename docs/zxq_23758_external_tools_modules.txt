@@ -60,9 +60,203 @@
   ],
   "modules": [
     {
-      "name": "All",
+      "name": "Bio: Summer Reflection",
+      "assignments": [
+        "Summer Reflection"
+      ]
+    },
+    {
+      "name": "Bio: Is It Alive?",
+      "assignments": [
+        "Scientific Methods Quiz",
+        "Intro to Microscopes",
+        "DYOE #1",
+        "DYOE #4",
+        "DYOE #2",
+        "DYOE #3",
+        "Hypothesis Creation Worksheet",
+        "GAK Lab Mini-Presentation",
+        "Independent vs Dependent Variables",
+        "Final Report Requirements",
+        "Peer Hypothesis Critique",
+        "Qualitative vs Quantitative Data",
+        "Scientific Methods Review Sheet",
+        "Team Contract",
+        "Self Evaluation",
+        "Supply List"
+      ]
+    },
+    {
+      "name": "Lit: Is It Alive?",
+      "assignments": [
+        "Supply Check",
+        "Email to the Teacher",
+        "Group Contract",
+        "Storytelling In Science Discussion",
+        "Storytelling In Science Annotations",
+        "Vocabulary -- Week 2",
+        "Poe Posters",
+        "Elements of Storytelling and Narrative",
+        "Vocabulary -- Week 3",
+        "Daedalus and Icarus Quiz",
+        "Vocabulary -- Week 4",
+        "CommonLit Pre-Assessment",
+        "Vocabulary Quiz"
+      ]
+    },
+    {
+      "name": "Bio: Cell City",
+      "assignments": [
+        "Cell Quiz Version A",
+        "Prokaryotic vs Eukaryotic and Cell Theory",
+        "It's Alive Notesheet",
+        "Cell Theory Lecture Notes",
+        "Prokaryote Lecture Notes",
+        "Cell Organelle Analogy",
+        "Cell Scientist Review Sheet",
+        "Cell Organelle Analogy Peer Edit",
+        "Cheek Cell Pre-Lab",
+        "Cheek Cell Lab",
+        "Onion Cell Pre-Lab",
+        "Team Contract Cell City BioLit",
+        "Osmosis vs diffusion reinforcement"
+      ]
+    },
+    {
+      "name": "Lit: Cell City",
+      "assignments": [
+        "Cell City Vocabulary -- Week 1",
+        "Project Launch Annotations",
+        "Cell City Vocabulary -- Week 2",
+        "Annotated Bibliography",
+        "Outline",
+        "Research Paper -- Rough Draft",
+        "Research Paper -- Peer Review Draft"
+      ]
+    },
+    {
+      "name": "Haunting Nightmare",
+      "assignments": []
+    },
+    {
+      "name": "Romeo and Juliet in a Minute",
+      "assignments": []
+    },
+    {
+      "name": "Galapagos",
+      "assignments": []
+    },
+    {
+      "name": "Fahrenheit 451",
+      "assignments": []
+    },
+    {
+      "name": "Story of Me",
+      "assignments": []
+    },
+    {
+      "name": "MARS",
+      "assignments": []
+    },
+    {
+      "name": "Assignments",
+      "assignments": []
+    },
+    {
+      "name": "America's Test Kitchen",
+      "assignments": []
+    },
+    {
+      "name": "Assignments",
+      "assignments": []
+    },
+    {
+      "name": "Assignments",
+      "assignments": []
+    },
+    {
+      "name": "Assignments",
+      "assignments": []
+    },
+    {
+      "name": "Quizzes",
+      "assignments": []
+    },
+    {
+      "name": "Current Events",
+      "assignments": []
+    },
+    {
+      "name": "Make Your Own Experiment",
+      "assignments": []
+    },
+    {
+      "name": "Imported Assignments",
+      "assignments": []
+    },
+    {
+      "name": "Migrated Quizzes",
+      "assignments": []
+    },
+    {
+      "name": "Haunting Nightmare",
+      "assignments": []
+    },
+    {
+      "name": "Modern Family",
       "assignments": []
     }
   ],
-  "assignments": []
+  "assignments": [
+    "Summer Reflection",
+    "Scientific Methods Quiz",
+    "Intro to Microscopes",
+    "DYOE #1",
+    "DYOE #4",
+    "DYOE #2",
+    "DYOE #3",
+    "Hypothesis Creation Worksheet",
+    "GAK Lab Mini-Presentation",
+    "Independent vs Dependent Variables",
+    "Final Report Requirements",
+    "Peer Hypothesis Critique",
+    "Qualitative vs Quantitative Data",
+    "Scientific Methods Review Sheet",
+    "Team Contract",
+    "Self Evaluation",
+    "Supply List",
+    "Supply Check",
+    "Email to the Teacher",
+    "Group Contract",
+    "Storytelling In Science Discussion",
+    "Storytelling In Science Annotations",
+    "Vocabulary -- Week 2",
+    "Poe Posters",
+    "Elements of Storytelling and Narrative",
+    "Vocabulary -- Week 3",
+    "Daedalus and Icarus Quiz",
+    "Vocabulary -- Week 4",
+    "CommonLit Pre-Assessment",
+    "Vocabulary Quiz",
+    "Cell Quiz Version A",
+    "Prokaryotic vs Eukaryotic and Cell Theory",
+    "It's Alive Notesheet",
+    "Cell Theory Lecture Notes",
+    "Prokaryote Lecture Notes",
+    "Cell Organelle Analogy",
+    "Cell Scientist Review Sheet",
+    "Cell Organelle Analogy Peer Edit",
+    "Cheek Cell Pre-Lab",
+    "Cheek Cell Lab",
+    "Onion Cell Pre-Lab",
+    "Team Contract Cell City BioLit",
+    "Osmosis vs diffusion reinforcement",
+    "Cell City Vocabulary -- Week 1",
+    "Project Launch Annotations",
+    "Cell City Vocabulary -- Week 2",
+    "Annotated Bibliography",
+    "Outline",
+    "Research Paper -- Rough Draft",
+    "Research Paper -- Peer Review Draft"
+  ]
 }

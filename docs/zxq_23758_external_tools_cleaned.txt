@@ -1,0 +1,336 @@
+
+
+
+ <div>
+   <div>
+      
+   </div>
+    You need to have JavaScript enabled in order to access this site.
+ </div>
+
+
+
+
+
+
+
+
+<div>
+  
+
+
+
+
+
+  
+    
+    
+   <span>Global Navigation Menu</span>
+  
+  
+    
+     <div>Bio/Lit</div>
+       <div>Echo Gradebook</div>
+    
+    
+    
+      
+    
+
+
+
+
+  Skip To Content
+ <div>
+     <div>
+        
+         <span>Dashboard</span>
+        
+     </div>
+    
+        
+          
+           <div>
+             <div>
+                
+             </div>
+              
+           </div>
+           <div>
+              Account
+           </div>
+          
+        
+      
+        
+         <div>
+            
+
+         </div>
+         <div>
+            Dashboard
+         </div>
+        
+      
+        
+          
+           <div>
+              
+
+           </div>
+           <div>
+              Courses
+           </div>
+          
+        
+      
+        
+         <div>
+            
+
+         </div>
+         <div>
+            Calendar
+         </div>
+        
+      
+      
+      
+        
+         <div>
+           <span>
+</span>
+           <span>2 unread messages.</span><span>2</span>
+         </div>
+         <div>
+            Inbox
+         </div>
+        
+      
+        
+          
+           <div>
+              
+    
+
+           </div>
+           <div>
+              History
+           </div>
+          
+        
+        
+    
+      
+          
+            
+          
+       <div>
+          Studio
+       </div>
+      
+    
+
+      
+        
+         <div>
+              
+
+           <span>10 unread release notes.</span><span>10</span>
+         </div>
+         <div>
+            Support
+         </div>
+      
+    
+ </div>
+ <div>
+    
+      
+        
+         <div>
+            
+  
+
+
+         </div>
+        
+      
+    
+ </div>
+  
+  
+
+
+ <div>
+   <div>Close</div>
+    
+ </div>
+
+ <div>
+       <div>
+            
+              
+            
+
+         <div>
+             <span>
+ <span>My Dashboard</span>
+
+</span><span>Bio/Lit</span><span>Echo Gradebook</span>
+         </div>
+
+
+          
+         <div>
+            
+              
+         </div>
+
+       </div>
+   <div>
+        
+       <div>
+         <div>
+             <span>2026-Da Vinci Charter Academy-T 228-Yearlong (Secondary)</span>
+            HomeAnnouncementsEcho GradebookModulesSyllabusFiles
+         </div>
+       </div>
+     <div>
+       <div>
+          
+         <div>
+            
+
+
+  
+
+
+
+
+
+
+
+
+
+<div>
+  
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+ <div>
+     <div>
+          This tool needs to be loaded in a new browser window
+         <div>
+              
+                  Load Echo Gradebook in a new window
+              
+         </div>
+     </div>
+     <div>
+          This tool was successfully loaded in a new browser window. Reload the page to access the tool again.
+     </div>
+ </div>
+  
+
+   <div>
+   <div><span><div>NTN Gradebook<div><span>Help</span></div><div><span>Student Performance </span></div><div><span><div></div></span><span><div><span>Show inactive students</span></div></span><span><div><span>Student</span><div></div></span></div>View All Courses<div>Zachary Quinn</div><div>89096</div><div>ZQ89096@djusdstudents.org</div><div><span>84.4%</span><span>Total Score</span></div><div><span>90%</span></div><div><span>54/60</span></div><div><span>10% Wt</span></div><div>Collaboration<div><span>CB</span></div><div><span>92%</span></div><div><span>110/120</span></div><div><span>10% Wt</span></div><div>Critical Thinking<div><span>CT</span></div><div><span>88%</span></div><div><span>178/202</span></div><div><span>25% Wt</span></div><div>Curricular Literacy<div><span>CL</span></div><div><span>71%</span></div><div><span>25/35</span></div><div><span>10% Wt</span></div><div>Learning Mindset<div><span>LM</span></div><div><span>100%</span></div><div><span>20/20</span></div><div><span>10% Wt</span></div><div>Oral Communication<div><span>OC</span></div><div><span>71%</span></div><div><span>131/185</span></div><div><span>10% Wt</span></div><div>Professionalism<div><span>Pr</span></div><div><span>80%</span></div><div><span>44/55</span></div><div><span>25% Wt</span></div><div>Written Communication<div><span>WC</span></div><div><table><tr>Bio: Summer Reflection<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr><td><div><span>Summer Reflection</span></div><div><span>Due</span> Aug 29, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr>Group Totals:<td><span>/0</span></td><td><span>5</span><span>/5</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>5</span><span>/5</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Bio: Is It Alive?<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr><td><div><span>Scientific Methods Quiz</span></div><div><span>Due</span> Sep 17, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>13</span><span>/13</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Intro to Microscopes</span></div><div><span>Due</span> Sep 11, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>4</span><span>/4</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>DYOE #1</span></div><div><span>Due</span> Sep 11, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>DYOE #4</span></div></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>DYOE #2</span></div><div><span>Due</span> Sep 17, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>DYOE #3</span></div></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Hypothesis Creation Worksheet</span></div><div><span>Due</span> Sep 5, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>GAK Lab Mini-Presentation</span></div></td><td><span>5</span><span>/5</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Independent vs Dependent Variables</span></div><div><span>Due</span> Sep 5, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Final Report Requirements</span></div><div><span>Due</span> Oct 1, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>20</span><span>/20</span></td><td><span>•</span></td><td><span>20</span><span>/20</span></td><td><span>10</span><span>/10</span></td><td><span>20</span><span>/20</span></td></tr><tr><td><div><span>Peer Hypothesis Critique</span></div></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Qualitative vs Quantitative Data</span></div><div><span>Due</span> Aug 28, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Scientific Methods Review Sheet</span></div><div><span>Due</span> Sep 15, 2025 at 5:00 pm</span></div></td><td><span>•</span></td><td><span>4</span><span>/5</span></td><td><span>4</span><span>/5</span></td><td><span>4</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Team Contract</span></div><div><span>Due</span> Sep 8, 2025 at 5:00 pm</span></div></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Self Evaluation</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Supply List</span></div><div><span>Due</span> Sep 17, 2025 at 5:00 pm</span></div></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr>Group Totals:<td><span>20</span><span>/20</span></td><td><span>79</span><span>/80</span></td><td><span>91</span><span>/92</span></td><td><span>9</span><span>/10</span></td><td><span>20</span><span>/20</span></td><td><span>43</span><span>/70</span></td><td><span>20</span><span>/20</span></td></tr></table></div><div><table><tr>Lit: Is It Alive?<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr><td><div><span>Supply Check</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Email to the Teacher</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td></tr><tr><td><div><span>Group Contract</span></div></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Storytelling In Science Discussion</span></div></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Storytelling In Science Annotations</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Vocabulary -- Week 2</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>3</span><span>/5</span></td></tr><tr><td><div><span>Poe Posters</span></div></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Elements of Storytelling and Narrative</span></div></td><td><span>•</span></td><td><span>6</span><span>/15</span></td><td><span>6</span><span>/15</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Vocabulary -- Week 3</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td></tr><tr><td><div><span>Daedalus and Icarus Quiz</span></div></td><td><span>•</span></td><td><span></span><span>/10</span></td><td><span></span><span>/10</span></td><td><span></span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/10</span></td></tr><tr><td><div><span>Vocabulary -- Week 4</span></div><div><span>Due</span> Sep 29, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>5</span><span>/5</span></td></tr><tr><td><div><span>CommonLit Pre-Assessment</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Vocabulary Quiz</span></div><div><span>Due</span> Oct 6, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/5</span></td></tr><tr>Group Totals:<td><span>15</span><span>/15</span></td><td><span>11</span><span>/20</span></td><td><span>11</span><span>/20</span></td><td><span>7</span><span>/10</span></td><td><span>/0</span></td><td><span>42</span><span>/45</span></td><td><span>18</span><span>/20</span></td></tr></table></div><div><table><tr>Bio: Cell City<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr><td><div><span>Cell Quiz Version A</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/25</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Prokaryotic vs Eukaryotic and Cell Theory</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>23</span><span>/25</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>It's Alive Notesheet</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cell Theory Lecture Notes</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Prokaryote Lecture Notes</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cell Organelle Analogy</span></div></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cell Scientist Review Sheet</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>4</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cell Organelle Analogy Peer Edit</span></div></td><td><span>4</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cheek Cell Pre-Lab</span></div></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cheek Cell Lab</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Onion Cell Pre-Lab</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/5</span></td><td><span></span><span>/5</span></td><td><span>•</span></td><td><span></span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Team Contract Cell City BioLit</span></div></td><td><span>10</span><span>/10</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Osmosis vs diffusion reinforcement</span></div></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr>Group Totals:<td><span>19</span><span>/25</span></td><td><span>15</span><span>/15</span></td><td><span>72</span><span>/80</span></td><td><span>5</span><span>/5</span></td><td><span>/0</span></td><td><span>32</span><span>/50</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Lit: Cell City<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr><td><div><span>Cell City Vocabulary -- Week 1</span></div><div><span>Due</span> Oct 6, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>2</span><span>/5</span></td></tr><tr><td><div><span>Project Launch Annotations</span></div><div><span>Due</span> Oct 6, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td></tr><tr><td><div><span>Cell City Vocabulary -- Week 2</span></div><div><span>Due</span> Oct 13, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>5</span><span>/5</span></td><td><span>2</span><span>/5</span></td></tr><tr><td><div><span>Annotated Bibliography</span></div><div><span>Due</span> Oct 16, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td></tr><tr><td><div><span>Outline</span></div><div><span>Due</span> Oct 17, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>2</span><span>/5</span></td><td><span>2</span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Research Paper -- Rough Draft</span></div><div><span>Due</span> Oct 27, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/5</span></td><td><span></span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td></tr><tr><td><div><span>Research Paper -- Peer Review Draft</span></div><div><span>Due</span> Oct 31, 2025 at 11:59 pm</span></div></td><td><span>•</span></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/5</span></td><td><span>•</span></td><td><span>•</span></td><td><span></span><span>/5</span></td></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>4</span><span>/10</span></td><td><span>4</span><span>/10</span></td><td><span>/0</span></td><td><span>9</span><span>/15</span></td><td><span>6</span><span>/15</span></td></tr></table></div><div><table><tr>Haunting Nightmare<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Romeo and Juliet in a Minute<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Galapagos<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Fahrenheit 451<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Story of Me<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>MARS<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Assignments<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>America's Test Kitchen<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Assignments<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Assignments<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Assignments<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Quizzes<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Current Events<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Make Your Own Experiment<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Imported Assignments<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Migrated Quizzes<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Haunting Nightmare<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div><div><table><tr>Modern Family<span><div><span>CB</span></div></span><span><div><span>CT</span></div></span><span><div><span>CL</span></div></span><span><div><span>LM</span></div></span><span><div><span>OC</span></div></span><span><div><span>Pr</span></div></span><span><div><span>WC</span></div></span></tr><tr>Group Totals:<td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td><td><span>/0</span></td></tr></table></div></span></div>
+
+  
+
+<span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span><span>Collaboration</span><span>Critical Thinking</span><span>Curricular Literacy</span><span>Learning Mindset</span><span>Oral Communication</span><span>Professionalism</span><span>Written Communication</span></div>
+</div>
+
+
+
+
+  
+
+
+
+
+
+
+
+         </div>
+       </div>
+       <div>
+          
+            
+          
+       </div>
+     </div>
+   </div>
+ </div>
+
+
+  
+
+
+   <div>
+       <div>b6dfbb9b-f512-4994-a61b-e97b5ab31031</div>
+   </div>
+  
+  
+  
+  
+
+  
+
+
+  
+    Object.assign(
+      ENV,
+      {}
+    )
+  
+
+
+//
+
+
+
+
+</div> 
+
+

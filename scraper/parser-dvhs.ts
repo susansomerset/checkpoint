@@ -4,7 +4,13 @@ import * as fs from 'fs';
 
 export interface ModuleItem {
   title: string;
-  assignments: string[];
+  assignments: Assignment[];
+}
+
+export interface Assignment {
+  title: string;
+  dueDate?: string;
+  scores: { [outcomeKey: string]: string }; // outcomeKey -> score (e.g., "5/5" or "•")
 }
 
 export interface Outcome {
@@ -64,7 +70,7 @@ function parseExternalTools(htmlContent: string): string {
   return cleaned;
 }
 
-function parseOutcomesFromCleaned(cleanedHtml: string, courseID: number, docsDir: string): { outcomes: Outcome[]; assignmentData: string } {
+function parseOutcomesFromCleaned(cleanedHtml: string): Outcome[] {
   const outcomes: Outcome[] = [];
   
   // Find the section between "Total Score" and "<table>"
@@ -73,7 +79,7 @@ function parseOutcomesFromCleaned(cleanedHtml: string, courseID: number, docsDir
   
   if (totalScoreIndex === -1 || tableIndex === -1) {
     console.log('Could not find "Total Score" or "<table>" in cleaned HTML');
-    return { outcomes: [], assignmentData: cleanedHtml };
+    return outcomes;
   }
   
   // Extract just the outcomes section
@@ -84,11 +90,6 @@ function parseOutcomesFromCleaned(cleanedHtml: string, courseID: number, docsDir
   
   // Collapse multiple consecutive ~ into a single ~
   outcomesSection = outcomesSection.replace(/~+/g, '~');
-  
-  // Save the outcomes section to its own file
-  const outcomesSectionFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_outcomes_section.txt`);
-  fs.writeFileSync(outcomesSectionFilePath, outcomesSection, 'utf8');
-  console.log(`Outcomes section saved to: ${outcomesSectionFilePath}`);
   
   // Split by ~ and remove first element ("Total Score")
   const parts = outcomesSection.split('~').filter(p => p.trim() !== '');
@@ -123,10 +124,83 @@ function parseOutcomesFromCleaned(cleanedHtml: string, courseID: number, docsDir
     });
   }
   
-  // Store the rest for assignment parsing
+  return outcomes;
+}
+
+function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number, docsDir: string): { modules: ModuleItem[]; assignments: string[] } {
+  // Find where tables start
+  const tableIndex = cleanedHtml.indexOf('<table>');
+  
+  if (tableIndex === -1) {
+    console.log('Could not find "<table>" in cleaned HTML');
+    return { modules: [], assignments: [] };
+  }
+  
+  
   const assignmentData = cleanedHtml.substring(tableIndex);
   
-  return { outcomes, assignmentData };
+  // Save the assignment table content to its own file
+  const assignmentTableFilePath = path.join(docsDir, `zxq_${courseID}_assignment_table_content.txt`);
+  fs.writeFileSync(assignmentTableFilePath, assignmentData, 'utf8');
+  console.log(`Assignment table content saved to: ${assignmentTableFilePath}`);
+  
+  // Split by </table> first
+  const tables = assignmentData.split('</table>');
+  
+  // Enumerate and write the tables
+  let enumeratedTables = '';
+  tables.forEach((table, index) => {
+    enumeratedTables += `[${index}] ${table}\n\n`;
+  });
+  
+  // Save the enumerated tables for debugging
+  const assignmentDebugFilePath = path.join(docsDir, `zxq_${courseID}_assignments_cleaned.txt`);
+  fs.writeFileSync(assignmentDebugFilePath, enumeratedTables, 'utf8');
+  console.log(`Enumerated assignment tables saved to: ${assignmentDebugFilePath}`);
+  
+  // Parse each module from tables 0-22 (skip last one which is just closing tag)
+  const modules: ModuleItem[] = [];
+  const allAssignments: string[] = [];
+  
+  for (let i = 0; i < Math.min(tables.length - 1, 23); i++) {
+    const moduleString = tables[i];
+    
+    // Extract module name from first <tr>
+    const firstTrMatch = moduleString.match(/<tr>([^<]+)/);
+    const moduleName = firstTrMatch ? firstTrMatch[1].trim() : '';
+    
+    if (!moduleName) continue;
+    
+    // Split by <tr> to get rows
+    const rows = moduleString.split('<tr>').filter(r => r.trim() !== '');
+    
+    const moduleAssignments: string[] = [];
+    
+    for (let j = 1; j < rows.length; j++) { // Skip first row (module name)
+      const row = rows[j];
+      
+      // Skip Group Totals row
+      if (row.includes('Group Totals')) continue;
+      
+      // Extract assignment name from <td><div><span>Assignment Name</span>
+      const spanMatch = row.match(/<td><div><span>([^<]+)<\/span><\/div>/);
+      if (spanMatch) {
+        moduleAssignments.push(spanMatch[1].trim());
+      }
+    }
+    
+    modules.push({
+      title: moduleName,
+      assignments: moduleAssignments.map(title => ({
+        title,
+        scores: {}
+      }))
+    });
+    
+    allAssignments.push(...moduleAssignments);
+  }
+  
+  return { modules, assignments: allAssignments };
 }
 
 export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
@@ -153,22 +227,27 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
       
       // Parse external tools - strip attributes and keep only table, tr, td, span, div
       const cleanedHtml = parseExternalTools(externalToolsHtml);
-      const cleanedFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_react.txt`);
+      const cleanedFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_cleaned.txt`);
       fs.writeFileSync(cleanedFilePath, cleanedHtml, 'utf8');
       console.log(`Cleaned external tools saved to: ${cleanedFilePath}`);
       
       // Parse outcomes from cleaned HTML
-      const { outcomes, assignmentData } = parseOutcomesFromCleaned(cleanedHtml, courseID, docsDir);
+      const outcomes = parseOutcomesFromCleaned(cleanedHtml);
       console.log(`Found ${outcomes.length} outcomes`);
       
-      // TODO: Parse assignmentData for assignments and modules
+      // Parse modules and assignments from cleaned HTML
+      const { modules, assignments: allAssignments } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID, docsDir);
+      console.log(`Found ${modules.length} modules`);
       
       // Build result object
       const courseResult = {
         courseId: courseID.toString(),
         outcomes: outcomes,
-        modules: [{ name: "All", assignments: [] }],
-        assignments: []
+        modules: modules.map(m => ({
+          name: m.title,
+          assignments: m.assignments.map(a => a.title)
+        })),
+        assignments: allAssignments
       };
       
       results.push(courseResult);
