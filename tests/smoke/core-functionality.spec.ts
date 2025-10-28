@@ -133,8 +133,7 @@ test.describe('Smoke Tests - Core Functionality', () => {
                       pointsPossible: 100,
                       meta: { checkpointStatus: 'Graded', assignmentType: 'Pointed' }
                     }
-                  },
-                  orphanSubmissions: {}
+                  }
                 }
               }
             }
@@ -214,8 +213,7 @@ test.describe('Smoke Tests - Core Functionality', () => {
                   courseId: 'course-101',
                   canvas: { name: 'Algebra I' },
                   meta: { shortName: 'Algebra I', teacher: 'Ms. Johnson', period: 1 },
-                  assignments: {},
-                  orphanSubmissions: {}
+                  assignments: {}
                 }
               }
             }

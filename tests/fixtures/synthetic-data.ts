@@ -52,8 +52,7 @@ export function generateSyntheticStudentData(): StudentData {
       teacher: 'Test Teacher',
       period: 1
     },
-    assignments,
-    orphanSubmissions: {}
+    assignments
   };
 
   const student: Student = {
@@ -119,8 +118,7 @@ export function generateVectorOnlyCourseData(): StudentData {
       teacher: 'Vector Teacher',
       period: 2
     },
-    assignments,
-    orphanSubmissions: {}
+    assignments
   };
 
   const student: Student = {
@@ -194,8 +192,7 @@ export function generateAllStatusesData(): StudentData {
       teacher: 'Status Teacher',
       period: 3
     },
-    assignments,
-    orphanSubmissions: {}
+    assignments
   };
 
   const student: Student = {

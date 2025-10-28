@@ -23,6 +23,7 @@ export interface StudentNode {
   meta: {
     legalName?: string;
     preferredName?: string;
+    parseType?: string;
   };
   courses: Record<string, CourseNode>;
 }
@@ -36,7 +37,6 @@ export interface CourseNode {
     period?: string;
   };
   assignments: Record<string, AssignmentNode>;
-  orphanSubmissions: Record<string, SubmissionNode>;
 }
 
 export interface AssignmentMetadata {
@@ -220,7 +220,8 @@ export function buildStudentData(input: BuilderInput): StudentData {
         studentId: studentId,
         meta: {
           legalName: studentName,
-          preferredName: (metadata?.students?.[studentId] as { preferredName?: string })?.preferredName || studentName
+          preferredName: (metadata?.students?.[studentId] as { preferredName?: string })?.preferredName || studentName,
+          parseType: (metadata?.students?.[studentId] as { parseType?: string })?.parseType
         },
         courses: {}
       };
@@ -236,8 +237,7 @@ export function buildStudentData(input: BuilderInput): StudentData {
         teacher: (metadata?.courses?.[courseId] as { teacher?: string })?.teacher || 'Unknown',
         period: (metadata?.courses?.[courseId] as { period?: string })?.period || 'tbd'
       },
-      assignments: {},
-      orphanSubmissions: {}
+      assignments: {}
     };
     
     // Add assignments for this course

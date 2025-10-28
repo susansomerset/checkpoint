@@ -90,7 +90,6 @@ export const CourseSchema = z.object({
   canvas: z.record(z.string(), z.any()),
   meta: CourseMetaSchema,
   assignments: z.record(z.string(), AssignmentSchema),
-  orphanSubmissions: z.record(z.string(), SubmissionSchema),
 })
 export type Course = z.infer<typeof CourseSchema>
 
@@ -98,6 +97,7 @@ export type Course = z.infer<typeof CourseSchema>
 export const StudentMetaSchema = z.object({
   legalName: z.string().optional(),
   preferredName: z.string().optional(),
+  parseType: z.string().optional(),
 })
 export type StudentMeta = z.infer<typeof StudentMetaSchema>
 

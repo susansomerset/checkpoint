@@ -137,8 +137,7 @@ export const getMockStudentData = (): StudentData => ({
                 assignmentType: 'Vector',
               },
             },
-          },
-          orphanSubmissions: {},
+          }
         },
         'course2': {
           courseId: 'course2',
@@ -185,8 +184,7 @@ export const getMockStudentData = (): StudentData => ({
                 assignmentType: 'Pointed',
               },
             },
-          },
-          orphanSubmissions: {},
+          }
         },
       },
     },
@@ -289,8 +287,7 @@ export const getEdgeCaseTestData = (): StudentData => {
               assignmentType: 'Pointed' as const,
             },
           },
-        },
-        orphanSubmissions: {},
+        }
       },
     },
   }

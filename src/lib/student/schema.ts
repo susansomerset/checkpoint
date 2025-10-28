@@ -57,13 +57,13 @@ export const CourseNodeSchema = z.object({
   canvas: z.record(z.string(), z.any()),
   meta: CourseMetaSchema,
   assignments: z.record(z.string(), AssignmentNodeSchema),
-  orphanSubmissions: z.record(z.string(), SubmissionNodeSchema),
 });
 export type CourseNode = z.infer<typeof CourseNodeSchema>;
 
 export const StudentMetaSchema = z.object({
   legalName: z.string().optional(),
   preferredName: z.string().optional(),
+  parseType: z.string().optional(),
 });
 export type StudentMeta = z.infer<typeof StudentMetaSchema>;
 

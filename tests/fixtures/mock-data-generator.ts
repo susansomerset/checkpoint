@@ -88,8 +88,7 @@ export function generateMockStudentData(): StudentData {
                   assignmentType: 'Pointed'
                 }
               }
-            },
-            orphanSubmissions: {}
+            }
           },
           'course-102': {
             courseId: 'course-102',
@@ -141,8 +140,7 @@ export function generateMockStudentData(): StudentData {
                   assignmentType: 'Pointed'
                 }
               }
-            },
-            orphanSubmissions: {}
+            }
           }
         }
       },
@@ -203,8 +201,7 @@ export function generateMockStudentData(): StudentData {
                   assignmentType: 'Pointed'
                 }
               }
-            },
-            orphanSubmissions: {}
+            }
           }
         }
       }

@@ -85,7 +85,6 @@ const mockStudentData: StudentDataResponse = {
               },
             },
           },
-          orphanSubmissions: {},
         },
         'course2': {
           courseId: 'course2',
@@ -134,7 +133,6 @@ const mockStudentData: StudentDataResponse = {
               },
             },
           },
-          orphanSubmissions: {},
         },
       },
     },
