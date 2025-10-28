@@ -9,8 +9,8 @@ export interface ModuleItem {
 
 export interface Assignment {
   title: string;
-  dueDate?: string;
-  scores: { [outcomeKey: string]: string }; // outcomeKey -> score (e.g., "5/5" or "•")
+  dueDate: string;
+  scores: Array<{ Key: string; Earned: string; Possible: string }>;
 }
 
 export interface Outcome {
@@ -174,7 +174,11 @@ function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number
     // Split by <tr> to get rows
     const rows = moduleString.split('<tr>').filter(r => r.trim() !== '');
     
-    const moduleAssignments: string[] = [];
+    const moduleAssignments: Assignment[] = [];
+    
+    // Extract outcome keys from first row
+    const outcomeKeysMatch = moduleString.match(/(CB|CT|CL|LM|OC|Pr|WC)/g);
+    const outcomeKeys = outcomeKeysMatch || [];
     
     for (let j = 1; j < rows.length; j++) { // Skip first row (module name)
       const row = rows[j];
@@ -182,22 +186,69 @@ function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number
       // Skip Group Totals row
       if (row.includes('Group Totals')) continue;
       
-      // Extract assignment name from <td><div><span>Assignment Name</span>
-      const spanMatch = row.match(/<td><div><span>([^<]+)<\/span><\/div>/);
-      if (spanMatch) {
-        moduleAssignments.push(spanMatch[1].trim());
+      // Split row by <td> to get cells
+      const cells = row.split('<td>').filter(c => c.trim() !== '');
+      if (cells.length < 8) continue; // Need at least 8 cells (name/due + 7 outcomes)
+      
+      // First cell contains assignment name and due date
+      const firstCell = cells[0];
+      
+      // Extract assignment name
+      const nameMatch = firstCell.match(/<div><span>([^<]+)<\/span><\/div>/);
+      const assignmentName = nameMatch ? nameMatch[1].trim() : '';
+      
+      // Extract due date
+      const dueMatch = firstCell.match(/<div><span>Due<\/span> (.+? pm|.+? am)<\/span><\/div>/);
+      let dueDate = '';
+      if (dueMatch) {
+        const dateStr = dueMatch[1];
+        // Parse date like "Oct 6, 2025 at 11:59 pm"
+        const dateObj = new Date(dateStr);
+        if (!isNaN(dateObj.getTime())) {
+          // Format as MM/DD/YYYY HH:MM
+          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+          const day = String(dateObj.getDate()).padStart(2, '0');
+          const year = dateObj.getFullYear();
+          const hours = String(dateObj.getHours()).padStart(2, '0');
+          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+          dueDate = `${month}/${day}/${year} ${hours}:${minutes}`;
+        }
+      }
+      
+      // Parse outcome scores from cells 1-7
+      const outcomes: Array<{ Key: string; Earned: string; Possible: string }> = [];
+      for (let k = 1; k < cells.length && k <= outcomeKeys.length; k++) {
+        const cell = cells[k];
+        // Parse scores like <span>5</span><span>/5</span> or <span>•</span>
+        const scoreMatch = cell.match(/<span>(\d*)<\/span><span>\/(\d*)<\/span>/);
+        if (scoreMatch) {
+          const earned = scoreMatch[1] || '0';
+          const possible = scoreMatch[2] || '0';
+          if (earned !== '0' || possible !== '0') {
+            outcomes.push({
+              Key: outcomeKeys[k - 1],
+              Earned: earned,
+              Possible: possible
+            });
+          }
+        }
+      }
+      
+      if (assignmentName) {
+        moduleAssignments.push({
+          title: assignmentName,
+          dueDate,
+          scores: outcomes
+        });
       }
     }
     
     modules.push({
       title: moduleName,
-      assignments: moduleAssignments.map(title => ({
-        title,
-        scores: {}
-      }))
+      assignments: moduleAssignments
     });
     
-    allAssignments.push(...moduleAssignments);
+    moduleAssignments.forEach(a => allAssignments.push(a.title));
   }
   
   return { modules, assignments: allAssignments };
@@ -239,6 +290,13 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
       const { modules, assignments: allAssignments } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID, docsDir);
       console.log(`Found ${modules.length} modules`);
       
+      // Collect all assignments with their outcome scores
+      const allAssignmentObjects = modules.flatMap(m => m.assignments.map(a => ({
+        Name: a.title,
+        Due: a.dueDate,
+        Outcomes: a.scores
+      })));
+      
       // Build result object
       const courseResult = {
         courseId: courseID.toString(),
@@ -247,7 +305,7 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
           name: m.title,
           assignments: m.assignments.map(a => a.title)
         })),
-        assignments: allAssignments
+        assignments: allAssignmentObjects
       };
       
       results.push(courseResult);

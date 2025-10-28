@@ -89,18 +89,18 @@
     {
       "name": "Lit: Is It Alive?",
       "assignments": [
-        "Supply Check",
-        "Email to the Teacher",
-        "Group Contract",
-        "Storytelling In Science Discussion",
-        "Storytelling In Science Annotations",
-        "Vocabulary -- Week 2",
-        "Poe Posters",
-        "Elements of Storytelling and Narrative",
-        "Vocabulary -- Week 3",
-        "Daedalus and Icarus Quiz",
-        "Vocabulary -- Week 4",
         "CommonLit Pre-Assessment",
+        "Vocabulary -- Week 4",
+        "Daedalus and Icarus Quiz",
+        "Vocabulary -- Week 3",
+        "Elements of Storytelling and Narrative",
+        "Poe Posters",
+        "Vocabulary -- Week 2",
+        "Storytelling In Science Annotations",
+        "Storytelling In Science Discussion",
+        "Group Contract",
+        "Email to the Teacher",
+        "Supply Check",
         "Vocabulary Quiz"
       ]
     },
@@ -129,7 +129,7 @@
         "Project Launch Annotations",
         "Cell City Vocabulary -- Week 2",
         "Annotated Bibliography",
-        "Outline",
+        "Research Paper -- Outline",
         "Research Paper -- Rough Draft",
         "Research Paper -- Peer Review Draft"
       ]
@@ -208,55 +208,875 @@
     }
   ],
   "assignments": [
-    "Summer Reflection",
-    "Scientific Methods Quiz",
-    "Intro to Microscopes",
-    "DYOE #1",
-    "DYOE #4",
-    "DYOE #2",
-    "DYOE #3",
-    "Hypothesis Creation Worksheet",
-    "GAK Lab Mini-Presentation",
-    "Independent vs Dependent Variables",
-    "Final Report Requirements",
-    "Peer Hypothesis Critique",
-    "Qualitative vs Quantitative Data",
-    "Scientific Methods Review Sheet",
-    "Team Contract",
-    "Self Evaluation",
-    "Supply List",
-    "Supply Check",
-    "Email to the Teacher",
-    "Group Contract",
-    "Storytelling In Science Discussion",
-    "Storytelling In Science Annotations",
-    "Vocabulary -- Week 2",
-    "Poe Posters",
-    "Elements of Storytelling and Narrative",
-    "Vocabulary -- Week 3",
-    "Daedalus and Icarus Quiz",
-    "Vocabulary -- Week 4",
-    "CommonLit Pre-Assessment",
-    "Vocabulary Quiz",
-    "Cell Quiz Version A",
-    "Prokaryotic vs Eukaryotic and Cell Theory",
-    "It's Alive Notesheet",
-    "Cell Theory Lecture Notes",
-    "Prokaryote Lecture Notes",
-    "Cell Organelle Analogy",
-    "Cell Scientist Review Sheet",
-    "Cell Organelle Analogy Peer Edit",
-    "Cheek Cell Pre-Lab",
-    "Cheek Cell Lab",
-    "Onion Cell Pre-Lab",
-    "Team Contract Cell City BioLit",
-    "Osmosis vs diffusion reinforcement",
-    "Cell City Vocabulary -- Week 1",
-    "Project Launch Annotations",
-    "Cell City Vocabulary -- Week 2",
-    "Annotated Bibliography",
-    "Outline",
-    "Research Paper -- Rough Draft",
-    "Research Paper -- Peer Review Draft"
+    {
+      "Name": "Summer Reflection",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Scientific Methods Quiz",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "13",
+          "Possible": "13"
+        }
+      ]
+    },
+    {
+      "Name": "Intro to Microscopes",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "4",
+          "Possible": "4"
+        }
+      ]
+    },
+    {
+      "Name": "DYOE #1",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "CL",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "DYOE #4",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "CL",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "DYOE #2",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "DYOE #3",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Hypothesis Creation Worksheet",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "GAK Lab Mini-Presentation",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Independent vs Dependent Variables",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Final Report Requirements",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "CL",
+          "Earned": "20",
+          "Possible": "20"
+        },
+        {
+          "Key": "OC",
+          "Earned": "20",
+          "Possible": "20"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "WC",
+          "Earned": "20",
+          "Possible": "20"
+        }
+      ]
+    },
+    {
+      "Name": "Peer Hypothesis Critique",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Qualitative vs Quantitative Data",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Scientific Methods Review Sheet",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "4",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "4",
+          "Possible": "5"
+        },
+        {
+          "Key": "LM",
+          "Earned": "4",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Team Contract",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Self Evaluation",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "LM",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Supply List",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "CommonLit Pre-Assessment",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "LM",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Vocabulary -- Week 4",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Daedalus and Icarus Quiz",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "0",
+          "Possible": "10"
+        },
+        {
+          "Key": "CL",
+          "Earned": "0",
+          "Possible": "10"
+        },
+        {
+          "Key": "LM",
+          "Earned": "0",
+          "Possible": "10"
+        },
+        {
+          "Key": "WC",
+          "Earned": "0",
+          "Possible": "10"
+        }
+      ]
+    },
+    {
+      "Name": "Vocabulary -- Week 3",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Elements of Storytelling and Narrative",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "6",
+          "Possible": "15"
+        },
+        {
+          "Key": "CL",
+          "Earned": "6",
+          "Possible": "15"
+        }
+      ]
+    },
+    {
+      "Name": "Poe Posters",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CT",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Vocabulary -- Week 2",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "3",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Storytelling In Science Annotations",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "LM",
+          "Earned": "2",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Storytelling In Science Discussion",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Group Contract",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Email to the Teacher",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Supply Check",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Vocabulary Quiz",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "LM",
+          "Earned": "0",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "0",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell Quiz Version A",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "0",
+          "Possible": "25"
+        }
+      ]
+    },
+    {
+      "Name": "Prokaryotic vs Eukaryotic and Cell Theory",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "23",
+          "Possible": "25"
+        }
+      ]
+    },
+    {
+      "Name": "It's Alive Notesheet",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell Theory Lecture Notes",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Prokaryote Lecture Notes",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell Organelle Analogy",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "CL",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell Scientist Review Sheet",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "4",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell Organelle Analogy Peer Edit",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "4",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cheek Cell Pre-Lab",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "CL",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cheek Cell Lab",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Onion Cell Pre-Lab",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "0",
+          "Possible": "5"
+        },
+        {
+          "Key": "LM",
+          "Earned": "0",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "0",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Team Contract Cell City BioLit",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CB",
+          "Earned": "10",
+          "Possible": "10"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Osmosis vs diffusion reinforcement",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CT",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "LM",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell City Vocabulary -- Week 1",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Project Launch Annotations",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "LM",
+          "Earned": "2",
+          "Possible": "5"
+        },
+        {
+          "Key": "Pr",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Cell City Vocabulary -- Week 2",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "Pr",
+          "Earned": "5",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Annotated Bibliography",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "2",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Research Paper -- Outline",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "2",
+          "Possible": "5"
+        },
+        {
+          "Key": "LM",
+          "Earned": "2",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Research Paper -- Rough Draft",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "CL",
+          "Earned": "0",
+          "Possible": "5"
+        },
+        {
+          "Key": "LM",
+          "Earned": "0",
+          "Possible": "5"
+        }
+      ]
+    },
+    {
+      "Name": "Research Paper -- Peer Review Draft",
+      "Due": "",
+      "Outcomes": [
+        {
+          "Key": "LM",
+          "Earned": "0",
+          "Possible": "5"
+        },
+        {
+          "Key": "WC",
+          "Earned": "0",
+          "Possible": "5"
+        }
+      ]
+    }
   ]
 }
