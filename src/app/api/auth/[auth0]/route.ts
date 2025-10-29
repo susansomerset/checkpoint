@@ -4,6 +4,16 @@ import { handleAuth, handleLogin, handleLogout } from '@auth0/nextjs-auth0';
 // For Vercel with custom domains, configure cookies properly
 // Ensure AUTH0_BASE_URL env var is set to your Vercel deployment URL
 // Note: prompt=login parameter in URL will be automatically passed to Auth0
+
+// Validate required environment variables before initializing handler
+const requiredEnvVars = ['AUTH0_SECRET', 'AUTH0_DOMAIN', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET'];
+const missingVars = requiredEnvVars.filter(v => !process.env[v]);
+
+if (missingVars.length > 0 && process.env.NODE_ENV === 'production') {
+  console.error('❌ Missing Auth0 environment variables:', missingVars);
+  console.error('Visit /api/auth/health to check configuration');
+}
+
 export const GET = handleAuth({
   login: handleLogin({
     returnTo: '/dashboard',
