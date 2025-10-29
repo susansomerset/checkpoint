@@ -216,6 +216,46 @@ export default function DashboardPage() {
             View Assignments
           </a>
           <button 
+            onClick={() => {
+              // Clear all cookies (including Auth0)
+              const cookies = document.cookie.split(';');
+              const domain = window.location.hostname;
+              const domainParts = domain.split('.');
+              
+              cookies.forEach(cookie => {
+                const eqPos = cookie.indexOf('=');
+                const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                if (name) {
+                  // Clear with current domain
+                  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+                  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${domain}`;
+                  
+                  // For vercel.app subdomains, try parent domain
+                  if (domain.includes('vercel.app') && domainParts.length > 2) {
+                    const parentDomain = domainParts.slice(-2).join('.');
+                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${parentDomain}`;
+                  }
+                  
+                  // Also try with just the domain as-is (for exact match)
+                  if (domainParts.length > 1) {
+                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${domain}`;
+                  }
+                }
+              });
+              
+              // Clear storage
+              sessionStorage.clear();
+              localStorage.clear();
+              
+              // Force logout and redirect back to dashboard
+              window.location.href = '/api/auth/logout?returnTo=' + encodeURIComponent('/dashboard');
+            }} 
+            style={{ color: '#dc3545', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}
+            title="Clear all cookies and storage, force re-login"
+          >
+            Clear Cookies
+          </button>
+          <button 
             onClick={() => window.location.href = '/api/auth/logout'} 
             style={{ color: '#666', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
           >

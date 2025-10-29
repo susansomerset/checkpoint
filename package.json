@@ -71,6 +71,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.3",
+    "ignore-loader": "^0.1.2",
     "node-fetch": "^3.3.2",
     "postcss": "^8.4.39",
     "size-limit": "^11.2.0",

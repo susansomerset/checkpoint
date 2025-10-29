@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, camelcase */
 import { firefox } from 'playwright';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import { parseOutcomes_dvjh } from './parser-dvjh';
 import { parseOutcomes_dvhs } from './parser-dvhs';
 
-// Load environment variables from .env.local
-dotenv.config({ path: path.join(process.cwd(), '..', '.env.local') });
+// Note: dotenv loading removed - Next.js handles env vars automatically
+// Only load dotenv if running as standalone script (not in Next.js context)
+if (typeof window === 'undefined' && !process.env.NEXT_RUNTIME) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const dotenv = require('dotenv');
+    dotenv.config({ path: path.join(process.cwd(), '..', '.env.local') });
+  } catch {
+    // dotenv not available or not needed
+  }
+}
 
 interface ScraperConfig {
   courseID: string;

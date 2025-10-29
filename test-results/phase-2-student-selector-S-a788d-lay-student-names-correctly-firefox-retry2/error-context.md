@@ -1,0 +1,103 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]:
+            - heading "Checkpoint" [level=1] [ref=e7]
+            - generic [ref=e9]:
+              - button "Johnny" [ref=e10] [cursor=pointer]
+              - button "Sarah" [ref=e11] [cursor=pointer]
+          - generic [ref=e13]:
+            - generic [ref=e14]:
+              - generic [ref=e16]: Test User
+              - link "Sign out" [ref=e17] [cursor=pointer]:
+                - /url: /api/auth/logout
+                - img [ref=e18] [cursor=pointer]
+            - generic [ref=e20]:
+              - generic [ref=e21]: 1m
+              - button "Refresh student data" [ref=e22] [cursor=pointer]:
+                - img [ref=e23] [cursor=pointer]
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - img [ref=e31]
+            - img [ref=e46]
+            - img [ref=e61]
+            - generic:
+              - img
+            - generic:
+              - generic:
+                - generic:
+                  - text: Algebra I
+                  - generic: Ms. Johnson
+          - generic [ref=e75]:
+            - img [ref=e79]
+            - img [ref=e94]
+            - img [ref=e109]
+            - generic:
+              - img
+            - generic:
+              - generic:
+                - generic:
+                  - text: English Lit
+                  - generic: Mr. Davis
+        - navigation "Tabs" [ref=e124]:
+          - link "Progress" [ref=e125] [cursor=pointer]:
+            - /url: /progress
+          - link "Assignments" [ref=e126] [cursor=pointer]:
+            - /url: /assignments
+          - link "Detail" [ref=e127] [cursor=pointer]:
+            - /url: /detail
+    - main [ref=e128]:
+      - table [ref=e132]:
+        - rowgroup [ref=e133]:
+          - row "Johnny — ⚠️:0 / ❓:0 / 👍:0 / ✅:0" [ref=e134]:
+            - cell "Johnny — ⚠️:0 / ❓:0 / 👍:0 / ✅:0" [ref=e135]
+          - row "Class Name Prior Weeks Mon (10/27) Tue (10/28) Wed (10/29) Thu (10/30) Fri (10/31) Next Week No Date" [ref=e136]:
+            - columnheader "Class Name" [ref=e137]
+            - columnheader "Prior Weeks" [ref=e138]
+            - columnheader "Mon (10/27)" [ref=e139]:
+              - text: Mon
+              - text: (10/27)
+            - columnheader "Tue (10/28)" [ref=e140]:
+              - text: Tue
+              - text: (10/28)
+            - columnheader "Wed (10/29)" [ref=e141]:
+              - text: Wed
+              - text: (10/29)
+            - columnheader "Thu (10/30)" [ref=e142]:
+              - text: Thu
+              - text: (10/30)
+            - columnheader "Fri (10/31)" [ref=e143]:
+              - text: Fri
+              - text: (10/31)
+            - columnheader "Next Week" [ref=e144]
+            - columnheader "No Date" [ref=e145]
+        - rowgroup [ref=e146]:
+          - row "Algebra I" [ref=e147]:
+            - cell "Algebra I" [ref=e148]
+            - cell [ref=e149]
+            - cell [ref=e150]
+            - cell [ref=e151]
+            - cell [ref=e152]
+            - cell [ref=e153]
+            - cell [ref=e154]
+            - cell [ref=e155]
+            - cell [ref=e156]
+          - row "English Lit" [ref=e157]:
+            - cell "English Lit" [ref=e158]
+            - cell [ref=e159]
+            - cell [ref=e160]
+            - cell [ref=e161]
+            - cell [ref=e162]
+            - cell [ref=e163]
+            - cell [ref=e164]
+            - cell [ref=e165]
+            - cell [ref=e166]
+  - button "Open Next.js Dev Tools" [ref=e172] [cursor=pointer]:
+    - img [ref=e173] [cursor=pointer]
+  - alert [ref=e177]
+```
