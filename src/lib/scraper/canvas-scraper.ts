@@ -1,3 +1,4 @@
+/* eslint-disable no-console, no-restricted-syntax, @typescript-eslint/no-require-imports */
 /**
  * Main Canvas scraper entry point
  * 
@@ -5,7 +6,7 @@
  *   npm run scrape:canvas
  */
 import { getAuthenticatedContext, clearAuthState } from './auth';
-import { scrapeExternalToolPage, capturePageScreenshot } from './parsers';
+import { scrapeExternalToolPage } from './parsers';
 import { ScraperConfig, ScrapeResult } from './types';
 import * as dotenv from 'dotenv';
 import * as path from 'path';

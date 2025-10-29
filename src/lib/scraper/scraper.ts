@@ -1,5 +1,5 @@
-import { chromium, firefox, webkit } from 'playwright';
-import * as fs from 'fs';
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console, no-restricted-syntax, camelcase */
+import { firefox } from 'playwright';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { parseOutcomes_dvjh } from './parser-dvjh';
@@ -99,10 +99,10 @@ export async function pageScrape(url: string, format: 'html' | 'react'): Promise
   
   // Wait for the content to be fully rendered
   try {
-    await page.waitForSelector('#content', { timeout: 10000 });
-  } catch (e) {
-    // Continue even if selector not found
-  }
+      await page.waitForSelector('#content', { timeout: 10000 });
+    } catch {
+      // Continue even if selector not found
+    }
   
   // Check if there's an iframe for external tool content
   const iframeHandle = await page.$('iframe.tool_launch');
@@ -125,7 +125,7 @@ export async function pageScrape(url: string, format: 'html' | 'react'): Promise
           );
         }
       }
-    } catch (e) {
+    } catch {
       // If iframe access fails, continue with main content
     }
   }
@@ -147,8 +147,8 @@ interface ScrapeOutcomesResponse {
 }
 
 export async function scrapeOutcomes(courseIDs: number[], parseType: string, shouldCloseSession: boolean = true): Promise<ScrapeOutcomesResponse> {
-  const sessionManager = SessionManager.getInstance();
-  const session = await sessionManager.getSession();
+    const sessionManager = SessionManager.getInstance();
+    await sessionManager.getSession();
   
   try {
     let data: any[] = [];

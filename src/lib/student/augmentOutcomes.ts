@@ -2,7 +2,7 @@
 // Runs scraping operations and matches data by assignment name
 
 import { scrapeOutcomes, closeScraperSession } from '@/lib/scraper/scraper';
-import { StudentData, StudentNode } from './builder';
+import { StudentData } from './builder';
 
 interface OutcomeScore {
   Key: string;
@@ -37,14 +37,6 @@ interface ScrapedCourseData {
   assignments: ScrapedAssignment[];
 }
 
-interface CourseOutcomeMeta {
-  Name: string;
-  Key: string;
-  Grade: string;
-  Earned: string;
-  Possible: string;
-  Weight: string;
-}
 
 export interface AugmentationResult {
   ok: boolean;
@@ -196,12 +188,12 @@ export async function augmentStudentDataOutcomes(
         // Build module lookup map (index by both original and normalized names)
         const moduleByAssignment: Record<string, string> = {};
         if (scraped.modules) {
-          for (const module of scraped.modules) {
-            for (const assignmentName of module.assignments) {
+          for (const scrapedModule of scraped.modules) {
+            for (const assignmentName of scrapedModule.assignments) {
               const normalizedName = normalizeAssignmentName(assignmentName);
               // Index by both original and normalized names for lookup
-              moduleByAssignment[assignmentName] = module.title;
-              moduleByAssignment[normalizedName] = module.title;
+              moduleByAssignment[assignmentName] = scrapedModule.title;
+              moduleByAssignment[normalizedName] = scrapedModule.title;
             }
           }
         }

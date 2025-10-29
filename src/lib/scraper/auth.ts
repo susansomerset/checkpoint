@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 /**
  * Canvas authentication with session persistence
  */
-import { firefox, Browser, BrowserContext, Page } from 'playwright';
+import { firefox, Browser, BrowserContext } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
 

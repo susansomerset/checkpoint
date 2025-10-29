@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { scrapeOutcomes } from './scraper';
 
 async function test(courseID: number, parseType: string) {

@@ -1,6 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console, no-restricted-syntax, camelcase */
 import { pageScrape } from './scraper';
-import * as path from 'path';
-import * as fs from 'fs';
 
 export interface ModuleItem {
   title: string;
@@ -127,7 +126,7 @@ function parseOutcomesFromCleaned(cleanedHtml: string): Outcome[] {
   return outcomes;
 }
 
-function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number): { modules: ModuleItem[]; assignments: string[] } {
+function parseModuleAssignmentsFromCleaned(cleanedHtml: string, _courseID: number): { modules: ModuleItem[]; assignments: string[] } {
   // Find where tables start
   const tableIndex = cleanedHtml.indexOf('<table>');
   
@@ -286,11 +285,11 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
       const outcomes = parseOutcomesFromCleaned(cleanedHtml);
       
       // Parse modules and assignments from cleaned HTML
-      const { modules, assignments: allAssignments } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID);
+      const { modules } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID);
       console.log(`ZXQ Found ${modules.length} modules`);
       
       // Collect all assignments with their outcome scores
-      const allAssignmentObjects = modules.flatMap(m => m.assignments.map(a => ({
+      const assignmentObjects = modules.flatMap(m => m.assignments.map(a => ({
         Name: a.title,
         Due: a.dueDate,
         Outcomes: a.scores
@@ -304,7 +303,7 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
           name: m.title,
           assignments: m.assignments.map(a => a.title)
         })),
-        assignments: allAssignmentObjects
+        assignments: assignmentObjects
       };
       
       results.push(courseResult);

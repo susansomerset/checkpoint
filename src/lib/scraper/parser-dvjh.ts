@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { pageScrape } from './scraper';
 
 export interface ModuleItem {

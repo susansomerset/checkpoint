@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console, no-restricted-syntax */
 /**
  * Parsers for extracting data from Canvas external tool pages
  */
@@ -204,7 +205,7 @@ async function extractVectorFromCard(element: any): Promise<VectorMetadata[]> {
     
     // Return all vectors found in this card
     return vectors;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -299,7 +300,7 @@ async function extractAssignmentFromRow(element: any): Promise<ScrapedAssignment
       dueDate,
       vectorScores: vectorScoresArray,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -328,7 +329,7 @@ async function extractVectorScores(element: any): Promise<Record<string, string>
         }
       }
     }
-  } catch (error) {
+  } catch {
     // Ignore errors, return empty scores
   }
 

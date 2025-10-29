@@ -21,7 +21,7 @@ export interface ResetResult {
     assignments: number;
     submissions: number;
   };
-  stats?: any;
+  stats?: Record<string, unknown>;
 }
 
 export async function performStudentDataReset(): Promise<ResetResult> {
