@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, no-console, no-restricted-syntax, camelcase */
+/* eslint-disable @typescript-eslint/no-explicit-any, camelcase */
 import { firefox } from 'playwright';
 import * as path from 'path';
 import * as dotenv from 'dotenv';

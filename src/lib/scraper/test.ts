@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-restricted-syntax, no-console */
 import { scrapeOutcomes } from './scraper';
 
 async function test(courseID: number, parseType: string) {
@@ -18,5 +18,6 @@ async function test(courseID: number, parseType: string) {
 const courseID = parseInt(process.argv[2]) || 21874;
 const parseType = process.argv[3] || "dvjh";
 
+// eslint-disable-next-line no-console
 console.log(`Running test with courseID: ${courseID}, parseType: ${parseType}`);
 test(courseID, parseType);

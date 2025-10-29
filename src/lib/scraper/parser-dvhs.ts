@@ -126,7 +126,7 @@ function parseOutcomesFromCleaned(cleanedHtml: string): Outcome[] {
   return outcomes;
 }
 
-function parseModuleAssignmentsFromCleaned(cleanedHtml: string, _courseID: number): { modules: ModuleItem[]; assignments: string[] } {
+function parseModuleAssignmentsFromCleaned(cleanedHtml: string): { modules: ModuleItem[]; assignments: string[] } {
   // Find where tables start
   const tableIndex = cleanedHtml.indexOf('<table>');
   
@@ -285,7 +285,7 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
       const outcomes = parseOutcomesFromCleaned(cleanedHtml);
       
       // Parse modules and assignments from cleaned HTML
-      const { modules } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID);
+      const { modules } = parseModuleAssignmentsFromCleaned(cleanedHtml);
       console.log(`ZXQ Found ${modules.length} modules`);
       
       // Collect all assignments with their outcome scores
