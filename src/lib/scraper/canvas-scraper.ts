@@ -1,4 +1,4 @@
-/* eslint-disable no-console, no-restricted-syntax, @typescript-eslint/no-require-imports */
+/* eslint-disable no-console, no-restricted-syntax */
 /**
  * Main Canvas scraper entry point
  * 
