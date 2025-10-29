@@ -37,6 +37,14 @@ export interface CourseNode {
     period?: string;
   };
   assignments: Record<string, AssignmentNode>;
+  courseOutcomes?: Record<string, string | {
+    outcomeName: string;
+    outcomeKey: string;
+    outcomeGrade: string;
+    outcomeEarned: string;
+    outcomePossible: string;
+    outcomeWeight: string;
+  }>;
 }
 
 export interface AssignmentMetadata {
@@ -56,6 +64,8 @@ export interface AssignmentNode {
   link: string;
   submissions: Record<string, SubmissionNode>;
   meta: AssignmentMetadata;
+  outcomeScores?: Record<string, { earned: string; possible: string }>;
+  moduleName?: string;
 }
 
 export interface SubmissionNode {

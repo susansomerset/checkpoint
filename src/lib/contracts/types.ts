@@ -63,6 +63,11 @@ export const AssignmentSchema = z.object({
   link: z.string(), // html_url
   submissions: z.record(z.string(), SubmissionSchema),
   meta: AssignmentMetaSchema,
+  outcomeScores: z.record(z.object({
+    earned: z.string(),
+    possible: z.string()
+  })).optional(),
+  moduleName: z.string().optional(),
 })
 export type Assignment = z.infer<typeof AssignmentSchema>
 
@@ -90,6 +95,17 @@ export const CourseSchema = z.object({
   canvas: z.record(z.string(), z.any()),
   meta: CourseMetaSchema,
   assignments: z.record(z.string(), AssignmentSchema),
+  courseOutcomes: z.record(z.union([
+    z.string(),
+    z.object({
+      outcomeName: z.string(),
+      outcomeKey: z.string(),
+      outcomeGrade: z.string(),
+      outcomeEarned: z.string(),
+      outcomePossible: z.string(),
+      outcomeWeight: z.string()
+    })
+  ])).optional(),
 })
 export type Course = z.infer<typeof CourseSchema>
 

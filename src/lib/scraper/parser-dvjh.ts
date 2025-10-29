@@ -157,12 +157,26 @@ interface Assignment {
 
 interface GradesParseResult {
   assignments: Assignment[];
-  outcomes: string[];
+  outcomes: Array<{
+    outcomeName: string;
+    outcomeKey: string;
+    outcomeGrade: string;
+    outcomeEarned: string;
+    outcomePossible: string;
+    outcomeWeight: string;
+  }>;
 }
 
 interface DVJHResult {
   courseId: string;
-  outcomes: string[];
+  outcomes: Array<{
+    outcomeName: string;
+    outcomeKey: string;
+    outcomeGrade: string;
+    outcomeEarned: string;
+    outcomePossible: string;
+    outcomeWeight: string;
+  }>;
   modules: ModuleItem[];
   assignments: Assignment[];
 }
@@ -280,17 +294,32 @@ function parseGradesFromHtml(htmlContent: string): GradesParseResult {
     }
   }
   
-  // Parse outcomes from data-assignment-id="group-*" patterns
-  const outcomes: string[] = [];
-  const outcomeRegex = /data-assignment-id="group-([^"]*)"[^>]*data-assignment-name="([^"]*)"/g;
-  let outcomeMatch;
+  // Aggregate outcome scores from assignments to build course-level outcome metadata
+  // Track totals for each outcome (Key is the outcome abbreviation like "Written Communication")
+  const outcomeTotals: Record<string, { earned: number; possible: number; key: string }> = {};
   
-  while ((outcomeMatch = outcomeRegex.exec(htmlContent)) !== null) {
-    const outcomeName = outcomeMatch[2].trim();
-    if (outcomeName) {
-      outcomes.push(outcomeName);
+  for (const assignment of assignments) {
+    if (assignment.Outcomes && assignment.Outcomes.length > 0) {
+      for (const outcome of assignment.Outcomes) {
+        const key = outcome.Key;
+        if (!outcomeTotals[key]) {
+          outcomeTotals[key] = { earned: 0, possible: 0, key };
+        }
+        outcomeTotals[key].earned += parseFloat(outcome.Earned) || 0;
+        outcomeTotals[key].possible += parseFloat(outcome.Possible) || 0;
+      }
     }
   }
+  
+  // Convert to array of outcome metadata objects
+  const outcomes = Object.entries(outcomeTotals).map(([key, totals]) => ({
+    outcomeName: key,
+    outcomeKey: key,
+    outcomeGrade: '',
+    outcomeEarned: totals.earned.toString(),
+    outcomePossible: totals.possible.toString(),
+    outcomeWeight: ''
+  }));
   
   return { assignments, outcomes };
 }

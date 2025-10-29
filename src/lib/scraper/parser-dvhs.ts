@@ -97,7 +97,7 @@ function parseOutcomesFromCleaned(cleanedHtml: string): Outcome[] {
   
   // Each outcome has 5 elements: grade, earned/possible, weight, name, key
   // So we loop through the array in chunks of 5
-  console.log(`Found ${Math.floor(parts.length / 5)} outcomes`);
+  console.log(`ZXQ Found ${Math.floor(parts.length / 5)} outcomes`);
   
   for (let i = 0; i < parts.length; i += 5) {
     if (i + 4 >= parts.length) break; // Need at least 5 elements
@@ -127,7 +127,7 @@ function parseOutcomesFromCleaned(cleanedHtml: string): Outcome[] {
   return outcomes;
 }
 
-function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number, docsDir: string): { modules: ModuleItem[]; assignments: string[] } {
+function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number): { modules: ModuleItem[]; assignments: string[] } {
   // Find where tables start
   const tableIndex = cleanedHtml.indexOf('<table>');
   
@@ -139,24 +139,24 @@ function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number
   
   const assignmentData = cleanedHtml.substring(tableIndex);
   
-  // Save the assignment table content to its own file
-  const assignmentTableFilePath = path.join(docsDir, `zxq_${courseID}_assignment_table_content.txt`);
-  fs.writeFileSync(assignmentTableFilePath, assignmentData, 'utf8');
-  console.log(`Assignment table content saved to: ${assignmentTableFilePath}`);
+  // Save the assignment table content to its own file (DEBUG ONLY - commented out for production)
+  // const assignmentTableFilePath = path.join(docsDir, `zxq_${courseID}_assignment_table_content.txt`);
+  // fs.writeFileSync(assignmentTableFilePath, assignmentData, 'utf8');
+  // console.log(`Assignment table content saved to: ${assignmentTableFilePath}`);
   
   // Split by </table> first
   const tables = assignmentData.split('</table>');
   
-  // Enumerate and write the tables
-  let enumeratedTables = '';
-  tables.forEach((table, index) => {
-    enumeratedTables += `[${index}] ${table}\n\n`;
-  });
+  // Enumerate and write the tables (DEBUG ONLY - commented out for production)
+  // let enumeratedTables = '';
+  // tables.forEach((table, index) => {
+  //   enumeratedTables += `[${index}] ${table}\n\n`;
+  // });
   
-  // Save the enumerated tables for debugging
-  const assignmentDebugFilePath = path.join(docsDir, `zxq_${courseID}_assignments_cleaned.txt`);
-  fs.writeFileSync(assignmentDebugFilePath, enumeratedTables, 'utf8');
-  console.log(`Enumerated assignment tables saved to: ${assignmentDebugFilePath}`);
+  // Save the enumerated tables for debugging (DEBUG ONLY - commented out for production)
+  // const assignmentDebugFilePath = path.join(docsDir, `zxq_${courseID}_assignments_cleaned.txt`);
+  // fs.writeFileSync(assignmentDebugFilePath, enumeratedTables, 'utf8');
+  // console.log(`Enumerated assignment tables saved to: ${assignmentDebugFilePath}`);
   
   // Parse each module from tables 0-22 (skip last one which is just closing tag)
   const modules: ModuleItem[] = [];
@@ -255,40 +255,39 @@ function parseModuleAssignmentsFromCleaned(cleanedHtml: string, courseID: number
 }
 
 export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
-  console.log(`Parsing outcomes for ${courseIDs.length} courses using dvhs method`);
+  //console.log(`Parsing outcomes for ${courseIDs.length} courses using dvhs method`);
   
   try {
     const results: any[] = [];
     
     for (const courseID of courseIDs) {
-      console.log(`Processing course ${courseID}...`);
+      console.log(`ZXQ Processing course ${courseID}...`);
       
       // Scrape external tools page - try the specific tool first (Echo Gradebook)
       const externalToolsUrl = `${process.env.CANVAS_BASE_URL}/courses/${courseID}/external_tools/493`;
       const externalToolsHtml = await pageScrape(externalToolsUrl, 'react');
       
-      // Save external tools HTML
-      const docsDir = path.join(process.cwd(), '..', 'docs');
-      if (!fs.existsSync(docsDir)) {
-        fs.mkdirSync(docsDir, { recursive: true });
-      }
-      const externalToolsFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_react.txt`);
-      fs.writeFileSync(externalToolsFilePath, externalToolsHtml, 'utf8');
-      console.log(`External tools REACT saved to: ${externalToolsFilePath}`);
+      // Save external tools HTML (DEBUG ONLY - commented out for production)
+      // const docsDir = path.join(process.cwd(), '..', 'docs');
+      // if (!fs.existsSync(docsDir)) {
+      //   fs.mkdirSync(docsDir, { recursive: true });
+      // }
+      // const externalToolsFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_react.txt`);
+      // fs.writeFileSync(externalToolsFilePath, externalToolsHtml, 'utf8');
+      // console.log(`External tools REACT saved to: ${externalToolsFilePath}`);
       
       // Parse external tools - strip attributes and keep only table, tr, td, span, div
       const cleanedHtml = parseExternalTools(externalToolsHtml);
-      const cleanedFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_cleaned.txt`);
-      fs.writeFileSync(cleanedFilePath, cleanedHtml, 'utf8');
-      console.log(`Cleaned external tools saved to: ${cleanedFilePath}`);
+      // const cleanedFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_cleaned.txt`);
+      // fs.writeFileSync(cleanedFilePath, cleanedHtml, 'utf8');
+      // console.log(`Cleaned external tools saved to: ${cleanedFilePath}`);
       
       // Parse outcomes from cleaned HTML
       const outcomes = parseOutcomesFromCleaned(cleanedHtml);
-      console.log(`Found ${outcomes.length} outcomes`);
       
       // Parse modules and assignments from cleaned HTML
-      const { modules, assignments: allAssignments } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID, docsDir);
-      console.log(`Found ${modules.length} modules`);
+      const { modules, assignments: allAssignments } = parseModuleAssignmentsFromCleaned(cleanedHtml, courseID);
+      console.log(`ZXQ Found ${modules.length} modules`);
       
       // Collect all assignments with their outcome scores
       const allAssignmentObjects = modules.flatMap(m => m.assignments.map(a => ({
@@ -310,11 +309,11 @@ export async function parseOutcomes_dvhs(courseIDs: number[]): Promise<any[]> {
       
       results.push(courseResult);
       
-      // Save parsed data
-      const modulesFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_modules.txt`);
-      const modulesJson = JSON.stringify(courseResult, null, 2);
-      fs.writeFileSync(modulesFilePath, modulesJson, 'utf8');
-      console.log(`External tools data saved to: ${modulesFilePath}`);
+      // Save parsed data (DEBUG ONLY - commented out for production)
+      // const modulesFilePath = path.join(docsDir, `zxq_${courseID}_external_tools_modules.txt`);
+      // const modulesJson = JSON.stringify(courseResult, null, 2);
+      // fs.writeFileSync(modulesFilePath, modulesJson, 'utf8');
+      // console.log(`External tools data saved to: ${modulesFilePath}`);
     }
     
     return results;

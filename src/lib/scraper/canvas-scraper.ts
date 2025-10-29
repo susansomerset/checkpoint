@@ -2,7 +2,7 @@
  * Main Canvas scraper entry point
  * 
  * Usage:
- *   npx ts-node scraper/canvas-scraper.ts
+ *   npm run scrape:canvas
  */
 import { getAuthenticatedContext, clearAuthState } from './auth';
 import { scrapeExternalToolPage, capturePageScreenshot } from './parsers';
@@ -63,8 +63,8 @@ export async function scrapeCanvas(config: ScraperConfig): Promise<ScrapeResult>
         
         if (ltiFrame) {
           const iframeHtml = await ltiFrame.content();
-          await require('fs').promises.writeFile(`scraper/debug-iframe-${courseId}.html`, iframeHtml);
-          await page.screenshot({ path: `scraper/debug-course-${courseId}.png`, fullPage: true });
+          await require('fs').promises.writeFile(`src/lib/scraper/debug-iframe-${courseId}.html`, iframeHtml);
+          await page.screenshot({ path: `src/lib/scraper/debug-course-${courseId}.png`, fullPage: true });
           console.log(`  💾 Debug files saved (iframe: ${ltiFrame.name()})`);
         } else {
           console.warn(`  ⚠️  Could not find LTI iframe. Available frames: ${frames.map(f => f.name()).join(', ')}`);
@@ -158,7 +158,7 @@ async function main() {
     canvasBaseUrl: process.env.CANVAS_BASE_URL || 'https://djusd.instructure.com',
     username: process.env.CANVAS_USERNAME!,
     password: process.env.CANVAS_PASSWORD!,
-    authStatePath: './scraper/auth-state.json',
+    authStatePath: './src/lib/scraper/auth-state.json',
     headless: process.env.HEADLESS !== 'false',
     courseIds,
   };

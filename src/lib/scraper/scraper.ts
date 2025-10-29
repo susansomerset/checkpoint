@@ -146,7 +146,7 @@ interface ScrapeOutcomesResponse {
   data: any[];
 }
 
-export async function scrapeOutcomes(courseIDs: number[], parseType: string): Promise<ScrapeOutcomesResponse> {
+export async function scrapeOutcomes(courseIDs: number[], parseType: string, shouldCloseSession: boolean = true): Promise<ScrapeOutcomesResponse> {
   const sessionManager = SessionManager.getInstance();
   const session = await sessionManager.getSession();
   
@@ -167,16 +167,28 @@ export async function scrapeOutcomes(courseIDs: number[], parseType: string): Pr
       data: data
     };
     
-    // Close the session before returning
-    await sessionManager.closeSession();
+    // Close the session if requested (default true for backward compatibility)
+    if (shouldCloseSession) {
+      await sessionManager.closeSession();
+    }
     
     return result;
     
   } catch (error) {
     console.error('Error during scraping:', error);
-    await sessionManager.closeSession();
+    if (shouldCloseSession) {
+      await sessionManager.closeSession();
+    }
     throw error;
   }
+}
+
+/**
+ * Close the scraper session (call after batch scraping is complete)
+ */
+export async function closeScraperSession(): Promise<void> {
+  const sessionManager = SessionManager.getInstance();
+  await sessionManager.closeSession();
 }
 
 export { SessionManager };

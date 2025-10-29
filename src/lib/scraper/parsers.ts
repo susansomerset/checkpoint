@@ -343,7 +343,7 @@ export async function capturePageScreenshot(
   filename: string
 ): Promise<void> {
   await page.screenshot({ 
-    path: `scraper/${filename}`,
+    path: `src/lib/scraper/${filename}`,
     fullPage: true 
   });
 }
