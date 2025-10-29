@@ -73,6 +73,7 @@ export async function scrapeCanvas(config: ScraperConfig): Promise<ScrapeResult>
         
         if (ltiFrame) {
           const iframeHtml = await ltiFrame.content();
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           await require('fs').promises.writeFile(`src/lib/scraper/debug-iframe-${courseId}.html`, iframeHtml);
           await page.screenshot({ path: `src/lib/scraper/debug-course-${courseId}.png`, fullPage: true });
           console.log(`  💾 Debug files saved (iframe: ${ltiFrame.name()})`);
