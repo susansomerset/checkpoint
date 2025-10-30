@@ -1,8 +1,7 @@
 import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
-export default withMiddlewareAuthRequired(async function middleware(req: NextRequest) {
+export default withMiddlewareAuthRequired(async function middleware() {
   // Middleware is only called for matched routes
   return NextResponse.next();
 });
