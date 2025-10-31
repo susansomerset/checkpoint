@@ -21,4 +21,14 @@ echo "Oft0hgALGYczF5q6aO9IuJcCGqVlYfaR" | vercel env add AUTH0_CLIENT_ID product
 # AUTH0_CLIENT_SECRET
 echo "V5Wnz2DRcC5xzfcVZnKEp2csA5NRi47jgj3crft9Pgis_CJ-rO8jLf6k1Ao8xdyO" | vercel env add AUTH0_CLIENT_SECRET production
 
+# AUTH0_COOKIE_DOMAIN (required - SDK doesn't allow empty domain)
+# Set to deployment domain for Vercel
+echo "checkpoint-fawn.vercel.app" | vercel env add AUTH0_COOKIE_DOMAIN production
+
+# AUTH0_COOKIE_SAME_SITE (recommended for Vercel)
+echo "Lax" | vercel env add AUTH0_COOKIE_SAME_SITE production
+
+# AUTH0_SECURE_COOKIE (required for HTTPS)
+echo "true" | vercel env add AUTH0_SECURE_COOKIE production
+
 echo "Environment variables added successfully!"
