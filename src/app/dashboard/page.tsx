@@ -244,26 +244,16 @@ export default function DashboardPage() {
               });
               
               // Clear storage
-              localStorage.clear();
               sessionStorage.clear();
+              localStorage.clear();
               
-              // Simple logout without nested returnTo to avoid CORS
-              window.location.href = '/api/auth/logout';
+              // Force logout and redirect back to dashboard
+              window.location.href = '/api/auth/logout?returnTo=' + encodeURIComponent('/dashboard');
             }} 
             style={{ color: '#dc3545', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}
-            title="Clear all cookies and storage, then logout"
+            title="Clear all cookies and storage, force re-login"
           >
             Clear Cookies
-          </button>
-          <button 
-            onClick={() => {
-              // Force re-login with prompt=login to show login screen instead of SSO
-              window.location.href = '/api/auth/login?prompt=login&returnTo=' + encodeURIComponent('/dashboard');
-            }} 
-            style={{ color: '#2563eb', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}
-            title="Force login prompt (shows login screen instead of auto-login)"
-          >
-            Force Re-Login
           </button>
           <button 
             onClick={() => window.location.href = '/api/auth/logout'} 

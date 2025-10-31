@@ -1,4 +1,4 @@
-/* eslint-disable no-console, no-restricted-syntax */
+/* eslint-disable no-console, no-restricted-syntax, @typescript-eslint/no-require-imports */
 /**
  * Main Canvas scraper entry point
  * 
@@ -14,7 +14,6 @@ import * as path from 'path';
 // Only load dotenv if running as standalone script (not in Next.js context)
 if (typeof window === 'undefined' && !process.env.NEXT_RUNTIME) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const dotenv = require('dotenv');
     // Use process.cwd() instead of __dirname (not available in ESM)
     dotenv.config({ path: path.join(process.cwd(), 'src', 'lib', 'scraper', '.env.local') });
@@ -73,7 +72,6 @@ export async function scrapeCanvas(config: ScraperConfig): Promise<ScrapeResult>
         
         if (ltiFrame) {
           const iframeHtml = await ltiFrame.content();
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
           await require('fs').promises.writeFile(`src/lib/scraper/debug-iframe-${courseId}.html`, iframeHtml);
           await page.screenshot({ path: `src/lib/scraper/debug-course-${courseId}.png`, fullPage: true });
           console.log(`  💾 Debug files saved (iframe: ${ltiFrame.name()})`);
