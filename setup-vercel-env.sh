@@ -9,8 +9,11 @@ echo "11284e113a8568224aadfe9afc3f0c14f8daef8a56ecec88fdb86788a42ec028" | vercel
 # AUTH0_DOMAIN
 echo "dev-lawlsypxo8s3bt4y.us.auth0.com" | vercel env add AUTH0_DOMAIN production
 
-# APP_BASE_URL (v4 uses APP_BASE_URL, not AUTH0_BASE_URL)
-echo "https://checkpoint-fawn.vercel.app" | vercel env add APP_BASE_URL production
+# AUTH0_ISSUER_BASE_URL (v3.8.0 uses AUTH0_ISSUER_BASE_URL, not AUTH0_DOMAIN directly)
+echo "https://dev-lawlsypxo8s3bt4y.us.auth0.com" | vercel env add AUTH0_ISSUER_BASE_URL production
+
+# AUTH0_BASE_URL (v3.8.0 uses AUTH0_BASE_URL, v4 uses APP_BASE_URL)
+echo "https://checkpoint-fawn.vercel.app" | vercel env add AUTH0_BASE_URL production
 
 # AUTH0_CLIENT_ID
 echo "Oft0hgALGYczF5q6aO9IuJcCGqVlYfaR" | vercel env add AUTH0_CLIENT_ID production
