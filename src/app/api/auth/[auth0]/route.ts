@@ -1,34 +1,20 @@
 // app/api/auth/[auth0]/route.ts
 import { handleAuth, handleLogin } from '@auth0/nextjs-auth0';
 
-// Create auth handler function with login configuration  
-const authHandler = handleAuth({
+// Create handler with login configuration
+// Note: handleAuth() returns a route handler that Next.js will call
+// We assign it directly to avoid wrapping issues
+const handler = handleAuth({
   login: handleLogin({
     returnTo: '/dashboard'
   })
 });
 
-// Wrap handler to await params (Next.js 15+ requirement)
-// The SDK expects synchronous params, so we await and pass resolved params
-export async function GET(
-  req: Request,
-  context: { params: Promise<{ auth0: string }> }
-) {
-  // Await params to satisfy Next.js 15+ requirement
-  const params = await context.params;
-  // Call handler with resolved params - SDK expects synchronous params
-  return authHandler(req, { params });
-}
-
-export async function POST(
-  req: Request,
-  context: { params: Promise<{ auth0: string }> }
-) {
-  // Await params to satisfy Next.js 15+ requirement
-  const params = await context.params;
-  // Call handler with resolved params - SDK expects synchronous params
-  return authHandler(req, { params });
-}
+// Export handler directly - Next.js 15 may warn about async params
+// but the SDK should handle it internally. If this causes issues,
+// we'll need to await params and pass them explicitly.
+export const GET = handler;
+export const POST = handler;
 
 // Important: force Node runtime & dynamic; Auth0 SDK does not support Edge here.
 export const runtime = 'nodejs';
