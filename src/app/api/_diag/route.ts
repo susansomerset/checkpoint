@@ -8,13 +8,12 @@ export async function GET() {
     'AUTH0_CLIENT_SECRET',
     'AUTH0_SECRET',
   ].reduce((acc, k) => ({ ...acc, [k]: !!process.env[k] }), {});
-  return new Response(
-    JSON.stringify({
-      runtime: 'node',
-      nodeVersion: process.versions?.node,
-      envPresent: present,
-    }),
-    { headers: { 'content-type': 'application/json' } }
-  );
+  
+  return Response.json({
+    runtime: 'node',
+    nodeVersion: process.versions?.node,
+    envPresent: present,
+    timestamp: new Date().toISOString(),
+  });
 }
 
