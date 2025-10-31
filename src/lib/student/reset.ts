@@ -146,21 +146,38 @@ export async function performStudentDataReset(): Promise<ResetResult> {
     console.info(`ZXQ reset.build.L1-L4: ${b1EndTime - buildStartTime}ms`);
     
     // Phase A - Augment with outcome data
-    const augmentStartTime = Date.now();
-    const augmentationResult = await augmentStudentDataOutcomes(studentData);
+    // Skip scraping in serverless environments (Playwright browsers not available)
+    const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === 'production';
+    let augmentationResult;
     
-    if (!augmentationResult.ok) {
-      console.error(`ZXQ reset.augment.failure`);
-      return {
-        ok: false,
-        step: 'augment',
-        errors: augmentationResult.errors,
-        stats: augmentationResult.stats
+    if (isServerless) {
+      console.info('ZXQ reset.augment.skipped: Playwright not available in serverless environment');
+      augmentationResult = {
+        ok: true,
+        errors: [],
+        stats: {
+          studentsProcessed: 0,
+          parseTypeGroups: {},
+          coursesScraped: 0,
+          assignmentsAugmented: 0,
+          assignmentsUnmatched: 0,
+          coursesWithOutcomes: 0,
+          duration: 0
+        }
       };
+    } else {
+      const augmentStartTime = Date.now();
+      augmentationResult = await augmentStudentDataOutcomes(studentData);
+      
+      if (!augmentationResult.ok) {
+        console.error(`ZXQ reset.augment.failure`);
+        // Don't fail the entire reset if scraping fails - just log and continue
+        console.warn('ZXQ reset.augment.warning: Scraping failed but continuing with basic data');
+      }
+      
+      const augmentEndTime = Date.now();
+      console.info(`ZXQ reset.augment.complete: ${augmentEndTime - augmentStartTime}ms`);
     }
-    
-    const augmentEndTime = Date.now();
-    console.info(`ZXQ reset.augment.success: ${augmentEndTime - augmentStartTime}ms`);
     
     // Phase S - Atomic save
     const saveStartTime = Date.now();
